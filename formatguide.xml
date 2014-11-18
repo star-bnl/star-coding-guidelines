@@ -1,0 +1,1633 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="styleguide.xsl"?>
+<GUIDE title="STAR C++ Naming &amp; Formatting Guidelines">
+    
+    <address>
+        Authors:<br/>
+        Mustafa Mustafa <br/>
+        Thomas Ullrich <br/>
+        Anselm Vossen <br/>
+    </address>
+    
+    <CATEGORY title="Introduction">
+        <p>
+            This document is a draft of new naming &amp; formatting guidelines compiled for the STAR
+            collaboration by the above mentioned authors. This effort was initiated by the STAR
+            computing coordinator Jerome Lauret on October 31, 2014. The charge can be
+            viewed <a href="charge.txt">here</a>. The committee produced two documents, one for the
+            naming &amp; formatting guidelines  seen here, and one for C++ coding guidelines that
+            can be viewed <a href="codingguide.xml">here</a>.
+        </p>
+        
+        <p>
+            The committee based their work on the existing guidelines, expanded them for clarity, and
+            added new material where it saw fit. We have made heavy use of the Google Style guide
+            at <a href="http://google-styleguide.googlecode.com">
+                http://google-styleguide.googlecode.com</a>.
+        </p>
+        
+        <p>
+            The goal of this guide is to provide a number of rules that keep the code base manageable
+            by enforcing <em>consistency</em>.
+            
+            It is very important that any programmer
+            can look at another programmer's code and understand it quickly.
+            Maintaining a uniform style and following conventions means that "pattern-matching" can be
+            more easily used to identify different symbols and invariants.
+        </p>
+        <p>
+            Creating common, required
+            idioms and patterns makes code much easier to understand.  In some
+            cases there might be good arguments for changing certain style rules.
+            Nonetheless, for reasons of consistency the rules are left unchanged.
+        </p>
+        
+        
+    </CATEGORY>
+
+   START EDITING HERE
+   
+<OVERVIEW>
+    <CATEGORY title="Important Note">
+        <STYLEPOINT title="Displaying Hidden Details in this Guide">
+            <SUMMARY>
+                This style guide contains many details that are initially
+                hidden from view.  They are marked by the triangle icon, which you
+                see here on your left. The first level of hidden information is
+                the subsection <i>Summary</i> in each rule and the second level of hidden information is the
+                optional subsection <i>Extra details and exceptions to the rule</i>. Click the arrow on the
+                left now, you should see "Hooray" appear below.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Hooray!  Now you know you can expand points to get more
+                    details.  Alternatively, there are an "expand all summaries"
+                    and an "expand all summaries and extra details" at the
+                    top of this document.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+    </CATEGORY>
+    
+</OVERVIEW>
+
+    <CATEGORY title="Naming">
+        <p>
+            The most important consistency rules are those that govern
+            naming. The style of a name immediately informs us what sort of
+            thing the named entity is: a type, a variable, a function, a macro, etc., without requiring us to search for the
+            declaration of that entity. The pattern-matching engine in our
+            brains relies a great deal on these naming rules.
+        </p>
+        <p>
+            Naming rules are pretty arbitrary, but we feel that consistency is more important than individual preferences in this area, so regardless of whether you find them sensible or not, the rules are the rules.
+        </p>
+        
+        <STYLEPOINT title="General Naming Rules">
+            <SUMMARY>
+                Names should be meaningful; abbreviations should be avoided.
+                They follow camel case convention. Types and variables should be nouns,
+                while functions should be "command" verbs.    </SUMMARY>
+            <BODY>
+                <SUBSECTION title="How to Name">
+                    <p>
+                        Within reason, give as descriptive a name as possible. Do
+                        not worry about saving horizontal space as it is far more
+                        important to make your code immediately understandable to a
+                        new reader. Examples of well-chosen names:
+                    </p>
+                    <CODE_SNIPPET>
+                        int numberOfErrors;               // Good.
+                        int numberOfCompletedConnections; // Good.
+                    </CODE_SNIPPET>
+                    <p>
+                        Poorly chosen names use ambiguous abbreviations or arbitrary
+                        characters that do not convey meaning.
+                        Do not use directly the variable names from mathematical formulas.
+                        In mathematics, variable names are usually limited to a single letter.
+                        To implement a mathematical formula use variable names that
+                        clearly indicate what value it holds.
+                    </p>
+                    <CODE_SNIPPET>
+                        float distance = velocity * time; // Good - no ambiguity
+                    </CODE_SNIPPET>
+                    <BAD_CODE_SNIPPET>
+                        int n;           // Bad - meaningless.
+                        int nerr;        // Bad - ambiguous abbreviation.
+                        int nCompConns;  // Bad - ambiguous abbreviation.
+                        float s = v * t; // Bad - almost meaningless.
+                    </BAD_CODE_SNIPPET>
+                    <p>
+                        Type and variable names should typically be nouns: e.g.,
+                        <code>FileOpener</code>, <code>numberOfErrors</code>.
+                    </p>
+                    <p>
+                        Function names should typically be imperative (that is they
+                        should be commands): e.g., <code>openFile()</code>,
+                        <code>setNumberOfErrors()</code>.
+                    </p>
+                </SUBSECTION>
+                
+                <SUBSECTION title="CamelCase Convention">
+                    <p>
+                        All names in C++ code follow camel case convention. This is
+                        the practice of writing compound words so that each word
+                        begins with a capital letter. No underscores are allowed.
+                    </p>
+                    <p>
+                        For example:
+                    </p>
+                    <CODE_SNIPPET>
+                        string tableName;   // Good
+                    </CODE_SNIPPET>
+                    <BAD_CODE_SNIPPET>
+                        string table_name;  // Bad - uses underscore.
+                        string tablename;   // Bad - all lowercase.
+                    </BAD_CODE_SNIPPET>
+                </SUBSECTION>
+                
+                <SUBSECTION title="Capitalization Rules">
+                    <p>
+                        Variables and functions start with a lowercase letter.<br/>
+                        Everything else in C++ code (namespaces, type names, constant
+                        expressions) starts with an uppercase letter.
+                    </p>
+                </SUBSECTION>
+                
+                <SUBSECTION title="Abbreviations">
+                    <p>
+                        Do not use abbreviations except for acronyms. For example:
+                    </p>
+                    <CODE_SNIPPET>
+                        // Good. These show proper names with no abbreviations.
+                        int numberOfDnsConnections;   // Most people know what "DNS" stands for.
+                        int priceCount;               // Price count, it makes sense.
+                        int daqRate;                  // In ALICE everyone knows what DAQ stands for.
+                    </CODE_SNIPPET>
+                    <BAD_CODE_SNIPPET>
+                        // Bad. Abbreviations can be confusing or ambiguous outside a small group.
+                        int wgcConnections;  // Only your group knows what this stands for.
+                        int pcReader;        // Lots of things can be abbreviated "pc".
+                    </BAD_CODE_SNIPPET>
+                    <p>
+                        A single letter variable name can be used for well-known idioms like iterators of integer type and pimpl-idioms (d-pointer).
+                    </p>
+                    <CODE_SNIPPET>
+                        for (int i = 0 ; i &lt; 10 ; i++) { // Good.
+                        prices[i] = 0;
+                        }
+                    </CODE_SNIPPET>
+                    <BAD_CODE_SNIPPET>
+                        for (auto i = &amp;prices[0]; i &lt; &amp;prices[10]; ++i) { // Bad
+                        *i = 0;                        // i is not of integer type
+                        }
+                    </BAD_CODE_SNIPPET>
+                    <p>
+                        Never abbreviate by leaving out letters. <br/>
+                        Exception:
+                        You may use <code>it</code> for iterator names or their names prefix.
+                    </p>
+                    <CODE_SNIPPET>
+                        // Good
+                        std::vector&lt;int &gt; myVector;
+                        auto it = myVector.begin();
+                        auto itMyVector = myVector.begin();
+                        auto myVectorIterator = myVector.begin();
+                    </CODE_SNIPPET>
+                    <BAD_CODE_SNIPPET>
+                        auto myVectorIt = myVector.begin();       // Bad. It is abbreviated, but not a prefix.
+                    </BAD_CODE_SNIPPET>
+                </SUBSECTION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="File Names">
+            <p>    </p>
+            <SUMMARY>
+                C++ code file names are derived from the class (or the namespace)
+                names. <br/>
+                Program file names and utility file names, which do not define a class
+                or a namespace, start with a lower case letter.<br/>
+            </SUMMARY>
+            <BODY>
+                <p>
+                    C++ implementation files should end in <code>.cxx</code> and header files
+                    should end in <code>.h</code>.
+                </p>
+                <p>
+                    Inline functions should go directly into your
+                    <code>.h</code> file. However, if they include a lot of code, they may go into a third file that
+                    ends in <code>.inl</code>.  This rule applies to templates too.
+                </p>
+                <p>
+                    Do not use filenames that already exist
+                    in <code>/usr/include</code>, such as <code>db.h</code>.
+                </p>
+                <p>
+                    Examples of acceptable file names:
+                </p>
+                <CODE_SNIPPET>
+                    MyClass.h       // The class declaration.
+                    MyClass.cxx     // The class definition.
+                    MyClass.inl     // Inline functions that include lots of code.
+                    myUtilities.h   // Utility functions/definitions
+                    testMyClass.cxx // Test program
+                </CODE_SNIPPET>
+                
+                <p>
+                    Having upper case letters in a file name might theoretically lead to problems for case-insensitive operating systems.
+                    However, as the file name corresponds to the class name it seems important to keep the same case as well.
+                    Moreover, having two valid class/file names that would collide on a not-case sensitive OS seems extremely unlikely.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Type Names">
+            <SUMMARY>
+                Type names follow camel case convention and start with an upper case letter:
+                <code>MyClass</code>, <code>MyEnum</code>.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    The names of all types — classes, structs, typedefs, and enums
+                    — have the same naming convention. For example:
+                </p>
+                <CODE_SNIPPET>
+                    // classes and structs
+                    class UrlTable { ...
+                    class UrlTableTester { ...
+                    struct UrlTableProperties { ...
+                    
+                    // typedefs
+                    typedef HashMap&lt;UrlTableProperties *, string&gt; PropertiesMap;
+                    
+                    // enums
+                    enum UrlTableErrors { ...
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Interface Names">
+            <SUMMARY>
+                <a href="#Interfaces">Pure interfaces</a> must be suffixed with "Interface".
+            </SUMMARY>
+            <BODY>
+                <CODE_SNIPPET>
+                    // pure interface
+                    class UrlTableInterface { ...
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Variable Names">
+            <SUMMARY>
+                Variable names follow camel case convention and start with
+                a lower case letter: <code>myLocalVariable</code>.
+                <ul>
+                    <li>Class member variables are prefixed with <code>m</code>.</li>
+                    <li>Static class member variables are prefixed with <code>s</code>.</li>
+                    <li>No <code>m</code> prefix for struct members.</li>
+                    <li>Global variables are prefixed with <code>g</code>.</li>
+                    <li><code>constexpr</code> variables are capitalized.</li>
+                    <li>No additional prefix for <code>const</code>.</li>
+                </ul>
+            </SUMMARY>
+            <BODY>
+                <SUBSECTION title="Local Variable names">
+                    <p>
+                        For example:
+                    </p>
+                    <CODE_SNIPPET>
+                        string tableName;   // Good.
+                    </CODE_SNIPPET>
+                </SUBSECTION>
+                <SUBSECTION title="Class Data Members">
+                    <p>
+                        Data members (also called instance variables or member
+                        variables) are prefixed with <code>m</code>.
+                        If the data member is <code>static</code>, prefix the variable with <code>s</code> instead.
+                    </p>
+                    <CODE_SNIPPET>
+                        class Something {
+                        private:
+                        string mTableName;
+                        static int sGlobalState;
+                        };
+                    </CODE_SNIPPET>
+                </SUBSECTION>
+                
+                <SUBSECTION title="Struct Variables">
+                    <p>
+                        Data members in structs are named like regular
+                        variables.
+                    </p>
+                    <CODE_SNIPPET>
+                        struct UrlTableProperties {
+                        string name;
+                        int numberOfEntries;
+                        }
+                    </CODE_SNIPPET>
+                </SUBSECTION>
+                
+                <SUBSECTION title="Global Variables">
+                    <p>
+                        Global variables,
+                        which should be rare in any case, are prefixed with <code>g</code>.
+                    </p>
+                </SUBSECTION>
+                
+                <SUBSECTION title="constexpr">
+                    <p>
+                        A variable declared as <code>constexpr</code> typically is only used as compile-time constant (but may be stored in read-only memory).
+                        Therefore it uses the same convention as <code>enum</code>s and uses uppercase CamelCase.
+                    </p>
+                    <CODE_SNIPPET>
+                        constexpr double LightSpeed = 2.99792458e+8;
+                    </CODE_SNIPPET>
+                </SUBSECTION>
+                
+                <SUBSECTION title="const">
+                    <p>
+                        A variable declared as <code>const</code> does not have any additional naming rules.
+                        The prefixes describe the scope of the variable.
+                        <code>const</code> is just one aspect of the type of the variable.
+                    </p>
+                    <p>
+                        To provide a constant in the public interface consider <code>constexpr</code>,
+                        <code>enum</code>, or a (<code>constexpr</code>) function instead.
+                    </p>
+                </SUBSECTION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Function Names">
+            <SUMMARY>
+                Regular functions follow camel case convention and start with a lower case
+                letter: <code>myFunction()</code>.
+                
+                <ul><li>Accessors and mutators match the name of the variable and are
+                    prefixed with <code>get</code> and <code>set</code>:
+                    <code>getMyMemberVariable()</code>, <code>setMyMemberVariable()</code>.</li>
+                <li> Functions (including accessors) returning a boolean value should be prefixed with
+                    <code>is</code> or <code>has</code>. </li>
+                </ul>
+            </SUMMARY>
+            <BODY>
+                <SUBSECTION title="Regular Functions">
+                    <p>
+                        Example of functions:
+                    </p>
+                    <CODE_SNIPPET>
+                        addTableEntry();
+                        deleteUrl();
+                    </CODE_SNIPPET>
+                    <p>
+                        The rule applies also to <code>constexpr</code> functions:
+                    </p>
+                    <CODE_SNIPPET>
+                        constexpr int getFive() { return 5; }
+                    </CODE_SNIPPET>
+                </SUBSECTION>
+                
+                <SUBSECTION title="Accessors and Mutators">
+                    <p>
+                        Accessors and mutators match
+                        the name of the variable they are getting and setting and use
+                        the prefixes <code>get</code> and <code>set</code>. The prefixes
+                        <code>get</code> and <code>set</code> are not exclusive for accessors and mutators and they could
+                        be used for other functions, if applicable.
+                        This shows an excerpt of a class whose instance variable is
+                        <code>mNumberOfEntries</code>:
+                    </p>
+                    <CODE_SNIPPET>
+                        class MyClass {
+                        public:
+                        ...
+                        int getNumberOfEntries() const { return mNumberOfEntries; }
+                        void setNumberOfEntries(int numberOfEntries) { mNumberOfEntries = numEntries; }
+                        private:
+                        int mNumberOfEntries;
+                        };
+                    </CODE_SNIPPET>
+                </SUBSECTION>
+                <SUBSECTION title="Functions returning a boolean value">
+                    <p>
+                        Functions returning a boolean value should be prefixed with
+                        <code>is</code> or <code>has</code>:
+                    </p>
+                    <CODE_SNIPPET>
+                        bool isOpen();
+                        bool hasZero();
+                    </CODE_SNIPPET>
+                    <p> This rule applies also to class member functions where <code>is</code> or <code>has</code> replace <code>get</code>:
+                    </p>
+                    <CODE_SNIPPET>
+                        class MyClass {
+                        public:
+                        void setValid(bool isValid) const { mValid = isValid; }
+                        bool isValid() const { return mValid; }
+                        private:
+                        bool mValid;
+                        };
+                    </CODE_SNIPPET>
+                </SUBSECTION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Namespace Names">
+            <SUMMARY>
+                Namespace names follow camel case convention and start with an upper case
+                letter: <code>MyNamespace</code>.
+            </SUMMARY>
+            <BODY>
+                <CODE_SNIPPET>
+                    namespace MyNamespace {
+                    void MyClass::doSomething()
+                    {
+                    ...
+                    }
+                    }
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Enumerator Names">
+            <SUMMARY>
+                Enumerations and enumerators (the type and the values) follow camel case
+                convention and start with an upper case letter:
+                <code> MyEnumType</code>, <code>MyEnumValue</code>.
+                <ul>
+                    <li>Enumerators in unscoped enumerations should have a common
+                        prefix/postfix derived from the enumerations name. </li>
+                    <li>Enum classes are already scoped and therefore the enumerators do not
+                        need a prefix/postfix.</li>
+                </ul>
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    A <i>scoped</i> enum is one that is declared with the <code>class</code>
+                    keyword, as opposed to a <i>traditional</i> enum, which is unscoped and
+                    doesn't include the <code>class</code> keyword in its declaration.
+                </DEFINITION>
+                <p>
+                    Unscoped enumerators are exposed to the enclosing scope.
+                    Therefore they should be prefixed or postfixed (decided by which position makes the code more prose-like)
+                    with the enumeration's name (or a sensible part thereof).
+                    All names use uppercase CamelCase.
+                </p>
+                <p>
+                    Example of an unscoped enumeration:
+                </p>
+                <CODE_SNIPPET>
+                    enum Something {
+                    SomethingSmall,   // the type name as prefix
+                    SomethingBig,
+                    SomethingElse
+                    };
+                    
+                    void add(Something);
+                    ...
+                    add(SomethingSmall);
+                    add(SomethingElse);
+                </CODE_SNIPPET>
+                <p>
+                    Another example of an unscoped enumeration whose enumerators are prefixed with just a (sensible) part
+                    of the type name.
+                </p>
+                <CODE_SNIPPET>
+                    enum MallocAlignment {
+                    AlignOnVector,    // the "Align" prefix taken from the type name
+                    AlignOnCacheline,
+                    AlignOnPage
+                    }
+                    
+                    template&lt;MallocAlignment A&gt; void* malloc(size_t);
+                    ...
+                    void* memory = malloc&lt;AlignOnCacheline&gt;(64);
+                </CODE_SNIPPET>
+                <p>
+                    Enum classes (new in C++11) create scoped enumerators.
+                    Therefore there is no need for prefixing or postfixing.
+                </p>
+                <CODE_SNIPPET>
+                    enum class Something : int {
+                    Small,
+                    Big,
+                    Unknown
+                    };
+                    
+                    void add(Something);
+                    ...
+                    add(Something::Small);
+                    add(Something::Unknown);
+                </CODE_SNIPPET>
+                
+                The following enum is forbidden unless it is enclosed in a private namespace.
+                The names <code>Ok</code> and <code>OutOfMemory</code> are too generic to be added to the global namespace.
+                <BAD_CODE_SNIPPET>
+                    enum UrlTableErrors {
+                    Ok,                 // Bad.
+                    OutOfMemory         // Bad.
+                    };
+                </BAD_CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Macro Names">
+            <SUMMARY>
+                All uppercase letters and underscores, prefixed with the sub/project name, i.e. <code>MY_PROJECT_PKG1_MY_MACRO</code>.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    For the rules on Macro usage see <a href="#Preprocessor_Macros">here</a>.
+                </p>
+                <p>
+                    They must be named with all uppercase letters and underscores, prefixed with the
+                    sub/project name.
+                </p>
+                <CODE_SNIPPET>
+                    #define O2_VERTEX_ROUND(x) ...
+                    #define O2_CORE_PI_ROUNDED 3.0
+                </CODE_SNIPPET>
+                Be sure to never put an underscore as prefix nor use a double underscore.
+                First it doesn't follow our naming convention.
+                Second, and more importantly, it is reserved to compiler developers.
+                <BAD_CODE_SNIPPET>
+                    #define _WRONG
+                    #define WRONG__AGAIN
+                </BAD_CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+    </CATEGORY>
+    
+    <CATEGORY title="Formatting">
+        <p>
+            Coding style and formatting are pretty arbitrary. However, a good project
+            is much easier to follow if everyone uses the same style. Individuals
+            may not agree with every aspect of the formatting rules, and some of
+            the rules may be hard to get used to. Even so, it is important that all
+            
+            project contributors
+            follow the style rules so that
+            
+            they
+            can all read and understand everyone's code easily.
+        </p>
+        
+        <STYLEPOINT title="Line Length">
+            <SUMMARY>
+                Each line of text in your code should be at most 100 characters
+                long.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Try keeping lines below 100 characters.
+                    In some cases it may make sense to use much longer lines (e.g. for block editing).
+                    But this should be confined to special sections in the code.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="One Statement Per Line">
+            <SUMMARY>
+                Prefer one statement per line because it improves code readability.
+            </SUMMARY>
+            <BODY>
+                <CODE_SNIPPET>
+                    // Good. One statement per line.
+                    if (condition) {
+                    doSomething();
+                    }
+                    else {
+                    doAnotherThing;
+                    }
+                </CODE_SNIPPET>
+                <BAD_CODE_SNIPPET>
+                    // Bad. Two statements per line.
+                    if (condition) doSomething(); else doAnotherThing;
+                </BAD_CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Spaces vs. Tabs">
+            <SUMMARY>
+                Indent with 2 spaces. Use only spaces, no tabs.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Spaces are used for indentation. Do not use tabs in your code.
+                    You should set your editor to emit spaces when you hit the tab
+                    key.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Function Declarations and Definitions">
+            <SUMMARY>
+                A function declaration is on one line if possible. Otherwise the parameters that do not
+                fit are on the next line(s).
+            </SUMMARY>
+            <BODY>
+                <p>
+                    The return type, function name and open parenthesis are always on the same line.
+                    The open curly brace is at the beginning of the new line after the last parameter
+                    except for inline functions.
+                </p>
+                <p>
+                    Example:
+                </p>
+                <CODE_SNIPPET>
+                    ReturnType ClassName::functionName(Type parName1, Type parName2)
+                    {
+                    doSomething();
+                    ...
+                    }
+                </CODE_SNIPPET>
+                <p>
+                    Example of an inline function on one line:
+                </p>
+                <CODE_SNIPPET>
+                    inline int getValue() const { return mValue; }
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Pointer and Reference Expressions">
+            <SUMMARY>
+                No spaces around period or arrow. Pointer operators are either followed
+                or preceded with a space.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    The following are examples of correctly formatted pointer and
+                    reference expressions:
+                </p>
+                <CODE_SNIPPET>
+                    int value = *valuePointer;
+                    int* valuePointer = &amp;value;
+                    int value = myObject-&gt;getValue();
+                    int value = myStruct.value;
+                </CODE_SNIPPET>
+                <p>
+                    When declaring a pointer or reference there are two widely used and equivalent methods: one, usually preferred in the C++ community, and another,
+                    introduced by Kerningham and Ritchie (the founders of C).
+                </p>
+                <CODE_SNIPPET>
+                    // Good.
+                    
+                    // Pointers
+                    char* myCharacter;  // typical C++ notation
+                    char *myCharacter;  // Kerningham &amp; Ritchie's  notation
+                    
+                    // References
+                    const string&amp; myString;
+                    const string &amp;myString;
+                </CODE_SNIPPET>
+                <BAD_CODE_SNIPPET>
+                    char * myCharacter;       // Bad - spaces on both sides of *
+                    const string &amp; myString;  // Bad - spaces on both sides of &amp;
+                </BAD_CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Boolean Expressions">
+            <SUMMARY>
+                In the case of a boolean expression that is longer than the <a href="#Line_Length">standard line length</a>, lines should be broken up in a consistent way. All operators should be either at the beginning or at the end of the line.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    In this example, the logical AND operator is always at the end
+                    of the lines:
+                </p>
+                <CODE_SNIPPET>
+                    if (thisOneThing &gt; thisOtherThing &amp;&amp;
+                    aThirdThing == aFourthThing &amp;&amp;
+                    yetAnother &amp;&amp; lastOne) {
+                    ...
+                    }
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        
+        <STYLEPOINT title="Variable and Array Initialization">
+            <SUMMARY>
+                Prefer initialization with braces except for single-argument assignment.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Example of single-argument assignments:
+                </p>
+                <CODE_SNIPPET>
+                    int x = 3;                           // preferred style
+                    std::string name = "Some Name";
+                    
+                    int x { 3 };                         // also possible
+                    std::string name{ "Some Name" };
+                    std::string name = { "Some Name" };
+                </CODE_SNIPPET>
+                
+                <p>
+                    Using <code>{}</code> for initialization is more consistent, more correct, and avoids
+                    having to know about old-style pitfalls [1].
+                </p>
+                <p>
+                    Example of variable initialization:
+                </p>
+                <CODE_SNIPPET>
+                    Rectangle window{ 0, 0, 1024, 768 };    // preferred style
+                    Rectangle window = { 0, 0, 1024, 768 }; // also possible
+                    Rectangle window(0, 0, 1024, 768);      // avoid unless necessary
+                </CODE_SNIPPET>
+                <p>
+                    There is one exception: In rare cases a class may provide an <code>std::initializer_list</code> constructor and other constructors that are hidden by the        <code>std::initializer_list</code> constructor.
+                    The hidden constructor can then still be accessed with <code>()</code>.
+                </p>
+                <CODE_SNIPPET>
+                    std::vector&lt;int&gt; v( 10, 20 ); // calls vector(size_t n, const int &amp;value)
+                    std::vector&lt;int&gt; v{ 10, 20 }; // calls vector(std::initializer_list&lt;int&gt; values)
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Preprocessor Directives">
+            <SUMMARY>
+                The hash mark that starts a preprocessor directive is
+                always at the beginning of the line.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Even when preprocessor directives are within the body of
+                    indented code, the directives should start at the beginning of
+                    the line.
+                </p>
+                <CODE_SNIPPET>
+                    // Good - directives at beginning of line
+                    if (lopsidedScore) {
+                    #if DISASTER_PENDING
+                    dropEverything();
+                    # if NOTIFY               // Good but not required -- Spaces after #
+                    notifyClient();
+                    # endif
+                    #endif
+                    goBackToNormal();
+                    }
+                </CODE_SNIPPET>
+                <BAD_CODE_SNIPPET>
+                    // Bad - indented directives
+                    if (lopsidedScore) {
+                    #if DISASTER_PENDING  // The "#if" should be at beginning of line
+                    dropEverything();
+                    #endif                // Do not indent "#endif"
+                    goBackToNormal();
+                    }
+                </BAD_CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Classes">
+            <SUMMARY>
+                Access specifiers in a class or a struct are indented by 2 spaces.
+                The sections they delimit are themselves indented by 2 more spaces.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    The basic format for a class declaration is:
+                </p>
+                <CODE_SNIPPET>
+                    class MyClass : public BaseClass {
+                    public:         // 2 spaces indent.
+                    MyClass();    // 4 spaces indent.
+                    ~MyClass() {}
+                    
+                    void someFunction();
+                    void someFunctionThatDoesNothing() {}
+                    void setSomeValue(int value) { mSomeValue = value; }
+                    
+                    private:
+                    bool someInternalFunction(); // notice that the method is before the data members
+                    
+                    int mSomeValue;
+                    int mSomeOtherValue;
+                    };
+                </CODE_SNIPPET>
+                <p>
+                    Things to note:
+                </p>
+                <ul>
+                    <li> The base class name should be on the same line as the
+                        subclass name, subject to the 100-character limit.
+                    </li>
+                    <li> Except for the first instance, the access specifier keywords should be preceded
+                        by a blank line. This rule is optional for small classes.
+                    </li>
+                    <li> Do not leave a blank line after access specifier keywords.
+                    </li>
+                    <li> The <code>public</code> section should be first, followed by
+                        the <code>protected</code> and finally the
+                        <code>private</code> section.
+                    </li>
+                    <li> Generally, each access specifier appears only once in a class
+                        declaration. </li>
+                    <li>
+                        Within each section, the declarations should be in the following order:
+                        <ul>
+                            <li> Constructors</li>
+                            <li> Destructor</li>
+                            <li> Methods</li>
+                            <li> Data Members </li>
+                        </ul>
+                    </li>
+                </ul>
+                <EXTRA>
+                    In certain situations you might need to use a different declaration order. For example, when using <code>decltype</code> :
+                    <CODE_SNIPPET>
+                        class A {
+                        private:             // Early declaration of a private data member
+                        int x;
+                        
+                        public:
+                        decltype(x) foo(); // Needs x to be already declared
+                        
+                        private:             // the rest of the private section
+                        float y;
+                        };
+                    </CODE_SNIPPET>
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Constructor Initializer Lists">
+            <SUMMARY>
+                Constructor initializer lists should be with subsequent lines indented
+                properly. Alternatively, they can be all in a single line.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    The preferred format for initializer lists is:
+                </p>
+                <CODE_SNIPPET>
+                    MyClass::MyClass(int var)
+                    : mSomeVar(var),             // 2 space indent
+                    mSomeOtherVar(var + 1)     // lined up
+                    {
+                    ...
+                    doSomething();
+                    ...
+                    }
+                </CODE_SNIPPET>
+                <p>
+                    Another accepted format is:
+                </p>
+                <CODE_SNIPPET>
+                    // When it all fits on one line:
+                    MyClass::MyClass(int var) : mSomeVar(var), mSomeOtherVar(var + 1) {}
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Namespaces">
+            <SUMMARY>
+                The contents of namespaces are not indented.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Namespaces do not add an extra level of
+                    indentation. For example, use:
+                </p>
+                <CODE_SNIPPET>
+                    namespace {
+                    
+                    void doSomething() {  // Good.  No extra indentation within namespace.
+                    ...
+                    }
+                    
+                    } // namespace
+                </CODE_SNIPPET>
+                <p>
+                    Do not indent within a namespace:
+                </p>
+                <BAD_CODE_SNIPPET>
+                    namespace {
+                    
+                    void doSomething() { // Bad.  Indented when it should not be
+                    ...
+                    }
+                    
+                    }
+                </BAD_CODE_SNIPPET>
+                <p>
+                    When declaring nested namespaces, put each namespace on its own line.
+                </p>
+                <CODE_SNIPPET>
+                    namespace Foo {
+                    namespace Bar {
+                    ...
+                    }
+                    }
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Braces">
+            <SUMMARY>
+                As a base rule, the left curly brace is on the same line as the start of
+                the statement. In control constructs, the braces must be used even if their body
+                consists of only one statement.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    The left curly brace is on the same line as the start of the statement.
+                </p>
+                Example:
+                <CODE_SNIPPET>
+                    if (condition) { // Correct. Curly brace on the same line.
+                    }
+                    else {
+                    }
+                </CODE_SNIPPET>
+                <BAD_CODE_SNIPPET>
+                    if (condition)   // Bad. Curly brace on new line.
+                    {
+                    }
+                    else
+                    {
+                    }
+                </BAD_CODE_SNIPPET>
+                <p> </p>
+                <p>Exception: Class, struct and namespace declarations always have the opening brace on the start of a line. This applies also to functions, unless they are inlined.
+                </p>
+                Example:
+                <CODE_SNIPPET>
+                    class Debug
+                    {
+                    };
+                </CODE_SNIPPET>
+                <p>In control constructs (<code>if</code> statements, <code>for</code> loops etc.),
+                    use curly braces even when the body of the statement fits on one line:</p>
+                <CODE_SNIPPET>
+                    // Good. Curly braces even for one statement body.
+                    if (condition) {
+                    return true;
+                    }
+                    
+                    for (int i = 0; i &#60; 10; ++i) {
+                    doSomething(i);
+                    }
+                </CODE_SNIPPET>
+                <BAD_CODE_SNIPPET>
+                    // Bad. No curly braces.
+                    if (true)
+                    return true;
+                    
+                    for (int i = 0; i &#60; 10; ++i)
+                    doSomething(i);
+                </BAD_CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Horizontal Whitespace">
+            <SUMMARY> Recommended guidelines:
+                <ul>
+                    <li> One space should be used after each keyword. </li>
+                    <li> No extra spaces inside parenthesis and angle brackets (templates). </li>
+                    <li> Spaces should be used around binary operators. </li>
+                    <li> No space between a unary operator and its operand.</li>
+                    <li> Never put trailing whitespace at the end of a line.</li>
+                </ul>
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Technically there is no right or wrong for whitespace as C++ does not really care about whitespaces.
+                    But on the other hand whitespaces can make a significant difference in whether code feels foreign or easy to understand to a developer.
+                    Thus, it is important that all developers become accustomed to the same style.
+                    This makes the communication via code much easier and enjoyable for everybody involved.
+                    Using one common whitespace style throughout a project also reduces unnecessary whitespace changes and thus makes diffs easier to read.
+                </p>
+                <p>
+                    Example:
+                </p>
+                <CODE_SNIPPET>
+                    int someFunction(int parameter) // No extra spaces inside parenthesis.
+                    {
+                    bool test = parameter &gt; 4;    // Use spaces around binary operators.
+                    double value = -otherValue;   // No space between a unary operator and its operand.
+                    
+                    if (!test) {                  // Use one space after each keyword.
+                    return 1;
+                    }
+                    
+                    std::vector&lt;std::vector&lt;int&gt;&gt; someMatrix;
+                    // No extra spaces between angle brackets (templates).
+                    
+                    std::string hello = "Hello World.";
+                    std::transform(hello.begin(), hello.end(), hello.begin(), [](char c) {
+                    return c + 1;
+                    });                           // This is the common style to embed lambdas (since C++11)
+                    // in function calls.
+                    return 0;
+                    }
+                </CODE_SNIPPET>
+                <p>
+                    Sometimes there are good reasons to deviate from the rules to make the code structure more visible or align similar code in different lines.
+                    Feel free to insert/remove whitespace if it increases the readability / clarity of the code.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        
+        <STYLEPOINT title="Vertical Whitespace">
+            <SUMMARY>
+                Use only one empty line to separate code.
+            </SUMMARY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Where to put const">
+            <SUMMARY>
+                Put <code>const</code> before the type when defining a const variable.
+            </SUMMARY>
+            <BODY>
+                <p>Do
+                    <CODE_SNIPPET>
+                        const int* foo;
+                    </CODE_SNIPPET>
+                    instead of
+                    <BAD_CODE_SNIPPET>
+                        int const *foo;
+                    </BAD_CODE_SNIPPET>
+                </p>
+                <p>
+                    Putting the <code>const</code> first is arguably more readable,
+                    since it follows English in putting the "adjective"
+                    (<code>const</code>) before the "noun" (<code>int</code>).
+                </p>
+            </BODY>
+        </STYLEPOINT>
+    </CATEGORY>
+    
+    <!--CATEGORY title="Comments">
+     <p>
+     Though a pain to write, comments are absolutely vital to keeping our
+     code readable.  The following rules describe what you should
+     comment and where.  But remember: while comments are very
+     important, the best code is self-documenting.  Giving sensible
+     names to types and variables is much better than using obscure
+     names that you must then explain through comments.
+     </p>
+     <p>
+     When writing your comments, write for your audience: the next
+     
+     contributor
+     who will need to understand your code.  Be generous — the next
+     one may be you!
+     </p>
+     
+     <CWG2>
+     <p>
+     <span style="color:#006600;">Barth: </span>
+     This will need a new iteration when we decide on a code documentation tool (e.g.
+     </p>
+     <p>
+     We need to remember to add something about encouraging the usage of unicode in comments. See below.
+     </p>
+     <Matthias>
+     (this was before in the Formatting section about non-ASCII characters that has been removed.)
+     It isn't clear whether this rule also affects comments. Because I really want to encourage Unicode (e.g. proper math formulas) in comments.
+     Example:
+     <CODE_SNIPPET>
+     inline void FitC::Filter(Track &amp;track, const HitInfo &amp;measurementModel,
+     const float_v m, const float_v weight) const
+     {
+     const float_v sigma2   = measurementModel.sigma2;
+     const float_v sigma216 = measurementModel.sigma216;
+     const Matrix&lt;float_v, 5&gt; F = track.C.slice&lt;0, 5, 0, 2&gt;()
+     * measurementModel.transposed(); //  CHᵀ
+     const float_v HCH = measurementModel * F.slice&lt;0, 2&gt;();     // HCHᵀ
+     const float_v residual = measurementModel
+     * track.slice&lt;0, 2&gt;() - m;   // ζ  = Hr - m
+     float_v denominator = HCH;
+     denominator(HCH &lt; sigma216) += sigma2;
+     const float_v zetawi = residual / denominator;      // (V + HCHᵀ)⁻¹ ζ
+     track -= F * zetawi;                       // r -= CHᵀ (V + HCHᵀ)⁻¹ ζ
+     track.C -= F * (weight / (sigma2 + HCH))* F.transposed();
+     // C -= CHᵀ (V + HCHᵀ)⁻¹ HC
+     track.Chi2(HCH &lt; sigma216) += residual * zetawi;
+     // χ² += ζ (V + HCHᵀ)⁻¹ ζ
+     track.NDF += weight;
+     }
+     </CODE_SNIPPET>
+     Also, C++11 introduced prefixes for string literals.
+     Thus <code>u8"some text"</code> is an UTF-8 containing "some text".
+     I'm not sure whether we should mention this here.
+     </Matthias>
+     </CWG2>
+     
+     <STYLEPOINT title="Comment Style">
+     <SUMMARY>
+     Use either the <code>//</code> or <code>/* */</code> syntax, as long
+     as you are consistent.
+     </SUMMARY>
+     <BODY>
+     <p>
+     You can use either the <code>//</code> or the <code>/* */</code>
+     syntax; however, <code>//</code> is <em>much</em> more common.
+     Be consistent with how you comment and what style you use where.
+     </p>
+     </BODY>
+     </STYLEPOINT>
+     
+     <STYLEPOINT title="File Comments">
+     <SUMMARY>
+     Start each file with license boilerplate,
+     followed by a description of its contents.
+     </SUMMARY>
+     <BODY>
+     <SUBSECTION title="Legal Notice and Author Line">
+     
+     <p>
+     Every file should contain license boilerplate.
+     Choose the appropriate boilerplate for the license used by the project
+     (for example, Apache 2.0, BSD, LGPL, GPL).
+     </p>
+     <p>
+     If you make significant changes to a file with an author line,
+     consider deleting the author line.
+     </p>
+     </SUBSECTION>
+     
+     <SUBSECTION title="File Contents">
+     <p>
+     Every file should have a comment at the top describing its contents.
+     </p>
+     <p>
+     Generally a <code>.h</code> file will describe the classes
+     that are declared in the file with an overview of what they
+     are for and how they are used. A <code>.cpp</code> file
+     should contain more information about implementation details
+     or discussions of tricky algorithms. If you feel the
+     implementation details or a discussion of the algorithms
+     would be useful for someone reading the <code>.h</code>,
+     feel free to put it there instead, but mention in the
+     <code>.cpp</code> that the documentation is in the
+     <code>.h</code> file.
+     </p>
+     <p>
+     Do not duplicate comments in both the <code>.h</code> and
+     the <code>.cpp</code>. Duplicated comments diverge.
+     </p>
+     </SUBSECTION>
+     </BODY>
+     </STYLEPOINT>
+     
+     <STYLEPOINT title="Class Comments">
+     <SUMMARY>
+     Every class definition should have an accompanying comment that
+     describes what it is for and how it should be used.
+     </SUMMARY>
+     <BODY>
+     <CODE_SNIPPET>
+     // Iterates over the contents of a GargantuanTable.  Sample usage:
+     //    GargantuanTableIterator* iter = table-&gt;NewIterator();
+     //    for (iter-&gt;Seek("foo"); !iter-&gt;done(); iter-&gt;Next()) {
+     //      process(iter-&gt;key(), iter-&gt;value());
+     //    }
+     //    delete iter;
+     class GargantuanTableIterator {
+     ...
+     };
+     </CODE_SNIPPET>
+     <p>
+     If you have already described a class in detail in the
+     comments at the top of your file feel free to simply state
+     "See comment at top of file for a complete description", but
+     be sure to have some sort of comment.
+     </p>
+     <p>
+     Document the synchronization assumptions the class makes, if
+     any.  If an instance of the class can be accessed by multiple
+     threads, take extra care to document the rules and invariants
+     surrounding multithreaded use.
+     </p>
+     </BODY>
+     </STYLEPOINT>
+     
+     <STYLEPOINT title="Function Comments">
+     <SUMMARY>
+     Declaration comments describe use of the function; comments at
+     the definition of a function describe operation.
+     </SUMMARY>
+     <BODY>
+     <SUBSECTION title="Function Declarations">
+     <p>
+     Every function declaration should have comments immediately
+     preceding it that describe what the function does and how to
+     use it.  These comments should be descriptive ("Opens the
+     file") rather than imperative ("Open the file"); the comment
+     describes the function, it does not tell the function what
+     to do.  In general, these comments do not describe how the
+     function performs its task.  Instead, that should be left to
+     comments in the function definition.
+     </p>
+     <p>
+     Types of things to mention in comments at the function
+     declaration:
+     </p>
+     <ul>
+     <li> What the inputs and outputs are.
+     </li>
+     <li> For class member functions:  whether the object
+     remembers reference arguments beyond the
+     duration of the method call, and whether it will
+     free them or not.
+     </li>
+     <li> If the function allocates memory that the caller
+     must free.
+     </li>
+     <li> Whether any of the arguments can be a null pointer.
+     </li>
+     <li> If there are any performance implications of how a
+     function is used.
+     </li>
+     <li> If the function is re-entrant.  What are its
+     synchronization assumptions?
+     </li>
+     </ul>
+     <p>
+     Here is an example:
+     </p>
+     <CODE_SNIPPET>
+     // Returns an iterator for this table.  It is the client's
+     // responsibility to delete the iterator when it is done with it,
+     // and it must not use the iterator once the GargantuanTable object
+     // on which the iterator was created has been deleted.
+     //
+     // The iterator is initially positioned at the beginning of the table.
+     //
+     // This method is equivalent to:
+     //    Iterator* iter = table-&gt;NewIterator();
+     //    iter-&gt;Seek("");
+     //    return iter;
+     // If you are going to immediately seek to another place in the
+     // returned iterator, it will be faster to use NewIterator()
+     // and avoid the extra seek.
+     Iterator* GetIterator() const;
+     </CODE_SNIPPET>
+     <p>
+     However, do not be unnecessarily verbose or state the
+     completely obvious.  Notice below that it is not necessary
+     to say "returns false otherwise" because this is implied.
+     </p>
+     <CODE_SNIPPET>
+     // Returns true if the table cannot hold any more entries.
+     bool IsTableFull();
+     </CODE_SNIPPET>
+     <p>
+     When commenting constructors and destructors, remember that
+     the person reading your code knows what constructors and
+     destructors are for, so comments that just say something like
+     "destroys this object" are not useful.  Document what
+     constructors do with their arguments (for example, if they
+     take ownership of pointers), and what cleanup the destructor
+     does.  If this is trivial, just skip the comment.  It is
+     quite common for destructors not to have a header comment.
+     </p>
+     </SUBSECTION>
+     
+     <SUBSECTION title="Function Definitions">
+     <p>
+     Each function definition should have a comment describing
+     what the function does if there's anything tricky about how it does
+     its job.  For example, in the definition comment you might
+     describe any coding tricks you use, give an overview of the
+     steps you go through, or explain why you chose to implement
+     the function in the way you did rather than using a viable
+     alternative.  For instance, you might mention why it must
+     acquire a lock for the first half of the function but why it
+     is not needed for the second half.
+     </p>
+     <p>
+     Note you should <em>not</em> just repeat the comments given
+     with the function declaration, in the <code>.h</code> file or
+     wherever.  It's okay to recapitulate briefly what the function
+     does, but the focus of the comments should be on how it does it.
+     </p>
+     </SUBSECTION>
+     </BODY>
+     </STYLEPOINT>
+     
+     <STYLEPOINT title="Variable Comments">
+     <SUMMARY>
+     In general the actual name of the variable should be descriptive
+     enough to give a good idea of what the variable is used for.  In
+     certain cases, more comments are required.
+     </SUMMARY>
+     <BODY>
+     <SUBSECTION title="Class Data Members">
+     <p>
+     Each class data member (also called an instance variable or
+     member variable) should have a comment describing what it is
+     used for.  If the variable can take sentinel values with
+     special meanings, such as a null pointer or -1, document this.
+     For example:
+     </p>
+     <CODE_SNIPPET>
+     private:
+     // Keeps track of the total number of entries in the table.
+     // Used to ensure we do not go over the limit. -1 means
+     // that we don't yet know how many entries the table has.
+     int num_total_entries_;
+     </CODE_SNIPPET>
+     </SUBSECTION>
+     
+     <SUBSECTION title="Global Variables">
+     <p>
+     As with data members, all global variables should have a
+     comment describing what they are and what they are used for.
+     For example:
+     </p>
+     <CODE_SNIPPET>
+     // The total number of tests cases that we run through in this regression test.
+     const int kNumTestCases = 6;
+     </CODE_SNIPPET>
+     </SUBSECTION>
+     </BODY>
+     </STYLEPOINT>
+     
+     <STYLEPOINT title="Implementation Comments">
+     <SUMMARY>
+     In your implementation you should have comments in tricky,
+     non-obvious, interesting, or important parts of your code.
+     </SUMMARY>
+     <BODY>
+     <SUBSECTION title="Class Data Members">
+     <p>
+     Tricky or complicated code blocks should have comments
+     before them. Example:
+     </p>
+     <CODE_SNIPPET>
+     // Divide result by two, taking into account that x
+     // contains the carry from the add.
+     for (int i = 0; i &lt; result-&gt;size(); i++) {
+     x = (x &lt;&lt; 8) + (*result)[i];
+     (*result)[i] = x &gt;&gt; 1;
+     x &amp;= 1;
+     }
+     </CODE_SNIPPET>
+     </SUBSECTION>
+     <SUBSECTION title="Line Comments">
+     <p>
+     Also, lines that are non-obvious should get a comment at the
+     end of the line. These end-of-line comments should be
+     separated from the code by 2 spaces.  Example:
+     </p>
+     <CODE_SNIPPET>
+     // If we have enough memory, mmap the data portion too.
+     mmap_budget = max&lt;int64&gt;(0, mmap_budget - index_-&gt;length());
+     if (mmap_budget &gt;= data_size_ &amp;&amp; !MmapData(mmap_chunk_bytes, mlock))
+     return;  // Error already logged.
+     </CODE_SNIPPET>
+     <p>
+     Note that there are both comments that describe what the
+     code is doing, and comments that mention that an error has
+     already been logged when the function returns.
+     </p>
+     <p>
+     If you have several comments on subsequent lines, it can
+     often be more readable to line them up:
+     </p>
+     <CODE_SNIPPET>
+     DoSomething();                  // Comment here so the comments line up.
+     DoSomethingElseThatIsLonger();  // Comment here so there are two spaces between
+     // the code and the comment.
+     { // One space before comment when opening a new scope is allowed,
+     // thus the comment lines up with the following comments and code.
+     DoSomethingElse();  // Two spaces before line comments normally.
+     }
+     </CODE_SNIPPET>
+     </SUBSECTION>
+     <SUBSECTION title="nullptr/NULL, true/false, 1, 2, 3...">
+     <p>
+     When you pass in a null pointer, boolean, or literal integer
+     values to functions, you should consider adding a comment about
+     what they are, or make your code self-documenting by using
+     constants. For example, compare:
+     </p>
+     <BAD_CODE_SNIPPET>
+     bool success = CalculateSomething(interesting_value,
+     10,
+     false,
+     NULL);  // What are these arguments??
+     </BAD_CODE_SNIPPET>
+     <p>
+     versus:
+     </p>
+     <CODE_SNIPPET>
+     bool success = CalculateSomething(interesting_value,
+     10,     // Default base value.
+     false,  // Not the first time we're calling this.
+     NULL);  // No callback.
+     </CODE_SNIPPET>
+     <p>
+     Or alternatively, constants or self-describing variables:
+     </p>
+     <CODE_SNIPPET>
+     const int kDefaultBaseValue = 10;
+     const bool kFirstTimeCalling = false;
+     Callback *null_callback = NULL;
+     bool success = CalculateSomething(interesting_value,
+     kDefaultBaseValue,
+     kFirstTimeCalling,
+     null_callback);
+     </CODE_SNIPPET>
+     </SUBSECTION>
+     
+     <SUBSECTION title="Don'ts">
+     <p>
+     Note that you should <em>never</em> describe the code
+     itself. Assume that the person reading the code knows C++
+     better than you do, even though he or she does not know what
+     you are trying to do:
+     </p>
+     <BAD_CODE_SNIPPET>
+     // Now go through the b array and make sure that if i occurs,
+     // the next element is i+1.
+     ...        // Geez.  What a useless comment.
+     </BAD_CODE_SNIPPET>
+     </SUBSECTION>
+     </BODY>
+     </STYLEPOINT>
+     
+     <STYLEPOINT title="Punctuation, Spelling and Grammar">
+     <SUMMARY>
+     Pay attention to punctuation, spelling, and grammar; it is
+     easier to read well-written comments than badly written ones.
+     </SUMMARY>
+     <BODY>
+     <p>
+     Comments should be as readable as narrative text, with proper
+     capitalization and punctuation. In many cases, complete sentences are
+     more readable than sentence fragments. Shorter comments, such as
+     comments at the end of a line of code, can sometimes be less formal, but
+     you should be consistent with your style.
+     </p>
+     <p>
+     Although it can be frustrating to have a code reviewer point
+     out that you are using a comma when you should be using a
+     semicolon, it is very important that source code maintain a
+     high level of clarity and readability.  Proper punctuation,
+     spelling, and grammar help with that goal.
+     </p>
+     </BODY>
+     </STYLEPOINT>
+     
+     <STYLEPOINT title="TODO Comments">
+     <SUMMARY>
+     Use <code>TODO</code> comments for code that is temporary, a
+     short-term solution, or good-enough but not perfect.
+     </SUMMARY>
+     <BODY>
+     <p>
+     <code>TODO</code>s should include the string <code>TODO</code> in
+     all caps, followed by the
+     
+     name, e-mail address, or other
+     identifier
+     of the person who can best provide context about the problem
+     referenced by the <code>TODO</code>.  A colon is optional.  The main
+     purpose is to have a consistent <code>TODO</code> format that can be
+     searched to find the person who can provide more details upon request.
+     A <code>TODO</code> is not a commitment that the person referenced
+     will fix the problem.  Thus when you create a <code>TODO</code>, it is
+     almost always your
+     
+     name
+     that is given.
+     </p>
+     
+     <CODE_SNIPPET>
+     // TODO(kl@gmail.com): Use a "*" here for concatenation operator.
+     // TODO(Zeke) change this to use relations.
+     </CODE_SNIPPET>
+     <p>
+     If your <code>TODO</code> is of the form "At a future date do
+     something" make sure that you either include a very specific
+     date ("Fix by November 2005") or a very specific event
+     ("Remove this code when all clients can handle XML responses.").
+     </p>
+     </BODY>
+     <CWG2>
+     <span style="color:#006600;">Barth: </span>
+     I disagree with email and name. Git/SVN is here for that. Otherwise we could put our initials at each comment... Ideally though it should reference a JIRA issue.
+     Realistically, todo's are used often with a future date is "when someone has time"...
+     </CWG2>
+     </STYLEPOINT>
+     
+     <STYLEPOINT title="Deprecation Comments">
+     <SUMMARY>
+     Mark deprecated interface points with <code>DEPRECATED</code> comments.
+     </SUMMARY>
+     <BODY>
+     <p>
+     You can mark an interface as deprecated by writing a comment containing
+     the word <code>DEPRECATED</code> in all caps.  The comment goes either
+     before the declaration of the interface or on the same line as the
+     declaration.
+     </p>
+     
+     <p>
+     After the word <code>DEPRECATED</code>, write your name, e-mail address,
+     or other identifier in parentheses.
+     </p>
+     <p>
+     A deprecation comment must include simple, clear directions for people to
+     fix their callsites.  In C++, you can implement a deprecated function as
+     an inline function that calls the new interface point.
+     </p>
+     <p>
+     Marking an interface point <code>DEPRECATED</code> will not magically
+     cause any callsites to change.  If you want people to actually stop using
+     the deprecated facility, you will have to fix the callsites yourself or
+     recruit a crew to help you.
+     </p>
+     <p>
+     New code should not contain calls to deprecated interface points.  Use
+     the new interface point instead.  If you cannot understand the
+     directions, find the person who created the deprecation and ask them for
+     help using the new interface point.
+     </p>
+     
+     </BODY>
+     <CWG2>
+     <span style="color:#006600;">Barth: </span>
+     There is a correct way of deprecating in C++ that should be described here:  String_t Name() const __attribute__ ((deprecated));
+     Putting a comment is useless.
+     </CWG2>
+     </STYLEPOINT>
+     
+     </CATEGORY-->
+    
+    <CATEGORY title="Exceptions to the Rules">
+        <p>
+            The coding conventions described above have to be followed.  However,
+            like all good rules, these sometimes have exceptions.
+        </p>
+        
+        <STYLEPOINT title="Existing Non-conformant Code">
+            <SUMMARY>
+                It is permissible to deviate from the rules when dealing with code that does not
+                conform to this style guide. For example, in naming something that is analogous to an existing C or C++ entity then the existing naming convention
+                scheme can be followed.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    To modify code that was written to
+                    specifications other than those presented by this guide, it may be necessary to deviate from these rules in order to stay consistent with
+                    the local conventions in that code.  In case of doubt the original author or the person currently
+                    responsible for the code should be consulted.  Remember that <em>consistency</em>
+                    also includes local consistency.
+                </p>
+                <p>
+                    For example, importing a full class from somewhere else
+                    , e.g. AliRoot, it is allowed to keep the naming scheme
+                    and the style as is. To use the "correct" naming and formatting scheme (described
+                    in this document),  then to be consistent, the whole coding standard must be applied to the
+                    whole class. <br/>
+                    Note: in the case that the whole formatting is changed then there should be 
+                    one commit for the style changes and one for the actual code
+                    changes.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+    </CATEGORY>
+    
+    <PARTING_WORDS>
+        <p>
+            Use common sense and <em>BE CONSISTENT</em>.
+        </p>
+        <p>
+            When editing code, take a few minutes to look at the
+            code and determine its style.
+        </p>
+        <p>
+            The point about having style guidelines is to have a common
+            vocabulary of coding so people can concentrate on what the programmer
+            is saying, rather than on how he/she is saying it. Global style rules are presented here so people know the vocabulary. However,
+            local style is also important.  If the code added to a file
+            looks drastically different from the existing code around it,
+            the discontinuity throws readers out of their rhythm when they
+            go to read it. Try to avoid this.
+        </p>
+        
+        <p>
+            OK, enough writing about writing code; the code itself is much
+            more interesting. Have fun!
+        </p>
+    </PARTING_WORDS>
+    
+    <REFERENCES>
+        <p>
+            [1] Herb Sutter on software, hardware, and concurrency blog [<a href="http://herbsutter.com/2013/05/09/gotw-1-solution">http://herbsutter.com/2013/05/09/gotw-1-solution</a>]
+        </p>
+    </REFERENCES>
+    
+</GUIDE>
