@@ -1,0 +1,2562 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="styleguide.xsl"?>
+<GUIDE title="STAR C++ Coding Guidelines">
+    
+    <address>
+        Authors:<br/>
+        Mustafa Mustafa <br/>
+        Thomas Ullrich <br/>
+        Anselm Vossen <br/>
+    </address>
+    
+    <CATEGORY title="Introduction">
+    <p>
+        This document is a draft of new C++ coding guidelines compiled for the STAR
+        collaboration by the above mentioned authors. This effort was initiated by the STAR
+        computing coordinator Jerome Lauret on October 31, 2014. The charge can be
+        viewed <a href="charge.txt">here</a>. The committee produced two documents, one for the
+        coding guidelines seen here, and one for the naming and formatting guidelines that
+        can be viewed <a href="formatguide.xml">here</a>.
+    </p>
+    
+    <p>
+        The committee based their work on the existing guidelines, expanded them for clarity, and
+        added new material where it saw fit. The coding guidlines include the new C++11 standard.
+        We have made heavy use of the C++ Google Style guide at <a href="http://google-styleguide.googlecode.com">
+        http://google-styleguide.googlecode.com</a>.
+    </p>
+
+    <p>
+        The goal of this guide is to manage the complexity of C++ (often in conjunction with ROOT)
+        by describing
+        in detail the dos and don'ts of writing C++ code. These rules exist to
+        keep the STAR code base manageable while still allowing coders to use C++ language
+        features productively. In some cases
+        we constrain, or even ban, the use of certain C++ and ROOT features. We do this to
+        keep code simple and to avoid the various common errors and
+        problems that these features can cause. We also had to take into account that
+        millions of lines of STAR code exist. For a new experiment the guidelines certainly
+        would look different in places but we have to live with the legacy
+        of existing code and the guidelines under which they were written.
+    </p>
+    
+    <p>
+        Note that this guide is not a C++ tutorial: we assume that the
+        reader is familiar with the language. We marked parts of the guidlines that address
+        specifically new C++11 features.
+    </p>
+ 
+    </CATEGORY>
+
+
+    START EDITING HERE
+
+
+    <OVERVIEW>
+        <CATEGORY title="Important Note">
+            <STYLEPOINT title="Displaying Hidden Details in this Guide">
+                <SUMMARY>
+                    This style guide contains many details that are initially
+                    hidden from view.  They are marked by the triangle icon, which you
+                    see here on your left. The first level of hidden information is
+                    the subsection <i>Summary</i> in each rule and the second level of hidden information is the
+                    optional subsection <i>Extra details and exceptions to the rule</i>. Click the arrow on the
+                    left now, you should see "Hooray" appear below.
+                </SUMMARY>
+                <BODY>
+                    <p>
+                        Hooray!  Now you know you can expand points to get more
+                        details.  Alternatively, there are an "expand all summaries"
+                        and an "expand all summaries and extra details" at the
+                        top of this document.
+                    </p>
+                </BODY>
+            </STYLEPOINT>
+        </CATEGORY>
+        
+    </OVERVIEW>
+    
+    <CATEGORY title="Header Files">
+        <p>
+            In general, every <code>.cxx</code> file should have an associated
+            <code>.h</code> file. There are some common exceptions, such as
+            
+            unittests
+            and small <code>.cxx</code> files containing just a <code>main()</code>
+            function.
+        </p>
+        <p>
+            Correct use of header files can make a huge difference to the
+            readability, size and performance of your code.
+        </p>
+        <p>
+            The following rules will guide you through the various pitfalls of
+            using header files.
+        </p>
+        
+        <STYLEPOINT title="The #define Guard">
+            <SUMMARY>
+                All header files should have <code>#define</code> guards to
+                prevent multiple inclusion.  The format of the symbol name
+                should be
+                <code><i>&lt;PROJECT&gt;</i>_<i>&lt;PATH&gt;</i>_<i>&lt;FILE&gt;</i>_H_</code>.
+            </SUMMARY>
+            <BODY>
+                
+                <p>
+                    To guarantee uniqueness, they should be based on the full path
+                    in a project's source tree.  For example, the file
+                    <code>foo/src/bar/myFile.h</code> in project <code>foo</code> should
+                    have the following guard:
+                </p>
+                <CODE_SNIPPET>
+                    #ifndef FOO_BAR_MYFILE_H_
+                    #define FOO_BAR_MYFILE_H_
+                    
+                    ...
+                    
+                    #endif  // FOO_BAR_MYFILE_H_
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Forward Declarations">
+            <SUMMARY>
+                You may forward declare ordinary classes in order to avoid
+                unnecessary <code>#include</code>s.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    A "forward declaration" is a declaration of a class, function,
+                    or template without an associated definition. <code>#include</code>
+                    lines can often be replaced with forward declarations of whatever
+                    symbols are actually used by the client code.
+                </DEFINITION>
+                <PROS>
+                    <ul>
+                        <li>Unnecessary <code>#include</code>s force the compiler to open
+                            more files and process more input.</li>
+                        <li>They can also force your code to be recompiled more often, due
+                            to changes in the header.</li>
+                    </ul>
+                </PROS>
+                <CONS>
+                    <ul>
+                        <li>It can be difficult to determine the correct form of a
+                            forward declaration in the presence of features like templates,
+                            typedefs, default parameters, and using declarations.</li>
+                        <li>Forward declaring multiple symbols from a header can be more
+                            verbose than simply including the header.</li>
+                        <li>Forward declarations of functions and templates can prevent
+                            the header owners from making otherwise-compatible changes to
+                            their APIs; for example, widening a parameter type, or adding
+                            a template parameter with a default value.</li>
+                        <li>Forward declaring symbols from namespace <code>std::</code>
+                            usually yields undefined behavior.</li>
+                    </ul>
+                </CONS>
+                <DECISION>
+                    <ul>
+                        <li>When using a function declared in a header file, always
+                            <code>#include</code> that header.</li>
+                        <li>When using a class template, prefer to <code>#include</code> its
+                            header file.</li>
+                        <li>When using an ordinary class, relying on a forward declaration
+                            is OK, but be wary of situations where a forward declaration may
+                            be insufficient or incorrect; when in doubt, just
+                            <code>#include</code> the appropriate header.</li>
+                        <li>Do not replace data members with pointers just to avoid an
+                            <code>#include</code>.</li>
+                    </ul>
+                    Always <code>#include</code> the file that actually provides the
+                    declarations/definitions you need; do not rely on the symbol being
+                    brought in transitively via headers not directly included. One
+                    exception is that <code>myFile.cxx</code> may rely on
+                    <code>#include</code>s and forward declarations from its corresponding
+                    header file <code>myFile.h</code>.
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Inline Functions">
+            <SUMMARY>
+                As a general rule, put function definitions into the <code>.cxx</code> file and let the compiler decide what gets inlined (it can decide anyway, regardless of the inline keyword).
+                Use inline when you require the implementation of a function in multiple translation units (e.g. template classes/functions).
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    <p>
+                        The inline keyword indicates that inline substitution of the function body at the point of call is to be preferred to the usual function call mechanism.
+                        But a compiler is not required to perform this inline substitution at the point of call.
+                    </p>
+                    <p>
+                        Functions that are defined within a class definition are implicitly inline.
+                    </p>
+                    <p>
+                        An inline function must be defined in every translation unit from where it is called.
+                        It is undefined behavior if the definition of the inline function is not the same for all translation units.
+                        Note that this implies that the function is defined in a header file.
+                        This can have an impact on compile time and lead to longer (= less efficient) development cycles.
+                    </p>
+                    <p>
+                        Note that the inline keyword has no effect on the linkage of a function.
+                        Linkage can be changed via unnamed namespaces or the static keyword.
+                    </p>
+                </DEFINITION>
+                <DECISION>
+                    <p>
+                        If you add a new function, put it into the <code>.cxx</code> file per default.
+                        Small functions, like accessors and mutators may be placed into the <code>.h</code> file instead (<code>inline</code>).
+                        Also, most template function implementations need to go into the <code>.h</code> file.
+                        If you later determine that a function should be moved from the <code>.cxx</code> file into the <code>.h</code> file, please make sure that it helps the compiler in optimizing the code.
+                        Otherwise you're just increasing compile time.
+                    </p>
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Names and Order of Includes">
+            <SUMMARY>
+                Include headers from external libraries using <b>angle brackets</b>. Include headers from your own project/libraries using <b>double quotes</b>.<br/>
+                Do not rely on implicit includes. Make header files self-sufficient. <br/>
+            </SUMMARY>
+            <BODY>
+                <p>
+                    There are two types of #include statements: <code>#include &lt;myFile.h&gt;</code> and <code>#include “myFile.h”</code>.
+                </p>
+                <ul>
+                    <li> Include headers from external libraries using angle brackets.
+                        <CODE_SNIPPET>
+                            #include &lt;iostream&gt;
+                            #include &lt;QtCore/QDate&gt;
+                            #include &lt;zlib.h&gt;
+                        </CODE_SNIPPET>
+                    </li>
+                    <li>
+                        Include headers from your own project using double quotes.
+                        <CODE_SNIPPET>
+                            #include &quot;MyClass.h&quot;
+                        </CODE_SNIPPET>
+                    </li>
+                </ul>
+                <p>
+                    The header files of external libraries are obviously not in the
+                    same directory as your source files. So you need to use angle brackets.
+                </p>
+                <p>
+                    Headers of your own application have a defined relative location to the source
+                    files of your application. Using double quotes, you have to specify the correct
+                    relative path to the include file.
+                </p>
+                
+                <i>Include order </i>
+                <p>
+                    Another important aspect of include management is the include order.
+                    Typically, you have a class named Foo, a file Foo.h and a file Foo.cxx .
+                    The rule is&#160;:
+                    In your file Foo.cxx, you should include Foo.h as the first include, before the system
+                    includes.
+                </p>
+                <p>
+                    The rationale behind that is to make your header standalone.
+                </p>
+                <p>
+                    Let's imagine that your Foo.h looks like this:
+                    <BAD_CODE_SNIPPET>
+                        class Foo
+                        &#123;
+                        public:
+                        Bar getBar&#40;&#41;;
+                        &#125;
+                    </BAD_CODE_SNIPPET>
+                </p>
+                <p>
+                    And your Foo.cpp looks like this:
+                    <BAD_CODE_SNIPPET>
+                        #include &quot;Bar.h&quot;
+                        #include &quot;Foo.h&quot;
+                    </BAD_CODE_SNIPPET>
+                </p>
+                <p>
+                    Your Foo.cxx file will compile, but it will not compile for other people using Foo.h without including Bar.h.
+                    Including Foo.h first makes sure that your Foo.h header works for others.
+                    <CODE_SNIPPET>
+                        // Foo.h
+                        #include &quot;Bar.h&quot;
+                        class Foo
+                        &#123;
+                        public:
+                        Bar getBar&#40;&#41;;
+                        &#125;
+                        
+                        // Foo.cxx
+                        #include &quot;Foo.h&quot;
+                    </CODE_SNIPPET>
+                </p>
+                <p>
+                    For more details: <a href="http://techbase.kde.org/Policies/Library_Code_Policy#Getting_.23includes_right">Getting #includes right</a>.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+    </CATEGORY>
+    
+    <CATEGORY title="Namespaces">
+        <p>
+            Namespaces subdivide the global scope into distinct, named
+            scopes, and thus are useful for logically grouping related types and functions and
+            preventing name collisions.
+        </p>
+        
+        <STYLEPOINT title="General guideline">
+            <SUMMARY>
+                Use a namespace for the project, a second nested namespace for code inside
+                a sub-project. Use one or two more nested namespaces to logically group types and functions together.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Example of a typical class definition within a project and
+                    sub-project namespace:
+                </p>
+                <CODE_SNIPPET>
+                    namespace Project
+                    {
+                    namespace SubProject
+                    {
+                    
+                    class MyClass
+                    {
+                    ...
+                    };
+                    
+                    } // namespace SubProject
+                    } // namespace Project
+                </CODE_SNIPPET>
+                <p>
+                    A nonmember function that is logically tied to a specific type should be in the
+                    same namespace as that type.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Using declarations and directives">
+            <SUMMARY>
+                Don't write namespace using declarations or using directives
+                in a header file or before an #include.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    <CODE_SNIPPET>
+                        # include "Bar.h"
+                        // OK in .cxx after include statements
+                        using namespace Foo;
+                        
+                        // sometimes a using declaration is preferable, to be precise
+                        // about the symbols that get imported
+                        using Foo::Type;
+                    </CODE_SNIPPET>
+                </p>
+                <p>
+                    <BAD_CODE_SNIPPET>
+                        // Forbidden in .h -- This pollutes the namespace.
+                        using namespace Foo;
+                    </BAD_CODE_SNIPPET>
+                </p>
+                <EXTRA>
+                    The using directive can sometimes be useful in header files to import one namespace into another one.
+                    This can effectively hide a namespace from the public interface, similar to what an inline namespace does.
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Unnamed namespaces">
+            <SUMMARY>
+                Unnamed namespaces are allowed and even encouraged in
+                <code>.cxx</code> files, they are not allowed in <code>.h</code>
+                files.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    All symbols inside an unnamed namespace (sometimes also called anonymous namespace)
+                    will have internal linkage.
+                    Thus, it is impossible to access these objects from other translation units (.cxx files).
+                </DEFINITION>
+                <PROS>
+                    Because of the internal linkage it is easier to reason about the code.
+                    This can lead to better optimization from compilers and clearer encapsulation.
+                </PROS>
+                <DECISION>
+                    Use unnamed namespaces in <code>.cxx</code> files whenever possible.
+                </DECISION>
+                <p>
+                    <CODE_SNIPPET>
+                        namespace Project {
+                        namespace {                           // This is in a .cxx file.
+                        int someFunction(int value) { return value + 1; }
+                        }  // unnamed namespace
+                        
+                        void someOtherFunction() {
+                        int value = 0;
+                        value = someFunction(value);
+                        ...
+                        }
+                        }
+                    </CODE_SNIPPET>
+                    For the above code the compiler can see that <code>someFunction</code> is called from only one place.
+                    It can thus inline the code and drop <code>someFunction</code>.
+                </p>
+                <EXTRA>
+                    In some special cases an unnamed namespace can be useful in a header file.
+                    Leave such decisions to architecture designers.
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Namespace aliases">
+            <SUMMARY>
+                Namespace aliases are allowed anywhere in a <code>.cxx</code> file,
+                inside the named namespace that wraps an entire <code>.h</code>
+                file and in functions and methods.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    <CODE_SNIPPET>
+                        // Shorten access to some commonly used names in .cxx files.
+                        namespace Fbz = ::Foo::Bar::Baz;
+                        
+                        // Shorten access to some commonly used names (in a .h file).
+                        namespace Librarian {
+                        // The following alias is available to all files including
+                        // this header (in namespace Librarian):
+                        // alias names should therefore be chosen consistently
+                        // within a project.
+                        namespace Pds = ::PipelineDiagnostics::Sidetable;
+                        
+                        inline void myInlineFunction() {
+                        // namespace alias local to a function (or method).
+                        namespace Fbz = ::Foo::Bar::Baz;
+                        ...
+                        }
+                        }  // namespace Librarian
+                    </CODE_SNIPPET>
+                </p>
+                <p>
+                    Note that an alias in a .h file is visible to everyone
+                    including that file, so public headers (those available
+                    outside a project) and headers transitively included by them,
+                    should avoid defining aliases, as part of the general
+                    goal of keeping public APIs as small as possible.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="std namespace">
+            <SUMMARY>
+                Do not declare anything in namespace <code>std</code>, not even forward
+                declarations of standard library classes.
+            </SUMMARY>
+            <BODY>
+                <MOTIVATION>
+                    <p>
+                        Declaring entities in namespace <code>std</code> represents undefined behavior,
+                        i.e., not portable.  To declare entities from the standard library, include
+                        the appropriate header file.
+                    </p>
+                </MOTIVATION>
+            </BODY>
+        </STYLEPOINT>
+        
+    </CATEGORY>
+    
+    <CATEGORY title="Scoping">
+        
+        <STYLEPOINT title="Nonmember and Global Functions">
+            <SUMMARY>
+                Nonmember functions (also known as global functions) should be
+                within a namespace.
+            </SUMMARY>
+            <BODY>
+                <p>Putting nonmember functions in a namespace avoids polluting
+                    the global namespace. Static member functions are an alternative
+                    as long as it makes sense to include the function within the
+                    class.</p>
+                <CODE_SNIPPET>
+                    namespace MyNamespace {
+                    void doGlobalFoo(); // Good -- doGlobalFoo is within a namespace.
+                    
+                    class MyClass {
+                    public:
+                    ...
+                    // Good -- doGlobalBar is a static member of class MyClass and
+                    // has a reason to be part of this class (not shown here).
+                    static Bar* doGlobalBar();
+                    }
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Local Variables">
+            <SUMMARY>
+                Declare variables as locally as possible.
+            </SUMMARY>
+            <BODY>
+                <MOTIVATION>
+                    <p> Variables whose lifetime are longer than necessary have several
+                        drawbacks:
+                        <ul>
+                            <li>They make the code harder to understand and maintain.</li>
+                            <li>They can't be always sensibly initialized.</li>
+                        </ul>
+                    </p>
+                </MOTIVATION>
+                <EXTRA>
+                    <ul>
+                        <li>It can be sometimes more efficient to declare a variable (usually of an
+                            object type) outside a loop.
+                            <p>
+                                If the variable is an object, its constructor is invoked every time
+                                it enters scope and is created, and its destructor is invoked every
+                                time it goes out of scope.
+                            </p>
+                            <BAD_CODE_SNIPPET>
+                                // Inefficient implementation:
+                                for (int i = 0; i &lt; bigNumber; ++i) {
+                                Foo foo;  // My ctor and dtor get called bigNumber times each.
+                                foo.doSomething(i);
+                                }
+                            </BAD_CODE_SNIPPET>
+                            <p>
+                                It may be more efficient to declare such a variable used in a
+                                loop outside that loop:
+                            </p>
+                            <CODE_SNIPPET>
+                                Foo foo;  // My ctor and dtor get called once each.
+                                for (int i = 0; i &lt; bigNumber; ++i) {
+                                foo.doSomething(i);
+                                }
+                            </CODE_SNIPPET>
+                        </li>
+                        <li> This item does not apply to constants, because constants don't add a state.
+                        </li>
+                    </ul>
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Variables Initialization">
+            <SUMMARY>
+                Always initialize variables.<br/>
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Do not separate initialization from declaration, e.g.
+                </p>
+                <BAD_CODE_SNIPPET>
+                    int value;
+                    value = function();      // Bad -- initialization separate from declaration.
+                </BAD_CODE_SNIPPET>
+                <CODE_SNIPPET>
+                    int value = function();  // Good -- declaration has initialization.
+                </CODE_SNIPPET>
+                
+                <p>
+                    Use a default initial value or ? to reduce mixing data flow with control
+                    flow.
+                </p>
+                <BAD_CODE_SNIPPET>
+                    int speedupFactor;       // Bad: does not initialize variable
+                    if (condition) {
+                    speedupFactor = NoFactor;
+                    }
+                    else {
+                    speedupFactor = DoubleFactor;
+                    }
+                </BAD_CODE_SNIPPET>
+                <CODE_SNIPPET>
+                    int speedupFactor = DoubleFactor; // Good: initializes variable
+                    if (condition) {
+                    speedupFactor = NoFactor;
+                    }
+                </CODE_SNIPPET>
+                <CODE_SNIPPET>
+                    int speedupFactor = condition ? NoFactor : DoubleFactor; // Good: initializes variable
+                </CODE_SNIPPET>
+                
+                <p>
+                    Prefer declaration of loop variables inside a loop, e.g.
+                </p>
+                <BAD_CODE_SNIPPET>
+                    int i;                   // Bad: does not initialize variable
+                    for (i = 0; i &lt; number; ++i) {
+                    doSomething(i);
+                    }
+                </BAD_CODE_SNIPPET>
+                <CODE_SNIPPET>
+                    for (int i = 0; i &lt; number; ++i) {
+                    doSomething(i); // Good
+                    }
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Brace Initialization" cpp11="yes">
+            <SUMMARY>
+                Prefer initialization with braces except for single-argument assignment.
+            </SUMMARY>
+            <BODY>
+                <p>In C++11, the brace initialization syntax for builtin arrays and POD structures has been extended for use with all other datatypes.
+                    <p> Example of brace initialization:
+                    </p>
+                    <CODE_SNIPPET>
+                        std::vector&#60;std::string&#62; myVector{"alpha", "beta", "gamma"};
+                    </CODE_SNIPPET>
+                </p>
+                <p>
+                    Example of single-argument assignments:
+                </p>
+                <CODE_SNIPPET>
+                    int value = 3;                           // preferred style
+                    std::string name = "Some Name";
+                    
+                    int value { 3 };                         // also possible
+                    std::string name{ "Some Name" };
+                    std::string name = { "Some Name" };
+                </CODE_SNIPPET>
+                <p>User data types can also define constructors that take
+                    <code>initializer_list</code>, which is automatically created from
+                    <i>braced-init-list</i>:
+                    <CODE_SNIPPET>
+                        #include &lt;initializer_list&gt;
+                        class MyType {
+                        public:
+                        // initializer_list is a reference to the underlying init list,
+                        // so it can be passed by value.
+                        MyType(std::initializer_list&lt;int&gt; initList) {
+                        for (int element : initList) { .. }
+                        }
+                        };
+                        MyType myObject{2, 3, 5, 7};
+                    </CODE_SNIPPET></p>
+                
+                <p>Finally, brace initialization can also call ordinary constructors of
+                    data types that do not have <code>initializer_list</code> constructors.
+                    <CODE_SNIPPET>
+                        // Calls ordinary constructor as long as MyOtherType has no
+                        // initializer_list constructor.
+                        class MyOtherType {
+                        public:
+                        explicit MyOtherType(std::string name);
+                        MyOtherType(int value, std::string name);
+                        };
+                        MyOtherType object1 = {1, "b"};
+                        // If the constructor is explicit, you can't use the "= {}" form.
+                        MyOtherType object2{"b"};
+                    </CODE_SNIPPET></p>
+                
+                <p>Never assign a <i>braced-init-list</i> to an auto local variable. In the
+                    single element case, what this means can be confusing.
+                    <BAD_CODE_SNIPPET>
+                        auto value = {1.23};        // value is an initializer_list&lt;double&gt;
+                    </BAD_CODE_SNIPPET>
+                    <CODE_SNIPPET>
+                        auto value = double{1.23};  // Good -- value is a double, not an initializer_list.
+                    </CODE_SNIPPET>
+                </p>
+                
+                <p> For clarity of the examples above we use directly explicit values, however following
+                    the rule about <a href="#Magic_Numbers">magic numbers</a> requires to define all such
+                    numbers as named constants or <code>constexpr</code> first. </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Global Variables">
+            <SUMMARY>
+                Variables declared in the global scope are not allowed.  Other global variables, including
+                static class variables and variables in namespace scope, should be
+                avoided where other means of communication are possible.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    A global variable is a variable that can be accessed (theoretically) from everywhere in the program.
+                    The adjective "global" should rather be understood as concerning its linkage, not whether it is in the global scope.
+                    <BAD_CODE_SNIPPET>
+                        int gBar;           // this is obviously global
+                        class Something
+                        {
+                        private:
+                        static int sId; // but this one too (details at the end of the rule)
+                        };
+                        namespace NotGlobalScope {
+                        Foo fooObject;    // and finally this one as well
+                        }
+                    </BAD_CODE_SNIPPET>
+                </DEFINITION>
+                <PROS>
+                    Global variables are a simple solution to sharing of data.
+                </PROS>
+                <CONS>
+                    Global variables make it harder to reason about the code (for humans and compilers):
+                    the smaller the number of variables a given region of code reads and writes, the easier.
+                    Global variables can be read and written from anywhere.
+                    Therefore, global variables pose a challenge to the optimizer.
+                </CONS>
+                <DECISION>
+                    We want to reduce the shared data in our software to the unavoidable minimum.
+                    Therefore, global variables should be avoided where other means of communication are possible.
+                </DECISION>
+                <EXTRA>
+                    Note that a private static class variable sId is global. For example two threads having
+                    each an instance of the class could access sId via these instances.
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        <STYLEPOINT title="Global variables initialization">
+            <SUMMARY>
+                In the rare and justified cases where you use global variables, including file-static variables, static member variables and variables in
+                namespace scope, initialize them statically.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    <ul>
+                        <li>This rule additionally applies to file-static variables.</li>
+                        <li>A global variable is statically initialized if the type has no constructor or a <code>constexpr</code> constructor.
+                            This is the case for fundamental types (integers, chars, floats, or pointers) and POD (Plain Old Data: structs/unions/arrays
+                            of fundamental types or other POD structs/unions). </li>
+                    </ul>
+                </DEFINITION>
+                <PROS>
+                    Dynamic initialization of globals can be used to run code before <code>main()</code>.
+                    Destructors of globals can be used to run code after <code>main()</code>.
+                    Dynamic initialization of globals in dynamically loaded objects can be used to run code on plugin load.
+                </PROS>
+                <CONS>
+                    It is very hard to reason about the order of execution of such functions.
+                    Especially if dynamically initialized globals are present in shared libraries that are linked
+                    into dynamically loaded objects, few people understand the semantics.
+                </CONS>
+                <p>
+                    As an example do this:
+                </p>
+                <CODE_SNIPPET>
+                    struct Pod {
+                    int indexes[5];
+                    float width;
+                    };
+                    struct LiteralType {
+                    int value;
+                    constexpr LiteralType() : value(1) {}
+                    };
+                    
+                    Pod gData;
+                    LiteralType gOtherData;
+                </CODE_SNIPPET>
+                <p>
+                    But not this :
+                </p>
+                <BAD_CODE_SNIPPET>
+                    class NotPod {
+                    NotPod();
+                    };
+                    NotPod gBadData;  // dynamic constructor
+                </BAD_CODE_SNIPPET>
+                <!--
+                 // a.cxx:
+                 int gSomeValue = someFunction();
+                 
+                 // b.cxx:
+                 extern int gSomeValue;
+                 int someOtherFunction() { return gSomeValue + 1; }
+                 int gGlobalValue = someOtherFunction(); // it is undefined whether gGlobalValue
+                 // will be 0 + 1 or someFunction() + 1
+                 -->
+                <DECISION>
+                    Global variables must be initialized statically. <br/>
+                    We only allow global variables to contain POD data.  This
+                    rule completely disallows <code>std::vector</code> (use <code>std::array</code> instead), or
+                    <code>std::string</code> (use <code>const char []</code>) for global variables.
+                </DECISION>
+                <EXTRA>
+                    <p>
+                        If there is a need for startup or shutdown code, dynamic constructors may be used. But only if:
+                        <ul>
+                            <li>The dependencies on other data are minimized.</li>
+                            <li>It is documented what code depends on this and why there is no issue of incorrect calling order.</li>
+                            <li>Side-effects are clearly understood and documented.</li>
+                        </ul>
+                    </p>
+                    <p>
+                        Example that exhibits the problem of execution order:
+                    </p>
+                    <BAD_CODE_SNIPPET>
+                        // Struct.h:
+                        #include &lt;string&gt;
+                        struct Struct {
+                        static std::string sString;
+                        };
+                        
+                        // Struct.cxx:
+                        std::string Struct::sString = "Hello World";
+                        
+                        // main.cxx:
+                        #include "Struct.h"
+                        #include &lt;iostream&gt;
+                        
+                        std::string gAnotherString = Struct::sString;
+                        
+                        int main() {
+                        std::cout &lt;&lt; gAnotherString &lt;&lt; std::endl;
+                        return 0;
+                        }
+                    </BAD_CODE_SNIPPET>
+                    <p>
+                        This program will either output "Hello World" or crash, depending on the initialization order (with GCC on Linux it depends on whether you link with <code>g++ Struct.o main.o</code> or <code>g++ main.o Struct.o</code>).
+                    </p>
+                </EXTRA>
+                
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Static Variables in functions">
+            <SUMMARY>
+                Static variables in functions (called "function-local static variables" in the C++ terminology)
+                are expensive and need care on destruction.
+                Prefer to use static class variables where possible.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    Function-local static variables are initialized on first use and destructed in the reverse order of construction.
+                    <CPP11>
+                        Since C++11, function-local static variables are guaranteed to be initialized exactly once, even in a multi-threaded environment.
+                    </CPP11>
+                </DEFINITION>
+                <PROS>
+                    The variable is lazily initialized.
+                    Therefore the order of construction is better under control.
+                    Also the cost of initialization is only incurred if it is really needed.
+                </PROS>
+                <CONS>
+                    Because of the thread-safe lazy initialization, function-local static variables have an extra cost compared to other function variables.
+                </CONS>
+                <DECISION>
+                    Use static class variables rather than function-local static variables.
+                    Therefore, do this :
+                    <CODE_SNIPPET>
+                        class Something
+                        {
+                        public:
+                        int generateId() {
+                        return Something::sId++;
+                        }
+                        
+                        private:
+                        static int sId; // initialized in .cxx
+                        };
+                    </CODE_SNIPPET>
+                    instead of :
+                    <BAD_CODE_SNIPPET>
+                        class Something
+                        {
+                        public:
+                        int generateId() {
+                        static int sId = 0;
+                        return sId++;
+                        }
+                        };
+                    </BAD_CODE_SNIPPET>
+                </DECISION>
+                
+                <EXTRA>
+                    <p>
+                        Function-local static variables can be used to build factory functions for lazily initialized global objects.
+                        This makes it possible to safely use dynamically initialized types in the global scope.
+                    </p>
+                    <p>
+                        In case function-local static variables are nevertheless used, it is best to avoid non-owning references
+                        because their destruction happens after return from <code>main()</code>, as shown on the following
+                        code snippets :
+                        <CODE_SNIPPET>
+                            std::string &amp;globalMessage()
+                            {
+                            static std::string message = "Hello world.";
+                            return message;
+                            }
+                            
+                            int main()
+                            {
+                            std::cout &lt;&lt; globalMessage() &lt;&lt; '\n';
+                            globalMessage() = "Goodbye cruel world.";
+                            std::cout &lt;&lt; globalMessage() &lt;&lt; '\n';
+                            return 0;
+                            }
+                            // prints:
+                            // Hello world.
+                            // Goodbye cruel world.
+                        </CODE_SNIPPET>
+                        <BAD_CODE_SNIPPET>
+                            class BreakTheCode
+                            {
+                            public:
+                            void setReference(int *value) { mValuePointer = value; }
+                            ~BreakTheCode() { *mValuePointer += 2; }
+                            
+                            private:
+                            int *mValuePointer = 0;
+                            };
+                            
+                            BreakTheCode &amp;globalBreaker()
+                            {
+                            static BreakTheCode breaker;
+                            return breaker;
+                            }
+                            
+                            int main()
+                            {
+                            int someValue = 1;
+                            globalBreaker().setReference(&amp;someValue);
+                            return 0;
+                            }
+                            // globalBreaker::breaker accesses main::someValue after it went out of scope.
+                            // This example should be harmless, but if a more complex type instead of int
+                            // is involved — and possibly the destructor of another function-local
+                            // static overwrites the stack data from main — this pattern can lead to a crash.
+                        </BAD_CODE_SNIPPET>
+                    </p>
+                </EXTRA>
+                
+            </BODY>
+        </STYLEPOINT>
+    </CATEGORY>
+    
+    <CATEGORY title="Classes">
+        Classes are the fundamental unit of code in C++. Naturally, we use
+        them extensively. This section lists the main dos and don'ts you
+        should follow when writing a class.
+        
+        <STYLEPOINT title="Initialization">
+            <SUMMARY>
+                Declare and initialize members variables in the same order.
+                Prefer initialization (in the constructor initializer list or in-class) to assignment (in the constructor function body).
+                Do not perform unmanaged resource acquisition in the constructor.
+            </SUMMARY>
+            <BODY>
+                <CPP11 title="in-class member initialization">
+                    Since C++11, it is possible to initialize struct/class member variables in the class definition.
+                    Thus, if there is no explicit initialization of this member variable in the constructor, this assignment will be used for initialization.
+                    <CODE_SNIPPET>
+                        class MyClass {
+                        public:
+                        MyClass() = default;
+                        MyClass(int z) : a(z) {}
+                        
+                        int data() const {
+                        return a;
+                        }
+                        
+                        private:
+                        int a = 1234;  // in-class initialization
+                        };
+                        
+                        int main() {
+                        MyClass firstClass;
+                        MyClass secondClass{5678};
+                        
+                        std::cout &#60;&#60; firstClass.data()
+                        &#60;&#60; ' ' &#60;&#60; secondClass.data();
+                        return 0;
+                        }
+                    </CODE_SNIPPET>
+                    The program above prints "1234 5678".
+                </CPP11>
+                
+                <DEFINITION>
+                    <p>
+                        Class member variables are initialized in the order in which they are declared in the class definition.
+                        The order in the constructor initializer list has no influence on initialization order and therefore may be misleading if it does not match the order of the declaration.
+                        Compilers often issue a warning if this rule is broken, but not always.
+                    </p>
+                    <p>
+                        If a member variable is not explicitly initialized in the constructor initializer list the default constructor of that variable is called.
+                        Therefore, if a member variable is assigned to in the constructor function body, the member variable may get initialized unnecessarily with the default constructor.
+                    </p>
+                    <p>
+                        If you do not declare any constructors yourself then the compiler will generate a
+                        default constructor for you, which may leave some fields uninitialized or
+                        initialized to inappropriate values.
+                    </p>
+                    <p>
+                        Examples:
+                    </p>
+                    <p>
+                        In-class member initialization:
+                    </p>
+                    <CODE_SNIPPET>
+                        // MyClass.h
+                        class MyClass {
+                        // ...
+                        private:
+                        int mValue = 1234;
+                        };
+                    </CODE_SNIPPET>
+                    <p>
+                        Initialization list:
+                    </p>
+                    <CODE_SNIPPET>
+                        // MyClass.h
+                        class MyClass : public MyBase  {
+                        // ...
+                        private:
+                        int mValue;
+                        std::vector mVector;
+                        };
+                        // MyClass.cxx
+                        MyClass::MyClass()
+                        : MyBase(),
+                        mValue(0),
+                        mVector()
+                        {}
+                    </CODE_SNIPPET>
+                    <p>
+                        See an example of initialization via <code>std::initializer_list</code>
+                        in <a href="#Brace_Initialization"> Brace Initialization</a>.
+                    </p>
+                </DEFINITION>
+                
+                <DECISION>
+                    <p>
+                        Member variables should be declared and initialized in the same order.
+                    </p>
+                    <p>
+                        Use in-class member initialization for simple initializations,
+                        especially when a member variable must be initialized the same way
+                        in more than one constructor.
+                    </p>
+                    <p>
+                        If your class defines member variables that aren't
+                        initialized in-class, and if it has no other constructors,
+                        you must define a default constructor (one that takes no
+                        arguments). It should preferably initialize the object in
+                        such a way that its internal state is consistent and valid.
+                    </p>
+                    <p>
+                        If your class inherits from an existing class but you add no
+                        new member variables, you are not required to have a default
+                        constructor.
+                    </p>
+                    <p>
+                        Avoid unmanaged resource acquisition in constructors, since the destructor of the class will not be called if an exception is thrown from the constructor.
+                        Therefore, always use C++ <a href="http://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Resource_Acquisition_Is_Initialization">
+                            "resource acquisition is initialization" (RAII)</a>
+                        idiom to ensure resources are properly freed.
+                    </p>
+                </DECISION>
+                <EXTRA>
+                    <p>
+                        An example demonstrating how to avoid unmanaged resource acquisition in constructor.
+                        Instead of
+                    </p>
+                    <BAD_CODE_SNIPPET>
+                        // MyClass.h
+                        class MyClass {
+                        public:
+                        MyClass();
+                        ~MyClass();
+                        private:
+                        Something* mSomething;  // raw pointer
+                        };
+                        // MyClass.cxx
+                        MyClass::MyClass()
+                        : mSomething(new Something())
+                        {}
+                        MyClass::~MyClass()
+                        {
+                        delete mSomething;       // mSomething has to be deleted with its owner
+                        }
+                    </BAD_CODE_SNIPPET>
+                    <p>
+                        do
+                    </p>
+                    <CODE_SNIPPET>
+                        // MyClass.h
+                        class MyClass {
+                        public:
+                        MyClass();
+                        ~MyClass() = delete;   // mSomething is deleted automatically
+                        private:
+                        std::unique_ptr&lt;Something&gt; mSomething; // smart pointer
+                        };
+                        // MyClass.cxx
+                        MyClass::MyClass()
+                        : mSomething(new Something())
+                        {}
+                    </CODE_SNIPPET>
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Virtual functions in constructors and destructors">
+            <SUMMARY>
+                Do not call virtual functions in constructors and destructors. <br/>
+            </SUMMARY>
+            <BODY>
+                
+                <p>
+                    Inside constructors and destructors virtual function do not
+                    behave "virtually". If the work calls virtual functions, these calls
+                    will not get dispatched to the subclass implementations.
+                    Calls to an unimplemented pure virtual function result in undefined
+                    behavior.
+                </p>
+                <p>
+                    Calling a virtual function non-virtually is fine:
+                    <BAD_CODE_SNIPPET>
+                        class MyClass {
+                        public:
+                        MyClass() { doSomething(); }    // Bad
+                        virtual void doSomething();
+                        };
+                    </BAD_CODE_SNIPPET>
+                    <CODE_SNIPPET>
+                        class MyClass {
+                        public:
+                        MyClass() { MyClass::doSomething(); }    // Good
+                        virtual void doSomething();
+                        };
+                    </CODE_SNIPPET>
+                </p>
+                <DECISION>
+                    Constructors should never call virtual functions.
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Explicit Constructors">
+            <SUMMARY>
+                Use the C++ keyword <code>explicit</code> for constructors with
+                one argument.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    Normally, if a constructor takes one argument, it can be used
+                    as a conversion.  For instance, if you define
+                    <BAD_CODE_SNIPPET>
+                        class Foo {
+                        public:
+                        Foo(const std::string &amp;name);
+                        };
+                    </BAD_CODE_SNIPPET>
+                    and then pass a string to a
+                    function that expects a <code>Foo</code>, the constructor will
+                    be called to convert the string into a <code>Foo</code> and
+                    will pass the <code>Foo</code> to your function for you.
+                    Declaring a constructor <code>explicit</code> prevents
+                    an implicit conversion.
+                    <CODE_SNIPPET>
+                        class MyClass {
+                        public:
+                        explicit MyClass(int number); //allocate number bytes
+                        explicit MyClass(const std::string &amp;name); // initialize with string name
+                        };
+                    </CODE_SNIPPET>
+                </DEFINITION>
+                <DECISION>
+                    <p>
+                        We require all single argument constructors to be
+                        explicit.
+                    </p>
+                    <p>
+                        Exceptions are copy constructors and classes that are intended to be
+                        transparent wrappers around other classes.
+                    </p>
+                    <p>
+                        Finally, constructors that take only an <code>initializer_list</code> may be
+                        non-explicit. This is to permit construction of your type using the
+                        assignment form for brace init lists (i.e. <code>MyType myObject = {1, 2}
+                        </code>).
+                    </p>
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Copy (and Move)">
+            <SUMMARY>
+                Explicitly enable or disable the copy constructor/assignment operator.
+                Only implement move constructors/assignment operators if your class needs optimizations for move semantics.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    The copy constructor and copy assignment operator are used to create copies of objects.
+                    The move constructor and move assignment operator are used to move (semantically) objects.
+                    <CPP11 title="move semantics">
+                        Move semantics were introduced with C++11.
+                        In essence, a move is just a copy that can be optimized from the knowledge that the source object is at the end of its life (such objects bind to rvalue references).
+                        Thus, a move of a <code>std::vector</code> does not need to copy all data, but only the pointer to the data.
+                        Additionally, the source object must be told that it does not own the data anymore, to inhibit the <code>free</code> from the destructor.
+                        In most cases the move constructor/assignment operator therefore modifies the source object (e.g. setting the data pointer to <code>nullptr</code>).
+                    </CPP11>
+                    The copy and move constructors are implicitly invoked by the compiler or generic containers in some situations, e.g. passing objects by value or from <code>std::vector</code>.
+                </DEFINITION>
+                <DECISION>
+                    <p>
+                        Classes that use value semantics normally need to be copyable.
+                        If they are not copyable (e.g. unique resource ownership) they should be movable.
+                        If the copy constructor is trivial (which normally implies an empty destructor) it can be useful for performance reasons to use the key word <code>default</code>:
+                        <CODE_SNIPPET>
+                            ClassName(const ClassName &amp;other) = default;
+                        </CODE_SNIPPET>
+                        instead of
+                        <BAD_CODE_SNIPPET>
+                            ClassName(const ClassName &amp;other)
+                            : data(other.data) {}
+                        </BAD_CODE_SNIPPET>
+                        The former can be optimized much better by the compiler.
+                    </p>
+                    <CPP11 title="default and delete">
+                        Since C++11 it is possible to <code>delete</code>/<code>default</code> copy/move constructors and copy/move assignment operators.
+                    </CPP11>
+                    <p>
+                        Polymorphic class design implies pointer semantics.
+                        These classes should have their copy constructors disabled via <code>delete</code>:
+                        <CODE_SNIPPET>
+                            ClassName(const ClassName &amp;) = delete;
+                            ClassName &amp;operator=(const ClassName &amp;) = delete;
+                        </CODE_SNIPPET>
+                    </p>
+                    <p>
+                        If your polymorphic class needs to be copyable, use a virtual <code>clone()</code> method.
+                        This way copying can be implemented without slicing and be used more naturally for pointers:
+                        <CODE_SNIPPET>
+                            void someFunction(SomeInterface *object)
+                            {
+                            SomeInterface *objectCopy = object->clone();
+                            ...
+                            }
+                        </CODE_SNIPPET>
+                    </p>
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Delegating and inheriting constructors" cpp11="yes">
+            <SUMMARY>
+                Use delegating and inheriting constructors
+                when they reduce code duplication.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    <p>
+                        Delegating and inheriting constructors are two different features,
+                        both introduced in C++11, for reducing code duplication in
+                        constructors. Delegating constructors allow the constructor
+                        to forward work to another constructor of the same class,
+                        using a special variant of the initialization list
+                        syntax. For example:
+                    </p>
+                    <CODE_SNIPPET>
+                        Foo::Foo(const string&amp; name) : mName(name) {
+                        ...
+                        }
+                        
+                        Foo::Foo() : Foo("example") { }
+                    </CODE_SNIPPET>
+                    <p>
+                        A subclass, per default, inherits all functions of the base class.
+                        This is not the case for constructors.
+                        Since C++11 it is possible to explicitly inherit the constructors of a base class.
+                        This can be a significant simplification for subclasses that don't need custom constructor logic.
+                    </p>
+                    <CODE_SNIPPET>
+                        class Base {
+                        public:
+                        Base();
+                        explicit Base(int number);
+                        explicit Base(const string&amp; name);
+                        ...
+                        };
+                        
+                        class Derived : public Base {
+                        public:
+                        using Base::Base;  // Base's constructors are redeclared here.
+                        };
+                    </CODE_SNIPPET>
+                    <p>
+                        This is especially useful when <code>Derived</code>'s constructors
+                        don't have to do anything more than calling <code>Base</code>'s
+                        constructors.
+                    </p>
+                </DEFINITION>
+                <DECISION>
+                    <p>
+                        Use delegating and inheriting constructors when they reduce code duplication.<br/>
+                        Be cautious about inheriting constructors when your derived class has new member
+                        variables and use in-class member initialization for the derived class's member variables.
+                    </p>
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Structs vs. Classes">
+            <SUMMARY>
+                Use a <code>struct</code> only for passive objects that carry data;
+                everything else is a <code>class</code>.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    The <code>struct</code> and <code>class</code> keywords behave
+                    almost identically in C++.  We add our own semantic meanings
+                    to each keyword, so you should use the appropriate keyword for
+                    the data-type you're defining.
+                </p>
+                <p>
+                    <code>structs</code> should be used for passive objects that carry
+                    data, and may have associated constants, but lack any functionality
+                    other than access/setting the data members. The
+                    accessing/setting of fields is done by directly accessing the
+                    fields rather than through method invocations. Methods should
+                    not provide behavior but should only be used to set up the
+                    data members, e.g., constructor, destructor,
+                    <code>initialize()</code>, <code>reset()</code>,
+                    <code>validate()</code>.
+                </p>
+                <p>
+                    If more functionality is required, a <code>class</code> is more
+                    appropriate.
+                </p>
+                <p>
+                    You can use <code>struct</code>
+                    instead of <code>class</code> for functors and traits.
+                </p>
+                <p>
+                    Note that member variables in structs and classes have
+                    <a HREF="#Variable_Names">different naming rules</a>.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Destructors">
+            <SUMMARY>
+                Every class must free resources (objects, IO handlers, etc.) it allocated
+                during its lifetime.  The base class destructors must be declared virtual
+                if they are public.
+            </SUMMARY>
+            
+            <BODY>
+                <p>
+                    In polymorphic design a special care is needed in implementing
+                    base class destructors. If deletion through a pointer to a base
+                    <code>Base</code> should be allowed, then the <code>Base</code>
+                    destructor must be public and virtual. Otherwise, it should be
+                    protected and can be non-virtual.
+                </p>
+                
+                <DECISION>
+                    <p>
+                        Always write a destructor for a base class, because the implicitly generated
+                        one is public and nonvirtual.
+                    </p>
+                </DECISION>
+                <EXTRA>
+                    In some class designs the destructors (of all classes in the inheritance tree) do nothing (implying that the classes and their members never allocate any resources).
+                    Typically, such designs do not have any virtual functions at all, and the virtual destructor would be the only reason for the existence of a vtable.
+                    Then a virtual destructor may be unnecessary and may be omitted.
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Inheritance">
+            <SUMMARY>
+                When using inheritance, make it <code>public</code> and declare overriden methods
+                as <code>override</code> or <code>final</code>.
+                However, composition is often more appropriate than inheritance especially if a
+                class is not designed to be a base class.
+            </SUMMARY>
+            <BODY>
+                <CPP11 title="override and final">
+                    <p>
+                        Since C++11 it is possible to mark virtual functions as overriding a virtual function from the base class.
+                        This is useful to state the intent and get a compile error if this intent is not fulfilled for some reason (e.g. typo in the function name, mismatching function signature, virtual keyword forgotten in the base class).
+                    </p><p>
+                        The <code>final</code> keyword tells the compiler that subclasses may not override the virtual function anymore.
+                        This is a special case, but useful to limit abuse of your classes by users.
+                    </p>
+                </CPP11>
+                <DEFINITION>
+                    When a sub-class inherits from a base class, it includes the
+                    definitions of all the data and operations that the parent
+                    base class defines.  In practice, inheritance is used in two
+                    major ways in C++: implementation inheritance, in which
+                    actual code is inherited by the child, and interface inheritance, in which only
+                    method names are inherited.
+                </DEFINITION>
+                <PROS>
+                    Implementation inheritance reduces code size by re-using the
+                    base class code as it specializes an existing type.  Because
+                    inheritance is a compile-time declaration, you and the
+                    compiler can understand the operation and detect errors.
+                    Interface inheritance can be used to programmatically enforce
+                    that a class expose a particular API.  Again, the compiler
+                    can detect errors, in this case, when a class does not define
+                    a necessary method of the API.
+                </PROS>
+                <CONS>
+                    For implementation inheritance, because the code implementing
+                    a sub-class is spread between the base and the sub-class, it
+                    can be more difficult to understand an implementation.  The
+                    sub-class cannot override functions that are not virtual, so
+                    the sub-class cannot change implementation.  The base class
+                    may also define some data members, so that specifies physical
+                    layout of the base class.
+                </CONS>
+                <DECISION>
+                    <p>
+                        All inheritance should be <code>public</code>.  If you want to
+                        do private inheritance, you should be including an instance of
+                        the base class as a member instead.
+                    </p>
+                    <p>
+                        Do not overuse implementation inheritance.  Composition is
+                        often more appropriate. Try to restrict use of inheritance
+                        to the "is-a" case: <code>Bar</code> subclasses
+                        <code>Foo</code> if it can reasonably be said that
+                        <code>Bar</code> "is a kind of" <code>Foo</code>.
+                    </p>
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Multiple Inheritance">
+            <SUMMARY>
+                Use multiple inheritance implementation only when at most one of
+                the base classes has an implementation; all other base classes
+                must be <A HREF="#Interfaces">pure interface</A> classes.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    Multiple inheritance allows a sub-class to have more than one
+                    base class.  However this functionality can bring to the so-called <a href="http://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem">Diamond problem</a> unless base classes are pure interfaces.
+                </DEFINITION>
+                <!--PROS>
+                 Multiple implementation inheritance may let you re-use even more code
+                 than single inheritance (see <a HREF="#Inheritance">Inheritance</a>).
+                 </PROS>
+                 <CONS>
+                 Only very rarely is multiple <em>implementation</em>
+                 inheritance actually useful. When multiple implementation
+                 inheritance seems like the solution, you can usually find a
+                 different, more explicit, and cleaner solution.
+                 </CONS-->
+                <DECISION>
+                    Multiple inheritance is allowed only when all superclasses, with the
+                    possible exception of the first one, are <A HREF="#Interfaces">pure
+                        interfaces</A>.
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Interfaces">
+            <SUMMARY>
+                If a class was designed as a pure interface, keep it as a pure interface.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    <p>
+                        A class is a pure interface if it meets the following requirements:
+                    </p>
+                    <ul>
+                        <li> It has only public pure virtual ("<code>= 0</code>") methods
+                            and static methods (see <A HREF="#Destructors">Destructors</A>).
+                        </li>
+                        <li> It does not have data members.
+                        </li>
+                        <li> It does not have any constructors defined.  If a constructor is
+                            provided, it must take no arguments and it must be protected.
+                        </li>
+                        <li> If it is a subclass, it may only be derived from classes
+                            that satisfy these conditions.
+                        </li>
+                    </ul>
+                </DEFINITION>
+                <DECISION>
+                    When writing a pure interface, apply the <a href="#Interface_Names">corresponding naming rule</a> and
+                    make sure there is no implementation in it.
+                    Make sure not to add implementation to an existing pure interface.
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Operator Overloading">
+            <SUMMARY>
+                When overloading operators keep the same semantics.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    Operator overloading is a specific case of function overloading in which some or all operators like +, = or ==
+                    have different behaviors depending on the types of their arguments.
+                    It can easily be emulated using function calls.
+                    <p>For example:
+                        <code>
+                            a &lt;&lt; 1;
+                        </code>
+                        shifts the bits of the variable left by one bit if a is an integer, but if a is an output stream instead this will write "1" to it.
+                    </p>
+                </DEFINITION>
+                <DECISION>
+                    <p>
+                        The semantics of the operator overloading should be kept the same.
+                        Because operator overloading allows the programmer to change
+                        the usual semantics of an operator, it should be used with care.
+                    </p>
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Access Control">
+            <SUMMARY>
+                Hide internals. Avoid returning handles to internal data managed
+                by your class.
+            </SUMMARY>
+            
+            <BODY>
+                <p>
+                    Information hiding protects the code from uncontrollable modifying
+                    state of your object by clients and it also help to minimize dependencies
+                    between calling and called codes.
+                </p>
+                <p>
+                    A class consisting mostly of gets/sets is probably poorly designed.
+                    Consider providing an abstraction or changing it in <code>struct</code>.
+                </p>
+                <DECISION>
+                    Make data members <code>private</code>, except in <code>structs</code>.
+                    If there is no better way how to hide the class internals,
+                    provide the access through protected or public accessor and,
+                    if really needed, modifier functions.
+                </DECISION>
+                
+                <p>
+                    See also <a HREF="#Inheritance">Inheritance</a>,
+                    <a HREF="#Structs_vs._Classes">Structs vs. Classes</a> and
+                    <a HREF="#Function_Names">Function Names</a>.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+    </CATEGORY>
+    
+    <CATEGORY title="Others">
+        
+        <STYLEPOINT title="Exceptions">
+            <SUMMARY>
+                Use C++ exceptions instead of return codes for error handling. Do not use exceptions to return values.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Exceptions should be used for error handling. <br />
+                    Exception classes typically derive from <code>std::exception</code> (or one of its subclasses like <code>std::runtime_error</code>).<br />
+                    Exceptions should be scoped inside the class that throws them.<br />
+                    By default, catch exceptions by reference.<br />
+                    <CODE_SNIPPET>
+                        int computePedestals()
+                        {
+                        ...
+                        if (somethingWrong) {
+                        throw BadComputation();
+                        }
+                        ...
+                        }
+                        ...
+                        try {
+                        computePedestals();
+                        }
+                        catch (BadComputation&amp; e) {  // catch exception by reference
+                        // code that handles error
+                        ...
+                        }
+                    </CODE_SNIPPET>
+                    <BAD_CODE_SNIPPET>
+                        int computePedestals()
+                        {
+                        ...
+                        if (somethingWrong) {
+                        return -1;
+                        }
+                        ...
+                        }
+                        ...
+                        if (computePedestals() == -1) {
+                        // code that handles error
+                        ...
+                        }
+                    </BAD_CODE_SNIPPET>
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Use of const">
+            <SUMMARY>
+                Declare objects that are logically constant as <code>const</code>.
+                Design const-correct interfaces.
+                Consider <a href="#Use_of_constexpr"><code>constexpr</code></a> for some uses of const.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    <CPP11>
+                        <p>
+                            The Standard Library […] in simple words says that it expects operations on const objects to be thread-safe.
+                            This means that the Standard Library won't introduce a data race as long as operations on const objects of your own types either
+                            <ul>
+                                <li>Consist entirely of reads –that is, there are no writes–; or</li>
+                                <li>Internally synchronizes writes.</li>
+                            </ul>
+                            [Source: <a href="http://stackoverflow.com/questions/14127379/does-const-mean-thread-safe-in-c11">Stack Overflow</a>]
+                        </p>
+                        
+                        <p>
+                            This is a great example of how C++11 is a simpler language: we can stop the Cold War-era waffling about subtleties about what 20th-century C++ const means, and proudly declare modern C++ const has the simple and natural and “obvious” meaning that most people expected all along anyway.
+                        </p>
+                        <p>
+                            […] Bjarne Stroustrup writes: “I do point out that const means immutable and absence of race conditions in the last Tour chapter. […]”
+                        </p>
+                        [Source: <a href="http://isocpp.org/blog/2012/12/you-dont-know-const-and-mutable-herb-sutter">isocpp.org</a>]
+                    </CPP11>
+                    Variables and parameters can be declared as <code>const</code> to indicate that the variables are logically immutable.
+                    (Because of <code>const_cast</code> and <code>mutable</code> member variables, and global variables, <code>const</code> is no hard guarantee for immutability.)
+                    Member functions can be declared <code>const</code> to allow calls with <code>const</code> <code>this</code> pointer.
+                    Note that overloading member functions on <code>const</code> is possible.
+                </DEFINITION>
+                <DECISION>
+                    <p>
+                        <code>const</code> variables, data members, methods and
+                        arguments add a level of compile-time type checking; it
+                        is better to detect errors as soon as possible.
+                        Therefore we strongly recommend that you use
+                        <code>const</code> whenever it makes sense to do so.
+                    </p>
+                    <p> Use <code>const</code>:
+                        <ul>
+                            <li>
+                                for an argument, if the function does not modify it when passed by reference or by pointer.
+                            </li>
+                            <li>For accessors.</li>
+                            <li>
+                                For methods, if they:
+                                <ul>
+                                    <li>do not modify any non-local data;</li>
+                                    <li>can be safely (no data race) called from multiple threads;</li>
+                                    <li>do not call any non-<code>const</code> methods;</li>
+                                    <li>do not return a non-<code>const</code> pointer or non-<code>const</code> reference to a data member.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                For data members, whenever they do not need to be modified after construction.
+                            </li>
+                        </ul>
+                    </p>
+                </DECISION>
+                <EXTRA>
+                    <p>
+                        <code>mutable</code> can be used to make objects that are already threadsafe (such as <code>std::mutex</code>) mutable in <code>const</code> methods.
+                        Thus, it is possible to make <code>const</code> methods thread-safe, through internal synchronization.
+                    </p>
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Use of constexpr" cpp11="yes">
+            <SUMMARY>
+                In C++11, use <code>constexpr</code>
+                to define true constants or to ensure constant initialization.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    Some variables can be declared <code>constexpr</code>
+                    to indicate the variables are true constants,
+                    i.e. fixed at compilation/link time.
+                    Some functions and constructors can be declared <code>constexpr</code>
+                    which enables them to be used
+                    in defining a <code>constexpr</code> variable.
+                </DEFINITION>
+                <PROS>
+                    Use of <code>constexpr</code> enables
+                    definition of constants with floating-point expressions
+                    rather than just literals;
+                    definition of constants of user-defined types; and
+                    definition of constants with function calls.
+                </PROS>
+                <CONS>
+                    Prematurely marking something as constexpr
+                    may cause migration problems if later on it has to be downgraded.
+                    
+                    Current restrictions on what is allowed
+                    in constexpr functions and constructors
+                    may invite obscure workarounds in these definitions.
+                </CONS>
+                <DECISION>
+                    <p>
+                        <code>constexpr</code> definitions enable a more robust
+                        specification of the constant parts of an interface.
+                        Use <code>constexpr</code> to specify true constants
+                        and the functions that support their definitions.
+                        Avoid complexifying function definitions to enable
+                        their use with <code>constexpr</code>.
+                        Do not use <code>constexpr</code> to force inlining.
+                    </p>
+                    
+                    
+                </DECISION>
+                <EXTRA>
+                    While <code>constexpr</code> variables are constant expressions, they can still have an address.
+                    Thus, using a <code>constexpr</code> variable as argument for a const-ref function parameter requires the <code>constexpr</code> variable to have a symbol.
+                    Consider the following header file:
+                    <CODE_SNIPPET>
+                        constexpr int GlobalScopeValue = 0;
+                        
+                        namespace Namespace {
+                        constexpr int ScopeValue = 1;
+                        }
+                        
+                        struct Struct {
+                        static constexpr int ScopeValue = 1;
+                        };
+                        
+                        template&lt;typename T&gt; struct TemplateStruct {
+                        static constexpr int ScopeValue = 1;
+                        };
+                        
+                        void function(const int &amp;value);
+                    </CODE_SNIPPET>
+                    And the following test code:
+                    <CODE_SNIPPET>
+                        function(GlobalScopeValue);      // fine
+                        function(Namespace::ScopeValue); // fine
+                        function(Struct::ScopeValue);    // link error
+                        function(TemplateStruct&lt;int&gt;::ScopeValue); // link error
+                    </CODE_SNIPPET>
+                    
+                    To provide the missing symbols you have to add
+                    <CODE_SNIPPET>
+                        template&lt;typename T&gt; constexpr int TemplateStruct&lt;T&gt;::ScopeValue;
+                    </CODE_SNIPPET>
+                    to the header file and
+                    <CODE_SNIPPET>
+                        constexpr int Struct::ScopeValue;
+                    </CODE_SNIPPET>
+                    to one <code>.cxx</code> file.
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Smart Pointers">
+            
+            <SUMMARY>
+                <a href="http://en.cppreference.com/w/cpp/memory/unique_ptr"><code>std::unique_ptr</code></a> and <a href="http://en.cppreference.com/w/cpp/memory/shared_ptr"><code>std::shared_ptr</code></a> should be used consistently instead of non-owning raw pointers.
+                Never use owning raw pointers, and thus never use <code>delete</code>.
+                The use of raw pointers may need an explanation in form of a comment.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    <CPP11 title="smart pointers">
+                        Smart pointers have existed long before C++11.
+                        But since C++11 the standard library contains the classes <code>unique_ptr&lt;T&gt;</code>,
+                        <code>shared_ptr&lt;T&gt;</code>, and <code>weak_ptr&lt;T&gt;</code>.
+                        Also, the standard library provides <code>make_shared&lt;T&gt;</code> and starting with C++14 also <code>make_unique&lt;T&gt;</code>.
+                    </CPP11>
+                    Smart pointers are objects that act like pointers, but automate ownership.
+                    There are two main semantics for ownership: unique and shared ownership.
+                    <p>
+                        Unique ownership ensures that there can be only one smart pointer to the object.
+                        If that smart pointer goes out of scope it will free the pointee.
+                    </p>
+                    <p>
+                        Shared ownership allows to have multiple pointers to an object without deciding who is the exclusive owner.
+                        Thus the owners can be freed in any order and the pointer will stay valid until the last one is freed, in which case the pointee is also freed.
+                        Note that <code>shared_ptr&lt;T&gt;</code> is thread-safe and thus enables sharing ownership over multiple threads.
+                    </p>
+                    <p>
+                        Example:
+                        <CODE_SNIPPET>
+                            {
+                            std::shared_ptr&lt;int&gt; first;
+                            {
+                            std::unique_ptr&lt;int&gt; second(new int);
+                            auto third = std::make_shared&lt;int&gt;();
+                            first = third;
+                            }
+                            // only second is freed automatically here
+                            }
+                            // first and third are automatically freed here
+                        </CODE_SNIPPET>
+                        When exiting the inner scope, only <code>second</code> is freed automatically, because the last
+                        reference to it went out of scope. But even though  <code>third </code> went out of scope here,
+                        no free occurred because <code>first</code> still has a reference.  Only when <code>first</code>
+                        went out of scope and as it is the last reference, <code>third </code> is automatically freed.
+                    </p>
+                    <p>
+                        A <a href="http://en.cppreference.com/w/cpp/memory/weak_ptr">weak pointer (<code>weak_ptr&lt;T&gt;</code>)</a> can be used to break cyclic ownership.
+                    </p>
+                    
+                </DEFINITION>
+                <PROS>
+                    Smart pointers are extremely useful for preventing memory leaks, and
+                    are essential for writing exception-safe code. They also formalize
+                    and document the ownership of dynamically allocated memory.
+                </PROS>
+                <CONS>
+                    Smart pointers enable sharing or transfer of ownership and can thus act as a tempting alternative to careful design of ownership semantics.
+                    This could lead to confusing code and even bugs in which memory is never deleted.
+                </CONS>
+                <DECISION>
+                    <dl>
+                        <dt><code>std::unique_ptr</code></dt>
+                        <dd>Straightforward and risk-free. This should be your default for any pointer.</dd>
+                        <dt><code>std::shared_ptr</code></dt>
+                        <dd>
+                            If you really need to share ownership, use a <code>shared_ptr</code>.
+                            You should avoid designs that require shared ownership, though, as it incurs an overhead.
+                            <code>unique_ptr</code> on the other hand is without overhead.
+                        </dd>
+                    </dl>
+                </DECISION>
+                <EXTRA>
+                    <p>
+                        The following code appears to require shared ownership:
+                        <BAD_CODE_SNIPPET>
+                            void function(shared_ptr&lt;int&gt; value)
+                            {
+                            *value = 0;
+                            }
+                            
+                            void otherFunction()
+                            {
+                            auto ptr = make_shared&lt;int&gt;();
+                            function(ptr);
+                            ...
+                            }
+                        </BAD_CODE_SNIPPET>
+                        Instead the code really has unique ownership in <code>otherFunction()</code>.
+                        There is no reason that <code>function()</code> and <code>otherFunction()</code> need
+                        to share ownership:
+                        <CODE_SNIPPET>
+                            void function(int *value) // caller retains ownership
+                            {
+                            *value = 0;
+                            }
+                            
+                            void otherFunction()
+                            {
+                            unique_ptr&lt;int&gt; ptr{new int};
+                            function(ptr.get());
+                            ...
+                            }
+                        </CODE_SNIPPET>
+                        There would be a reason to share ownership if the owner of the object is a different thread.
+                    </p>
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Magic numbers">
+            <SUMMARY>
+                <p>
+                    Avoid magic numbers.
+                </p>
+            </SUMMARY>
+            <BODY>
+                <p>Avoid spelling literal constants like <code>42</code> or
+                    <code>3.141592</code> in code.
+                    Use symbolic names and expressions instead. Names add information and introduce
+                    a single point of maintenance.
+                </p>
+                <p>
+                    Example of constants at namespace level:
+                </p>
+                <CODE_SNIPPET>
+                    static constexpr double Millimeter  = 1.;
+                    static constexpr double Centimeter  = 10.*Millimeter;
+                </CODE_SNIPPET>
+                <p>
+                    Example of class-specific constants:
+                </p>
+                <CODE_SNIPPET>
+                    // File Widget.h
+                    class Widget {
+                    private:
+                    static const int sDefaultWidth;           // value provided in definition
+                    static constexpr int DefaultHeight = 600; // value provided in declaration
+                    };
+                </CODE_SNIPPET>
+                <CODE_SNIPPET>
+                    // File Widget.cxx
+                    const int Widget::sDefaultWidth = 800; // value provided in definition
+                    constexpr int Widget::DefaultHeight;   // definition required only if reference/pointer to
+                    // DefaultHeight is needed
+                </CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Preprocessor Macros">
+            <SUMMARY>
+                Avoid macros. Use inline functions, constexpr functions, enums,
+                constexpr variables, or templates instead if they can solve the
+                problem.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Macros mean that the code you see is not the same as the code
+                    the compiler sees.  This can introduce unexpected behavior,
+                    especially since macros have global scope.
+                </p>
+                <p>
+                    The following usage pattern will avoid many problems with
+                    macros; if you use macros, follow it whenever possible:
+                </p>
+                <ul>
+                    <li> Don't define macros in a <code>.h</code> file.
+                    </li>
+                    <li> Define macros (via <code>#define</code>) right before you use them,
+                        and undefine them  (via <code>#undef</code>) right after.
+                    </li>
+                    <li> Do not just undefine an existing macro (via <code>#undef</code>) before
+                        replacing it with your own; instead, pick a name that's
+                        likely to be unique.
+                    </li>
+                    <li> Try not to use macros that expand to unbalanced C++
+                        constructs, or at least document that behavior well.
+                    </li>
+                    <li> Prefer not using <code>##</code> to generate function/class/variable
+                        names.
+                    </li>
+                    <li> Follow the naming convention as described <a href="#Macro_Names">here</a>.
+                    </li>
+                </ul>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Write Short Functions">
+            <SUMMARY>
+                Prefer small and focused functions.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Long functions are hard to debug and makes readability difficult. Short functions allow code reuse.
+                    If a function exceeds about 40 lines, think about whether it can be broken
+                    up without harming the structure of the program.<br/>
+                    Giving the function a name that describes what it does might help splitting it into smaller pieces.
+                    Functions should represent logical grouping, therefore it should be easy to assign them meaningful names.<br/>
+                    
+                    Please note that nesting is not the same as splitting long functions into short ones.
+                    In addition, it does not improve readability and ease of debug.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <!-- <STYLEPOINT title="Function Parameters (Matthias)">
+         <SUMMARY>
+         Function parameters should be by value or by const reference.
+         Limit the number of parameters to two or at maximum three.
+         </SUMMARY>
+         <BODY>
+         <DEFINITION>
+         <p>
+         Functions allow an arbitrary number of parameters with many different forms of parameter passing:
+         <ul>
+         <li>by value: <code>f(int)</code></li>
+         <li>by reference: <code>f(int &amp;)</code></li>
+         <li>by const reference: <code>f(const int &amp;)</code></li>
+         <li>as pointer: <code>f(int *)</code></li>
+         <li>as pointer to const: <code>f(const int *)</code></li>
+         <li>as const pointer: <code>f(int *const)</code></li>
+         <li>as const pointer to const: <code>f(const int *const)</code></li>
+         <li>by rvalue reference: <code>f(int &amp;&amp;)</code></li>
+         <li>... and more</li>
+         </ul>
+         Some of the above allow the function body to modify the value.
+         Some of those will make the changes visible to the caller.
+         </p>
+         <p>
+         By looking at a C/C++ function call it is impossible to know which arguments will/may be modified by the function without looking at the function signature.
+         Even then, the signature may be misleading and the function does not change the values of the arguments, even though the signature allows it.
+         </p>
+         <p>
+         In some designs function parameters are used to return results to the caller.
+         This is often the case if a function returns more than one object, or must return an error code in addition to a value.
+         </p>
+         </DEFINITION>
+         <DECISION>
+         <p>
+         Limit function argument usage to inputs.
+         Then, the only two useful variants for parameter passing are by value and by const reference.
+         Use const-reference when a copy of the object is expensive and not required.
+         If a copy is required anyway, or if the parameter is a builtin type consider passing by value.
+         </p>
+         <p>
+         Use return values for return values — not function parameters.
+         You do not need to return error codes anyway because exceptions are used instead.
+         If you still need to return multiple values use an appropriate structure or a <code>std::tuple</code>.
+         </p>
+         <p>
+         By disallowing return values in function arguments, code becomes much easier to read since the flow of data is obvious.
+         </p>
+         <p>
+         Use only few function parameters because this makes the function's signature easy to memorize and understand.
+         Thus, it helps code readability and maintainability.
+         </p>
+         </DECISION>
+         </BODY>
+         </STYLEPOINT>
+         
+         <STYLEPOINT title="Function Parameters">
+         <SUMMARY>
+         Take parameters appropriately by value, (smart) pointer, or reference.
+         The order : inputs, then outputs.
+         </SUMMARY>
+         <BODY>
+         <p>
+         Parameters to C/C++ functions are either input to the
+         function, output from the function, or both. 
+         </p>  
+         <DECISION>
+         <p> The guidelines for choosing how to take parameters:</p> 
+         <p> For input parameters: 
+         <ul>
+         <li> Always const-qualify all pointers and references to input-only parameters. </li>
+         <li> Prefer taking inputs of primitive types (eg. char. float) and value objects
+         that are cheap to copy (eg. Point, complex &lt;float&gt;) by value. </li>
+         <li> Prefer taking inputs for other user-defined types by reference to const. </li>
+         <li> Consider pass-by-value instead of reference if the function requires a copy
+         of its argument. </li>
+         </ul>     
+         </p>
+         <p> For input or input/output parameters: 
+         <ul>
+         <li> Prefer passing by (smart) pointer if the argument is optional or if the 
+         function stores a copy of the pointer or otherwise manipulates ownership
+         of the argument. </li>
+         <li> Prefer passing by reference  if the argument is required and the function
+         won't store a pointer to it or otherwise affects its ownership. </li>   
+         </ul>
+         </p>
+         <p> Don't use C-style varargs.
+         </p>
+         </DECISION>
+         </BODY>
+         </STYLEPOINT>-->
+        
+        
+        <STYLEPOINT title="Run-Time Type Information (RTTI)">
+            <SUMMARY>
+                Avoid using Run Time Type Information (RTTI).
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    RTTI allows a programmer to query the C++ class of an
+                    object at run time.  This is done by use of <code>typeid</code> or
+                    <code>dynamic_cast</code>.
+                </DEFINITION>
+                <CONS>
+                    <p>
+                        Querying the type of an object at run-time frequently means a
+                        design problem.  Needing to know the type of an
+                        object at runtime is often an indication that
+                        the design of your class hierarchy is flawed.
+                    </p>
+                    <p>
+                        Undisciplined use of RTTI makes code hard to maintain.  It can
+                        lead to type-based decision trees or switch statements scattered
+                        throughout the code, all of which must be examined when making
+                        further changes.
+                    </p>
+                    <p>
+                        Decision trees based on type are a strong indication that your
+                        code is on the wrong track.
+                        <BAD_CODE_SNIPPET>
+                            if (typeid(*data) == typeid(Data1)) {
+                            ...
+                            } else if (typeid(*data) == typeid(Data2)) {
+                            ...
+                            } else if (typeid(*data) == typeid(Data3)) {
+                            ...
+                        </BAD_CODE_SNIPPET>
+                        Code such as this usually breaks when additional subclasses are
+                        added to the class hierarchy.  Moreover, when properties of a subclass
+                        change, it is difficult to find and modify all the affected code segments.
+                    </p>
+                </CONS>
+                <PROS>
+                    <p>
+                        The standard alternatives to RTTI (described below) require
+                        modification or redesign of the class hierarchy in question.
+                        Sometimes such modifications are infeasible or undesirable,
+                        particularly in widely-used or mature code.
+                    </p>
+                    <p>
+                        RTTI can be useful in some unit tests. For example, it is useful in
+                        tests of factory classes where the test has to verify that a
+                        newly created object has the expected dynamic type.  It is also
+                        useful in managing the relationship between objects and their mocks.
+                    </p>
+                    <CODE_SNIPPET>
+                        // Example of a unit test
+                        Geo::Factory geoFactory;
+                        Geo::Object* circle = geoFactory.CreateCircle();
+                        if ( ! dynamic_cast&lt;Geo::Circle&gt;(circle) ) {
+                        std::cerr &lt;&lt; "Unit test failed."  &lt;&lt; std::endl;
+                        }  
+                    </CODE_SNIPPET>
+                </PROS>
+                <DECISION>
+                    <p>
+                        RTTI has legitimate uses but is prone to abuse, so you must
+                        be careful when using it.  You may use it freely
+                        in unittests, but avoid it when possible in other code.
+                        In particular, think twice before using RTTI in new code.
+                        If you find yourself needing to write code that behaves differently
+                        based on the class of an object, consider one of the following
+                        alternatives to querying the type:
+                        <ul>
+                            <li>
+                                Virtual methods are the preferred way of executing different
+                                code paths depending on a specific subclass type.  This puts
+                                the work within the object itself.
+                            </li>
+                            <li>
+                                If the work belongs outside the object and instead in some
+                                processing code, consider a double-dispatch solution, such
+                                as the Visitor design pattern.  This allows a facility
+                                outside the object itself to determine the type of class
+                                using the built-in type system.
+                            </li>
+                        </ul>
+                    </p>
+                    <p>
+                        When the logic of a program guarantees that a given instance
+                        of a base class is in fact an instance of a particular derived class,
+                        then use of a <code>dynamic_cast</code> or <code>static_cast</code> 
+                        as an alternative may be also justified in such situations.
+                    </p>
+                </DECISION>
+                <EXTRA>
+                    <p>
+                        An example of code based on <code>dynamic_cast</code>:
+                    </p>
+                    <BAD_CODE_SNIPPET>
+                        void foo(Bar* bar) {
+                        // ... some code where x, y, z are defined ...
+                        // ...
+                        if (Data1 data1 = dynamic_cast&lt;Data1*&gt;(bar)) {
+                        doSomething(data1, x, y);
+                        }
+                        else if (Data2 data2 = dynamic_cast&lt;Data2*&gt;(bar)) {
+                        doSomething(data2, z)
+                        }
+                    </BAD_CODE_SNIPPET>
+                    <p>
+                        which can be defined using the Visitor pattern: 
+                    </p>
+                    <CODE_SNIPPET>
+                        void foo(Bar* bar) {
+                        // ... some code where x, y, z are defined ...
+                        // ...
+                        DoSomethingVisitor visitor(x, y, z);
+                        bar.accept(visitor);
+                        }
+                    </CODE_SNIPPET>
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Casting">
+            <SUMMARY>
+                In general, avoid designs that require casting.
+                You may use <code>static_cast</code> when necessary, but avoid <code>const_cast</code> and <code>reinterpret_cast</code>.
+                C-casts are forbidden.
+            </SUMMARY>
+            <BODY>
+                <DECISION>
+                    <ul>
+                        <li>
+                            Try to avoid casts.
+                            The need for casts may be a hint that too much type information was lost somewhere.
+                        </li>
+                        <li>
+                            Use <code>static_cast</code> to explicitly convert values between different types.
+                            <code>static_cast</code>s are useful for up-casting pointers in an inheritance hierarchy.
+                        </li>
+                        <li>
+                            Avoid <code>const_cast</code>.
+                            (Possibly use <code>mutable</code> member variables instead.)
+                            <code>const_cast</code> may be used to adapt to const-incorrect interfaces that you cannot (get) fix(ed).
+                        </li>
+                        <li>
+                            <code>reinterpret_cast</code>s are powerful but dangerous.
+                            Rather try to avoid them.
+                            Code that requires a <code>reinterpret_cast</code> should document the aliasing implications.
+                            (<a href="http://en.cppreference.com/w/cpp/language/reinterpret_cast">reinterpret_cast on cppreference.com</a>)
+                        </li>
+                    </ul>
+                    <p> See the <a href="#Run-Time_Type_Information__RTTI_">RTTI section</a>
+                        for guidance on the use of <code>dynamic_cast</code>.
+                    </p>
+                </DECISION>
+                <EXTRA>
+                    For the dangers of <code>reinterpret_cast</code> consider:
+                    <BAD_CODE_SNIPPET>
+                        std::uint32_t fun()
+                        {
+                        std::uint32_t binary = 0;
+                        reinterpret_cast&lt;float &amp;&gt;(binary) = 1.f;
+                        return binary; // the return value is undefined, according to the C++ standard
+                        }
+                    </BAD_CODE_SNIPPET>
+                    The following is better, but still undefined behavior according to the type aliasing rules:
+                    <CODE_SNIPPET>
+                        std::uint32_t fun()
+                        {
+                        float value = 1.f;
+                        return reinterpret_cast&lt;std::uint32_t &amp;&gt;(value); // this returns 0x3f800000 on x86
+                        }
+                    </CODE_SNIPPET>
+                    In case of doubt, prefer not to use <code>reinterpret_cast</code> in order to avoid mistakes.
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Variable-Length Arrays and alloca()">
+            <SUMMARY>
+                Don't use variable-length arrays or <code>alloca()</code>.
+            </SUMMARY>
+            <BODY>
+                <PROS>
+                    Stack-allocated objects avoid the overhead of heap allocation.
+                    Variable-length arrays and <code>alloca</code> allow variably-sized stack allocations, whereas all other stack allocations in C++ only allow fixed-size objects on the stack.
+                </PROS>
+                <CONS>
+                    Variable-length arrays are part of C but not Standard C++.
+                    <code>alloca</code> is part of POSIX, but not part of Standard C++.
+                </CONS>
+                
+                <DECISION>
+                    Use STL containers instead.
+                    If you really need to improve the performance consider using a custom allocator for the containers.
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Increment and Decrement operators">
+            <SUMMARY>
+                Prefer the prefix form of the increment (<code>++i</code>) and decrement 
+                (<code>--i</code>) operators because it has simpler semantics.
+            </SUMMARY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Loops and Switch Statements">
+            <SUMMARY>
+                <p>
+                    If not conditional on an enumerated value, switch statements
+                    should always have a <code>default</code> case.
+                    Empty loop bodies should use <code>{}</code>
+                    or <code>continue</code>. 
+                </p>
+            </SUMMARY>
+            <BODY>
+                <p>If not conditional on an enumerated value, switch statements
+                    should always have a <code>default</code> case (in the case of
+                    an enumerated value, the compiler will warn you if any values
+                    are not handled).  If the default case should never execute,
+                    simply
+                    <code>assert</code>:
+                </p>
+                <CODE_SNIPPET>
+                    switch (value) {
+                    case 0: {  // 2 space indent
+                    ...      // 4 space indent
+                    break;
+                    }
+                    case 1: {
+                    ...
+                    break;
+                    }
+                    default: {
+                    assert(false);
+                    }
+                    }
+                </CODE_SNIPPET>
+                <p>
+                    Empty loop bodies should use <code>{}</code> or
+                    <code>continue</code>, but not a single semicolon.
+                </p>
+                <CODE_SNIPPET>
+                    while (condition) {
+                    // Repeat test until it returns false.
+                    }
+                    for (int i = 0; i &lt; someNumber; ++i) {}  // Good — empty body.
+                    while (condition) continue;  // Good — continue indicates no logic.
+                </CODE_SNIPPET>
+                <BAD_CODE_SNIPPET>
+                    while (condition);  // Bad — looks like part of do/while loop.
+                </BAD_CODE_SNIPPET>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Integer Types">
+            <SUMMARY>
+                Per default, use <code>int</code> if you need an integer type.
+                Prefer signed integers over unsigned integers and thus <code>std::int64_t</code> over <code>unsigned int</code> if you need more bits.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    The C++ standard only loosely specifies the sizes of its built-in integer types.
+                </p>
+                <p>
+                    If you need something other than <code>int</code>, consider one of the <a href="http://en.cppreference.com/w/cpp/header/cstdint">integer types in <code>&lt;cstdint&gt;</code></a>.
+                </p>
+                <SUBSECTION title="On Unsigned Integers">
+                    <p>
+                        Using unsigned types to represent numbers that are never
+                        negative may be a source of problems as demonstrated here:
+                    </p>
+                    <BAD_CODE_SNIPPET>
+                        for (unsigned int i = foo.getLength() - 1; i &gt;= 0; --i) ...
+                    </BAD_CODE_SNIPPET>
+                    <p>
+                        This code will never terminate!
+                        A compiler might notice the issue and warn you, but do not count on it.  Equally bad
+                        bugs can occur when comparing signed and unsigned
+                        variables.
+                    </p>
+                    <p>
+                        To avoid such situation we recommend to consistently use
+                        <code>int</code>:
+                    </p>
+                    <CODE_SNIPPET>
+                        for (int i = static_cast&lt;int&gt;(foo.getLength()) - 1; i &gt;= 0; --i) ...
+                    </CODE_SNIPPET>
+                </SUBSECTION>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Portability">
+            <SUMMARY>
+                Take extra care of the code portability. Bear in mind problems of
+                printing, comparisons, and structure alignment related to 
+                32-bit and 64-bit data representations .
+            </SUMMARY>
+            <BODY>
+                <p> 
+                    Below we give a list (incomplete) of possible portability 
+                    issues:
+                </p> 
+                <ul>
+                    <li> <code>printf()</code> specifiers for some types are
+                        not cleanly portable between 32-bit and 64-bit
+                        systems. </li>
+                    <li> Remember that <code>sizeof(void *)</code> !=
+                        <code>sizeof(int)</code>.  Use <code>intptr_t</code> if
+                        you need a pointer-sized integer.
+                    </li>
+                    <li> You may need to be careful with structure alignments,
+                        particularly for structures being stored on disk. </li>
+                    <li> The data memory representation is computer specific and
+                        not defined by C++. The terms endian and endianness, refer 
+                        to how bytes of a data word are ordered within memory.
+                        Big endian store bytes from the highest to the lowest, 
+                        Little endian from the lowest to the highest.
+                    </li>
+                </ul>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="0 and nullptr">
+            <SUMMARY>
+                Use <code>0</code> for integers, <code>nullptr</code> for pointers,
+                and <code>'\0'</code> for chars.
+            </SUMMARY>
+            <BODY>
+                <p> 
+                    <code>nullptr</code> is a pointer literal of type <code>std::nullptr_t</code>. On the other hand, <code>NULL</code> is a macro equivalent the integer <code>0</code>. Using <code>NULL</code> could bring to unexpected problems. For example imagine you have the following two function declarations:
+                    <BAD_CODE_SNIPPET>
+                        void function(int number);
+                        void function(char *name);
+                        
+                        function( NULL );
+                    </BAD_CODE_SNIPPET>
+                    Because <code>NULL</code> is <code>0</code>, and <code>0</code> is an integer, the first version of func will be called instead. 
+                    In C++11, <code>nullptr</code> is a new keyword that can (and should!) be used to represent <code>NULL</code> pointers.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="sizeof">
+            <SUMMARY>
+                Prefer <code>sizeof(<var>varname</var>)</code> to
+                <code>sizeof(<var>type</var>)</code>.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    Use <code>sizeof(<var>varname</var>)</code>
+                    when you take the size of a particular variable.
+                    <code>sizeof(<var>varname</var>)</code> will update
+                    appropriately if someone changes the variable type
+                    either now or later.
+                    You may use <code>sizeof(<var>type</var>)</code>
+                    for code unrelated to any particular variable,
+                    such as code that manages an external or internal
+                    data format where a variable of an appropriate C++ type
+                    is not convenient.
+                </p>
+                <p>
+                    <CODE_SNIPPET>
+                        Struct data;
+                        memset(&amp;data, 0, sizeof(data));
+                    </CODE_SNIPPET>
+                    <BAD_CODE_SNIPPET>
+                        memset(&amp;data, 0, sizeof(Struct));
+                    </BAD_CODE_SNIPPET>
+                    <CODE_SNIPPET>
+                        if (rawSize &lt; sizeof(int)) {
+                        logMessage &lt;&lt; "compressed record not big enough for count: " &lt;&lt; rawSize; 
+                        }
+                    </CODE_SNIPPET>
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="auto" cpp11="yes">
+            <SUMMARY>
+                Use <code>auto</code> to avoid type names that are just clutter.
+                Continue to use manifest type declarations when it helps readability,
+                and never use <code>auto</code> for anything but local variables.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    In C++11, a variable whose type is given as <code>auto</code> will be given
+                    a type that matches that of the expression used to initialize
+                    it. You can use <code>auto</code> either to initialize a
+                    variable by copying, or to bind a reference.
+                    <CODE_SNIPPET>
+                        vector&lt;string&gt; names;
+                        ...
+                        auto name1 = names[0];  // Makes a copy of names[0].
+                        const auto&amp; name2 = names[0];  // name2 is a reference to names[0].
+                    </CODE_SNIPPET>
+                </DEFINITION>
+                <PROS>
+                    <p>
+                        C++ type names can sometimes be long and cumbersome,
+                        especially when they involve templates or namespaces. In a statement like
+                        <BAD_CODE_SNIPPET>
+                            sparse_hash_map&lt;string, int&gt;::iterator iter = myMap.find(val);
+                        </BAD_CODE_SNIPPET>
+                        the return type is hard to read, and obscures the primary
+                        purpose of the statement. Changing it to
+                        <CODE_SNIPPET>
+                            auto iter = myMap.find(val);
+                        </CODE_SNIPPET>
+                        makes it more readable.
+                    </p>
+                    <p>
+                        Without <code>auto</code> we are sometimes forced to write a
+                        type name twice in the same expression, adding no value
+                        for the reader, as in
+                        <BAD_CODE_SNIPPET>
+                            diagnostics::ErrorStatus* status = new diagnostics::ErrorStatus("xyz");
+                        </BAD_CODE_SNIPPET>
+                    </p>
+                    <p>
+                        Using <code>auto</code> makes it easier to use intermediate
+                        variables when appropriate, by reducing the burden of writing
+                        their types explicitly.
+                        <CODE_SNIPPET>
+                            auto status = new diagnostics::ErrorStatus("xyz");
+                        </CODE_SNIPPET>
+                    </p>
+                </PROS>
+                <CONS>
+                    <p>Sometimes code is clearer when types are manifest, especially when
+                        the initialization of a variable depends on functions/variables that were declared
+                        far away. In an expression like
+                        <BAD_CODE_SNIPPET>
+                            auto i = xValue.Lookup(key);
+                        </BAD_CODE_SNIPPET>
+                        it may not be obvious what <code>i</code>'s type is, if <code>x</code>
+                        was declared hundreds of lines earlier.
+                    </p>
+                    
+                    <p>Programmers have to understand the difference between <code>auto</code>
+                        and <code>const auto&amp;</code> or they'll get copies when
+                        they didn't mean to.
+                    </p>
+                    
+                    <p>The interaction between <code>auto</code> and C++11
+                        brace-initialization can be confusing. The declarations
+                        <BAD_CODE_SNIPPET>
+                            auto xValue(3);  // Note: parentheses.
+                            auto yValue{3};  // Note: curly braces.
+                        </BAD_CODE_SNIPPET>
+                        mean different things — <code>xValue</code> is
+                        an <code>int</code>, while <code>yValue</code> is
+                        an <code>initializer_list</code>. The same applies to other
+                        normally-invisible proxy types.
+                    </p>
+                    
+                    <p>If an <code>auto</code> variable is used as part of an
+                        interface, e.g. as a constant in a header, then a programmer
+                        might change its type while only intending to change its
+                        value, leading to a more radical API change than intended.</p>
+                </CONS>
+                <DECISION>
+                    <p><code>auto</code> is permitted for local variables only.
+                        Do not use <code>auto</code> for file-scope or namespace-scope
+                        variables, or for class members. Never assign a braced initializer list
+                        to an <code>auto</code>-typed variable.</p>
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+        
+    </CATEGORY>
+    
+    <CATEGORY title="Exceptions to the Rules">
+        <p>
+            The coding conventions described above have to be followed.  However,
+            like all good rules, these sometimes have exceptions.
+        </p>
+        
+        <STYLEPOINT title="Existing Non-conformant Code">
+            <SUMMARY>
+                It is permissible to deviate from the rules when dealing with code that does not
+                conform to these guidelines. 
+            </SUMMARY>
+            <BODY>
+                <p>
+                    To modify code that was written to
+                    specifications other than those presented by this guide, it may be necessary to deviate from these rules in order to stay consistent with
+                    the local conventions in that code.  In case of doubt the original author or the person currently
+                    responsible for the code should be consulted.  Remember that <em>consistency</em>
+                    also includes local consistency.
+                </p>
+            </BODY>
+        </STYLEPOINT>
+    </CATEGORY>
+    
+    <PARTING_WORDS>
+        <p>
+            Use common sense and <em>BE CONSISTENT</em>.
+        </p>
+        <p>
+            The point about having style guidelines is to have a common
+            vocabulary of coding so people can concentrate on what the programmer
+            is saying, rather than on how he/she is saying it.
+        </p>
+        <p>
+            OK, enough writing about writing code; the code itself is much
+            more interesting. Have fun!
+        </p>
+    </PARTING_WORDS>
+    
+    <REFERENCES>
+        <p>
+            [1] Herb Sutter on software, hardware, and concurrency blog [<a href="http://herbsutter.com/2013/05/09/gotw-1-solution">http://herbsutter.com/2013/05/09/gotw-1-solution</a>]
+        </p>
+    </REFERENCES>
+    
+</GUIDE>
+<!-- vim: sw=2 et sts=2
+ -->
