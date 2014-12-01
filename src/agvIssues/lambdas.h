@@ -29,15 +29,7 @@ void testVarByReference()
 
 namespace Lambdas
 {
-class A
-{
-  int myA;
-};
 
-class B
-{
-  float fda;
-};
 
 void testLambdas()
 {
@@ -59,8 +51,6 @@ void testLambdas()
 
 
 }
-
-
 
 
 

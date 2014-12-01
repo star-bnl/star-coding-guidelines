@@ -7,15 +7,6 @@
 using namespace std;
 namespace StrongEnums
 {
-class A
-{
-  int myA;
-};
-
-class B
-{
-  float fda;
-};
 
 
 enum WeakEnum{one, two,three};
@@ -26,6 +17,9 @@ enum class C2
   {
     one, two, three, four
       };
+
+ enum class  strongEnum : int{first, second};
+
 void testStrongEnums()
 {
 enum class C {one, two, three};
@@ -37,10 +31,17 @@ enum class C {one, two, three};
   WeakEnum myWeakEnum=two;
   //  myEnum=one;
   //  myEnum2=C2::one;
+  strongEnum mStrongEnum=strongEnum::first;
+
   cout <<"hello, strong enums!"<<endl;
   cout <<" myenum is : "<< myWeakEnum<<endl;
-  //doesn't compile...
-  //  cout <<"strong enum is: " << myEnum<<endl;
+  //for some reason doesn't work w/o cast...
+  cout <<" strong enum first: " << (int) mStrongEnum <<endl;
+  mStrongEnum=strongEnum::second;
+  cout <<" strong enum second: " << static_cast<int>( mStrongEnum )<<endl;
+  //    cout <<" strong enum first: " << strongEnum::first <<endl;
+  //doesn't compile...even though underlying type should be int by default...
+  // cout <<"strong enum is: " << myEnum<<endl;
 
 }
 }

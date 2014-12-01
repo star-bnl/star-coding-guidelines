@@ -16,8 +16,10 @@ int main(int argc, char** argv)
   NullPtr::testNullPtr();
   StrongEnums::testStrongEnums();
   Lambdas::testLambdas();
+  InitLists::testInitLists();
+  Decltypes::testDeclType();    
+  InlineNS::testInlineNS();
+  Alignment::testAlignment();
     
-    
-    
-    return 0;
+  return 0;
 }
