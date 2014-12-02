@@ -10,6 +10,10 @@
 #include "nullPtr.h"
 #include "strongEnums.h"
 #include "lambdas.h"
+#include "initializerLists.h"
+#include "decltype.h"
+#include "alignments.h"
+#include "inlineNS.h"
 
 int main(int argc, char** argv)
 {
