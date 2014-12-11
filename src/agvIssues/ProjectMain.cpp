@@ -15,6 +15,11 @@
 #include "alignments.h"
 #include "inlineNS.h"
 
+constexpr int someFunction(int x)
+{
+  return x*4;
+};
+
 int main(int argc, char** argv)
 {
   NullPtr::testNullPtr();
@@ -24,6 +29,7 @@ int main(int argc, char** argv)
   Decltypes::testDeclType();    
   InlineNS::testInlineNS();
   Alignment::testAlignment();
-    
+  int y=someFunction(30);
+
   return 0;
 }
