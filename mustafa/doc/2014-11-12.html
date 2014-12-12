@@ -37,6 +37,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#control-of-defaults-default-and-delete">Control of defaults: default and delete</a></li>
 <li><a href="#control-of-defaults-move-and-copy">Control of defaults: move and copy:</a></li>
 <li><a href="#in-class-member-initializers">In-class member initializers</a></li>
+<li><a href="#rvo-and-copy-elision">RVO and copy elision</a></li>
 <li><a href="#references">References</a></li>
 </ul>
 <hr>
@@ -153,6 +154,34 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>This is basically equivalent to using initialization lists in constructors. The advantage of in-class initialization is that it allows consistent default initialization when there are multiple constructors and saves a lot of typing resulting in cleaner codes.</p>
 <p>Constructor initialization overrides in-class initialization.</p>
 <p><strong>Recommendation:</strong><br />- In-class member initialization should be encouraged.</p>
+<h3 id="rvo-and-copy-elision">RVO and copy elision</h3>
+<p>This is a note that will become useful later.<br />Return value optimization (RVO) and copy elision are both implemented in gcc compiler.<br />The copy elision as an implementation of the <em>as-if</em> rule of the standard which states that a compiler is allowed to do optimization to avoid unnecessary copying if the behavior of the program is the same <em>as if</em> all the requirements of the standard has been fulfilled. Furthermore,</p>
+<blockquote>
+<p>The term return value optimization refers to a special clause in the C++ standard which goes even further than the &quot;as-if&quot; rule: an implementation may omit a copy operation resulting from a return statement, even if the copy constructor has side effects.</p>
+</blockquote>
+<p>Example:</p>
+<p><a href="http://ideone.com/yOnDk2"><strong>Try it live.</strong></a></p>
+<pre class="sourceCode C"><code class="sourceCode c"><span class="ot">#include &lt;iostream&gt;</span>
+ 
+<span class="kw">struct</span> C 
+{
+  C() {}
+  C(<span class="dt">const</span> C&amp;) { std::cout &lt;&lt; <span class="st">&quot;A copy was made.</span><span class="ch">\n</span><span class="st">&quot;</span>; }
+};
+ 
+C f() {
+  <span class="kw">return</span> C();
+}
+ 
+<span class="dt">int</span> main()
+{
+  std::cout &lt;&lt; <span class="st">&quot;Hello World!</span><span class="ch">\n</span><span class="st">&quot;</span>;
+  C obj = f();
+}</code></pre>
+<p>Compiling and running with gcc gives:</p>
+<pre class="sourceCode C"><code class="sourceCode c">Hello World!</code></pre>
+<p>So both copies (from local variable to the stack and from the stack to obj) have been optimized away. i.e. RVO is being used even though avoiding the copy constructor has the side effect.</p>
+<p>You can avoid this optimization by using the gcc flag <code>-fno-elide-constructors</code>.</p>
 <h3 id="references">References</h3>
 <p>Most of the examples in this document are modified versions of those in:<br />- <a href="http://en.wikipedia.org/wiki/C%2B%2B11">C++11 wiki page</a>.<br />- Stroustrup's <a href="http://www.stroustrup.com/C++11FAQ.html">C++11 FAQ</a>.</p>
 </body>
