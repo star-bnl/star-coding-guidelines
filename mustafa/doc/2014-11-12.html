@@ -88,7 +88,8 @@ code > span.er { color: #ff0000; font-weight: bold; }
     <span class="dt">void</span> k() override; <span class="co">// doesn&#39;t override B::k() (B::k() is not virtual)</span>
     <span class="dt">void</span> h(<span class="dt">char</span>); <span class="co">// overrides B::h()</span>
 };</code></pre>
-<p>Error given by gcc compiler when there is a problem with an override attempt is &quot;error: ‘void foo::foo()’ marked override, but does not override&quot;.</p>
+<p>Error given by gcc compiler when there is a problem with an override attempt is</p>
+<pre class="sourceCode C"><code class="sourceCode c">error: ‘void foo::foo()’ marked override, but does not override.</code></pre>
 <p>The case of the <code>D::h(char)</code> is curious. gcc doesn't give a warning when the <code>override</code> keyword is not used. This is likely to avoid a volcano of warnings when compiling older code.</p>
 <p>The <code>override</code> keyword is very useful. It makes the code more readable by making the programmer intention explicit and avoids potential problems by catching, otherwise silent errors, at compile time. Common bugs such as missing a function constatnness or being careless with function siganture when overriding can be avoided.</p>
 <p><strong>Recommendation:</strong><br />- Use of <code>override</code> keyword is encouraged.</p>
