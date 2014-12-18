@@ -1,23 +1,18 @@
 #include <iostream>
+#include <memory>
+#include "TH1F.h"
+#include "TFile.h"
+
 using namespace std;
 
-struct A 
+int main()
 {
-    int data;
-    A() = default;
-    A(const A&) = default;
-    //NonCopyable & operator=(const NonCopyable&) = delete;
-};
-
-int main() {
+  TFile f("out.root","recreate");
+  f.cd();
+  unique_ptr<TH1F> h {new TH1F("h","h",100,-5,5)};
+  h->FillRandom("gaus",10000);
+  h->Write();
+  f.Close();
   
-  A a;
-  a.data = 10;
-  A b(a);
-  A c;
-  c = a;
-
-  cout<<b.data<<endl;
-  cout<<c.data<<endl;
   return 0;
 }
