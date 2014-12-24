@@ -36,7 +36,7 @@ void testInlineNS()
 
   cout <<"ordinary from inline is: "<< ordinary <<endl;
   int ordinary=2;
-  cout <<"now ordinary is : " << ordinary <<endl;
+  cout <<"now ordinary is : " << ordinary << "inline ordinary: "<< inner_inlineNS::ordinary <<endl;
   int nonOrdinary=5;
 
 }
@@ -44,3 +44,12 @@ void testInlineNS()
 
 }
 #endif
+
+
+#ifdef __VERSION_1
+inline
+#endif
+namespace version1_NS
+{
+
+}
