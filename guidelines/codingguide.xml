@@ -49,7 +49,7 @@
     </CATEGORY>
 
 
-    START EDITING HERE
+
 
 
     <OVERVIEW>
@@ -79,17 +79,11 @@
     <CATEGORY title="Header Files">
         <p>
             In general, every <code>.cxx</code> file should have an associated
-            <code>.h</code> file. There are some common exceptions, such as
-            
-            unittests
-            and small <code>.cxx</code> files containing just a <code>main()</code>
-            function.
+            <code>.h</code> file.
         </p>
         <p>
             Correct use of header files can make a huge difference to the
             readability, size and performance of your code.
-        </p>
-        <p>
             The following rules will guide you through the various pitfalls of
             using header files.
         </p>
@@ -99,23 +93,22 @@
                 All header files should have <code>#define</code> guards to
                 prevent multiple inclusion.  The format of the symbol name
                 should be
-                <code><i>&lt;PROJECT&gt;</i>_<i>&lt;PATH&gt;</i>_<i>&lt;FILE&gt;</i>_H_</code>.
+                <code><i>&lt;FILE&gt;</i>_H</code>.
             </SUMMARY>
             <BODY>
                 
                 <p>
-                    To guarantee uniqueness, they should be based on the full path
-                    in a project's source tree.  For example, the file
-                    <code>foo/src/bar/myFile.h</code> in project <code>foo</code> should
+                    For example, the file
+                    <code>myFile.h</code> should
                     have the following guard:
                 </p>
                 <CODE_SNIPPET>
-                    #ifndef FOO_BAR_MYFILE_H_
-                    #define FOO_BAR_MYFILE_H_
+                    #ifndef MYFILE_H
+                    #define MYFILE_H
                     
                     ...
                     
-                    #endif  // FOO_BAR_MYFILE_H_
+                    #endif  // MYFILE_H
                 </CODE_SNIPPET>
             </BODY>
         </STYLEPOINT>
@@ -190,7 +183,7 @@
                         But a compiler is not required to perform this inline substitution at the point of call.
                     </p>
                     <p>
-                        Functions that are defined within a class definition are implicitly inline.
+                        Functions that are defined within a class definition are implicitly inline. Note, however, that the definition of functions in the class definition is strongly discouraged in STAR.
                     </p>
                     <p>
                         An inline function must be defined in every translation unit from where it is called.
@@ -228,14 +221,15 @@
                     <li> Include headers from external libraries using angle brackets.
                         <CODE_SNIPPET>
                             #include &lt;iostream&gt;
-                            #include &lt;QtCore/QDate&gt;
-                            #include &lt;zlib.h&gt;
+                            #include &lt;cmath&gt;
+                            #include &lt;TH1D.h&gt;
                         </CODE_SNIPPET>
                     </li>
                     <li>
-                        Include headers from your own project using double quotes.
+                        Include headers from your own project or any STAR related project using double quotes.
                         <CODE_SNIPPET>
                             #include &quot;MyClass.h&quot;
+                            #include &quot;StEnumeration.h&quot;
                         </CODE_SNIPPET>
                     </li>
                 </ul>
@@ -266,12 +260,12 @@
                         class Foo
                         &#123;
                         public:
-                        Bar getBar&#40;&#41;;
-                        &#125;
+                            Bar getBar&#40;&#41;;
+                        &#125;;
                     </BAD_CODE_SNIPPET>
                 </p>
                 <p>
-                    And your Foo.cpp looks like this:
+                    And your Foo.cxx looks like this:
                     <BAD_CODE_SNIPPET>
                         #include &quot;Bar.h&quot;
                         #include &quot;Foo.h&quot;
@@ -286,10 +280,12 @@
                         class Foo
                         &#123;
                         public:
-                        Bar getBar&#40;&#41;;
-                        &#125;
-                        
-                        // Foo.cxx
+                            Bar getBar&#40;&#41;;
+                        &#125;;
+                    </CODE_SNIPPET>
+                    
+                    <CODE_SNIPPET>
+                       // Foo.cxx
                         #include &quot;Foo.h&quot;
                     </CODE_SNIPPET>
                 </p>
@@ -305,38 +301,43 @@
         <p>
             Namespaces subdivide the global scope into distinct, named
             scopes, and thus are useful for logically grouping related types and functions and
-            preventing name collisions.
+            preventing name collisions. In C++ it is in general very good practice to use namespaces,
+            especially in libraries. However, historically STAR software makes little to no use of namespaces
+            but rather uses a specific naming scheme to indicate the scope
+            (e.g. <code>StEmc</code>..., <code>StTpc</code>... etc). While certain tools in STAR can handle
+            namespaces (such as <code>cons</code>) others would be very cumbersome to adapt.
         </p>
         
         <STYLEPOINT title="General guideline">
             <SUMMARY>
-                Use a namespace for the project, a second nested namespace for code inside
-                a sub-project. Use one or two more nested namespaces to logically group types and functions together.
+                Namespaces are for legacy reasons depreciated in STAR. As with every guideline there
+                might be exceptions, especially in end user code. However, care shold be taken to check for
+                possible side effects. Namespaces should be entirely avoided in the context of <code>StEvent</code>.
             </SUMMARY>
             <BODY>
                 <p>
-                    Example of a typical class definition within a project and
-                    sub-project namespace:
-                </p>
-                <CODE_SNIPPET>
-                    namespace Project
-                    {
-                    namespace SubProject
+                    When using namespaces in end-user parts of your code (e.g. specific analysis code),
+                    encapsulate your entire class into the namespace.
+                    Nonmember functions that are logically tied to a specific type should be in the same namespace as that type.
+                    To make namespace work with <code>cons</code> and ROOT use the STAR specific $NMSPC tag as follows
+                    
+                    <CODE_SNIPPET>
+                    namespace StMyStuff //$NMSPC
                     {
                     
-                    class MyClass
-                    {
-                    ...
-                    };
+                    Class AClass : public TNamed {....};
+            
+                    Class BClass : public TNamed {....};
                     
-                    } // namespace SubProject
-                    } // namespace Project
-                </CODE_SNIPPET>
-                <p>
-                    A nonmember function that is logically tied to a specific type should be in the
-                    same namespace as that type.
+                    } // namespace StMyStuff
+                    </CODE_SNIPPET>
+                    This will cause cons to generate a dictionary consistent with ROOT. The tag
+                    $NMSPC triggers the namespace inclusion (multiple namespaces can be used but
+                    you cannot combine sections
+                    with namespace and sections without).
                 </p>
             </BODY>
+            
         </STYLEPOINT>
         
         <STYLEPOINT title="Using declarations and directives">
@@ -366,87 +367,6 @@
                     The using directive can sometimes be useful in header files to import one namespace into another one.
                     This can effectively hide a namespace from the public interface, similar to what an inline namespace does.
                 </EXTRA>
-            </BODY>
-        </STYLEPOINT>
-        
-        <STYLEPOINT title="Unnamed namespaces">
-            <SUMMARY>
-                Unnamed namespaces are allowed and even encouraged in
-                <code>.cxx</code> files, they are not allowed in <code>.h</code>
-                files.
-            </SUMMARY>
-            <BODY>
-                <DEFINITION>
-                    All symbols inside an unnamed namespace (sometimes also called anonymous namespace)
-                    will have internal linkage.
-                    Thus, it is impossible to access these objects from other translation units (.cxx files).
-                </DEFINITION>
-                <PROS>
-                    Because of the internal linkage it is easier to reason about the code.
-                    This can lead to better optimization from compilers and clearer encapsulation.
-                </PROS>
-                <DECISION>
-                    Use unnamed namespaces in <code>.cxx</code> files whenever possible.
-                </DECISION>
-                <p>
-                    <CODE_SNIPPET>
-                        namespace Project {
-                        namespace {                           // This is in a .cxx file.
-                        int someFunction(int value) { return value + 1; }
-                        }  // unnamed namespace
-                        
-                        void someOtherFunction() {
-                        int value = 0;
-                        value = someFunction(value);
-                        ...
-                        }
-                        }
-                    </CODE_SNIPPET>
-                    For the above code the compiler can see that <code>someFunction</code> is called from only one place.
-                    It can thus inline the code and drop <code>someFunction</code>.
-                </p>
-                <EXTRA>
-                    In some special cases an unnamed namespace can be useful in a header file.
-                    Leave such decisions to architecture designers.
-                </EXTRA>
-            </BODY>
-        </STYLEPOINT>
-        
-        <STYLEPOINT title="Namespace aliases">
-            <SUMMARY>
-                Namespace aliases are allowed anywhere in a <code>.cxx</code> file,
-                inside the named namespace that wraps an entire <code>.h</code>
-                file and in functions and methods.
-            </SUMMARY>
-            <BODY>
-                <p>
-                    <CODE_SNIPPET>
-                        // Shorten access to some commonly used names in .cxx files.
-                        namespace Fbz = ::Foo::Bar::Baz;
-                        
-                        // Shorten access to some commonly used names (in a .h file).
-                        namespace Librarian {
-                        // The following alias is available to all files including
-                        // this header (in namespace Librarian):
-                        // alias names should therefore be chosen consistently
-                        // within a project.
-                        namespace Pds = ::PipelineDiagnostics::Sidetable;
-                        
-                        inline void myInlineFunction() {
-                        // namespace alias local to a function (or method).
-                        namespace Fbz = ::Foo::Bar::Baz;
-                        ...
-                        }
-                        }  // namespace Librarian
-                    </CODE_SNIPPET>
-                </p>
-                <p>
-                    Note that an alias in a .h file is visible to everyone
-                    including that file, so public headers (those available
-                    outside a project) and headers transitively included by them,
-                    should avoid defining aliases, as part of the general
-                    goal of keeping public APIs as small as possible.
-                </p>
             </BODY>
         </STYLEPOINT>
         
@@ -622,11 +542,6 @@
                     std::string name{ "Some Name" };
                     std::string name = { "Some Name" };
                 </CODE_SNIPPET>
-                <p>
-                    Brace initialization can be in particular useful to initialize class members.
-                    </p>
-                
-                
                 <p>User data types can also define constructors that take
                     <code>initializer_list</code>, which is automatically created from
                     <i>braced-init-list</i>:
@@ -671,17 +586,6 @@
                 <p> For clarity of the examples above we use directly explicit values, however following
                     the rule about <a href="#Magic_Numbers">magic numbers</a> requires to define all such
                     numbers as named constants or <code>constexpr</code> first. </p>
-                
-                <p>
-                    One potential pitfall is the brace initialization of an array with a size-mismatched initializer list.
-                    </p>
-                <p>
-                    Example:
-                    </p>
-                <BAD_CODE_SNIPPET>
-                    double *pd= new double [3] {0.5, 1.2, 12.99, 4};
-                    </BAD_CODE_SNIPPET>
-                This leads to a run-time error.
             </BODY>
         </STYLEPOINT>
         
@@ -1559,249 +1463,6 @@
     
     <CATEGORY title="Others">
         
-        
-        <STYLEPOINT title="Strong Enums" cpp11="yes">
-            <SUMMARY>
-                Use strong enums instead of weak enums.
-                
-            </SUMMARY>
-            
-            <BODY>
-                <p>
-                    C++11 introduces strongly typed enums. They are what the name suggests. Enums with a type:
-                    <CODE_SNIPPET>
-                        enum class strongEnum {
-                        one, two, three, four
-                        };
-                    </CODE_SNIPPET>
-                    So the syntax stays similar and the class keyword is added. Additional, the underlying type can be specified.
-                    If not defined it defaults to int or, if e.g. large values are defined, system default.
-                    Strong enums solve the long standing problem with enums and scope.
-                    The strong type is also an advantage. In addition strong enums allow forward declaration and a definite size.
-                    Example:
-                    <CODE_SNIPPET>
-                        enum class  strongEnum : int{first, second};
-                    </CODE_SNIPPET>
-                    The advantage of strong enums is that they are strongly typed and have a scope. With weak enums the problem was e.g.
-                    Example:
-                    <BAD_CODE_SNIPPET>
-                        enum weakEnum_color{red, green,blue};
-                        //error: redefinition of enumerator red and green
-                        enum weakEnum_trafficLight{red, green, yellow};
-                        
-                    </BAD_CODE_SNIPPET>
-                    But this works:
-                    
-                    <CODE_SNIPPET>
-                        enum class strongEnum_color{red, green,blue};
-                        enum class strong_trafficLight{red, green, yellow};
-                        strong_trafficLight trafficLight=strong_trafficLight::red;
-                    </CODE_SNIPPET>
-                    This does not work, wrong type
-                    <BAD_CODE_SNIPPET>
-                        strong_trafficLight trafficLight=strongEnum_color::red;
-                    </BAD_CODE_SNIPPET>
-                    Strong enums do not convert to int by default anymore (even if the underlying type is int), so you cannot write
-                    <BAD_CODE_SNIPPET>
-                        int c= strongEnum_color::red;
-                    </BAD_CODE_SNIPPET>
-                    But you can use casts e.g. if you want to use cout:
-                    <CODE_SNIPPET>
-                        int c= static_cast &lt; int &gt; (strongEnum_color::red);
-                    </CODE_SNIPPET>
-                </p>
-            </BODY>
-        </STYLEPOINT>
-        
-        
-        
-        <STYLEPOINT title="Lambda Expressions" cpp11="yes">
-            <SUMMARY>
-                Lambda functions are a powerful addition. They can be very useful in particular when iterating over containers. They should not be used for regular functions as there might be a performance penalty when they are called often.
-                Capture by reference can lead to side-effects. Therefore capture by reference is discouraged.
-                
-            </SUMMARY>
-            <BODY>
-                <p>
-                    C++11 added Lambda functions (closures). This concept usually known from functional programming allows the creation of anonymous inline functions.
-                    Lambda functions can access variables of the enclosing functions (variable capture) either by value or by reference.
-                    Lambdas e.g. valuable with the std libraries iteration functions:
-                </p>
-                <p>
-                    Examples:
-                    <CODE_SNIPPET>
-                        std::vector&lt;int&gt; v;
-                        v.push_back(1);
-                        v.push_back(2);
-                        v.push_back(3);
-                        
-                        //iterate over vector and print out each element
-                        std::for_each(std::begin(v),std::end(v),[](int n)
-                        {std::cout&lt;&lt;n&lt;&lt;std::endl;});
-                        
-                        //declare is_odd to be lambda function that returns true if
-                        // the argument is odd. Note the return syntax
-                        // Note that the return type can be omitted. It is then
-                        //determined as if auto is applied to the statement after return;
-                        
-                        auto is_odd=[](int n)-&gt;bool{return n%2==true;};
-                        auto pos=std::find_if(std::begin(v),std::end(v),
-                        is_odd);
-                        //the below snipplet returns 1 (the first position with an odd number
-                        if(pos!=std::end(v))
-                        std::cout&lt;&lt;*pos&lt;&lt;std::endl;
-                    </CODE_SNIPPET>
-                </p>
-                A lambda function is of type <code>std::function</code>, therefore instead of <code>auto</code>, the above return type for <code>is_odd</code>_ could be written as <code>std::function&lt;bool(int)&gt; is_odd; </code>
-                
-                <p>
-                    
-                    A powerful feature of lambda functions is that variables of the surrounding function can be captured. This is what the [] part of the function is for.
-                    <ul>
-                        <li>	[] No capture </li>
-                        <li>	[=] capture by copy </li>
-                        <li>	[&amp;] capture by reference </li>
-                        <li>	[a,b] capture only <code>a,b </code>by copy </li>
-                        <li>	[&amp;a, b] capture <code>a</code> by reference, <code>b</code> by copy </li>
-                    </ul>
-                    
-                    If the function is also modifying the variables that are captured by copy or wants to access the non-const members of a captured object, the lambda function has to be declared as ‘mutable’. Note that this does not modify the captured variable in the surrounding function
-                </p>
-                <p>
-                    Example (Gives output <code>“a is now 5”</code>):
-                    <CODE_SNIPPET>
-                        int a=5;
-                        auto testCopy=[a]()mutable {a=7;};
-                        testCopy();
-                        cout &lt;&lt;"a is now " &lt;&lt; a &lt;&lt;endl;
-                    </CODE_SNIPPET>
-                </p>
-                <p>
-                    
-                    Example (Gives output <code>“a is now 7”</code>):
-                    <CODE_SNIPPET>
-                        int a=5;
-                        auto testCopy=[&amp;a](){a=7;};
-                        testCopy();
-                        cout &lt;&lt;"a is now " &lt;&lt; a &lt;&lt;endl;
-                    </CODE_SNIPPET>
-                </p>
-                <p>
-                    Example does not compile (mutable missing)
-                    <CODE_SNIPPET>
-                        int a=5;
-                        auto testCopy=[a](){a=7;};
-                        testCopy();
-                        cout "a is now " &lt;&lt; a &lt;&lt;endl;
-                        
-                        
-                        
-                    </CODE_SNIPPET>
-                    Obviously, capturing variables by reference can lead to side-effects.
-                    Another danger in capturing variables by reference is that the reference might not be valid anymore when the lambda function is called:
-                </p>
-                <p>
-                    Example:
-                    <CODE_SNIPPET>
-                        function&lt;int (float)&gt; retLambda(int a, int&amp; b)
-                        {
-                        int c=5;
-                        //if this is &amp; (i.e. pass by reference, it doesn't work... (a,b, are nonsense)
-                        return [&amp;] (float d) -&gt;int {cout &lt;&lt;"lambda param: "&lt;&lt; d &lt;&lt;", a: "&lt;&lt; a &lt;&lt;" b : " &lt;&lt; b &lt;&lt; " c: "&lt;&lt; c &lt;&lt;endl;
-                        b=7;
-                        cout &lt;&lt;" lambda b is now " &lt;&lt; b &lt;&lt;endl;
-                        return a+b+c;};
-                        
-                        }
-                        void testVarByReference()
-                        {
-                        int a=1;
-                        int b=2;
-                        int c=3.0;
-                        auto f=retLambda(a,b);
-                        cout &lt;&lt;" lambda returns " &lt;&lt;  f(c)&lt;&lt;endl;
-                        cout &lt;&lt;" b is now " &lt;&lt; b &lt;&lt;endl;
-                        }
-                    </CODE_SNIPPET>
-                </p>
-                <p>
-                    In the above example there are several things that are noteworthy:
-                    <ul>
-                        <li>	The function that returns a lambda function has the return type function <code>&lt;int (float)&gt; </code></li>
-                        <li>	All variables are captured by reference. However when the lambda function <code>f</code> is called in <code>testVarByReference</code>, all variables that where on the stack of the function that generated the lambda function (<code>retLambda</code>) are invalid. That means that <code>c</code> and <code>a</code> are invalid. </li>
-                        <li>	The variable that was given by reference, <code>b</code>, is still valid. In fact it is modified in the lambda function, so that it has the value <code>7</code> after the lambda function is called. </li>
-                    </ul>
-                                   </p>
-            </BODY>
-        </STYLEPOINT>
-        
-        
-        <STYLEPOINT title="decltype" cpp11="yes">
-            <SUMMARY>
-                Do not use <code>decltype</code> if you can use <code>auto</code>. <code>decltype</code> is useful for templates, since there is no other way to declare the return type of a function if the return type depends on the parameter.
-            </SUMMARY>
-            <BODY>
-                <p>
-                    <code>decltype</code> can be used to get the type of a variable. Its simple use is very similar to the <code>auto</code> statement
-                    
-                </p>
-                <p>
-                    Example:
-                </p>
-                <CODE_SNIPPET>
-                    
-                    int x=7;
-                    decltype(x) y=x;
-                    //same thing
-                    auto y2=x;
-                    
-                </CODE_SNIPPET>
-                <p>
-                    It can be used for lambda functions, but here <code>auto</code> works as well:
-                </p>
-                <p>
-                    Example:
-                </p>
-                
-                <CODE_SNIPPET>
-                    auto f = [] (int a, int b) -&gt; int { return a*b;};
-                    
-                    decltype(f) f2=f;
-                    //works as well, so use of decltype not necessary
-                    auto f3=f;
-                    
-                </CODE_SNIPPET>
-                <p>
-                    The most common use case for <code>decltype</code> is to declare a return type that is part of a template parameter.
-                </p>
-                <p>
-                    Example:
-                </p>
-                <CODE_SNIPPET>
-                    class A
-                    {
-                    public:
-                    int makeObject() const
-                    {return 8;};
-                    A(){};
-                    };
-                    
-                    
-                    template &lt;typename Builder&gt;
-                    auto
-                    makeAndProcessObject (const Builder&amp; builder) -&gt; decltype( builder.makeObject() )
-                    {
-                    auto val = builder.makeObject();
-                    // do stuff with val
-                    return val;
-                    }
-                    
-                    
-                </CODE_SNIPPET>
-                </BODY>
-            </STYLEPOINT>
-
-
         <STYLEPOINT title="Exceptions">
             <SUMMARY>
                 Use C++ exceptions instead of return codes for error handling. Do not use exceptions to return values.
@@ -2206,12 +1867,6 @@
                 </p>
             </BODY>
         </STYLEPOINT>
-        
-        <STYLEPOINT title="inline namespaces and align statements" cpp11="yes">
-            <SUMMARY>
-                Both, inline namespaces and align statements are new in C++11. Use cases are limited enough that no specific recommendations for their use are made.
-                </SUMMARY>
-            </STYLEPOINT>
         
         <!-- <STYLEPOINT title="Function Parameters (Matthias)">
          <SUMMARY>
@@ -2629,9 +2284,8 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="0 and nullptr" cpp11="yes">
+        <STYLEPOINT title="0 and nullptr">
             <SUMMARY>
-                C++ 11 introduces the literal nullptr. It is of type std::nullptr_t and it converts implicitly to all pointer types. nullptr is a prvalue (i.e. pure rvalue, you e.g. cannot take its address)
                 Use <code>0</code> for integers, <code>nullptr</code> for pointers,
                 and <code>'\0'</code> for chars.
             </SUMMARY>
