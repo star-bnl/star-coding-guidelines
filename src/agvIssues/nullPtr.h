@@ -53,13 +53,12 @@ void testNullPtr()
   int* something=pointer1;
   something=pointer;
 
+  //doesn't work
+  //  int number=nullptr;
+  //  int number1=0;
+  //  int number2=NULL;
 
-  //int number=nullptr;
-  //int number1=0;
-  //int number2=NULL;
-
-
-  //  if(pointer==pointer1)
+   if(pointer==pointer1)
     {
 
     }

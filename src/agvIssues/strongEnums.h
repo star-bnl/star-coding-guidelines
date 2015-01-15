@@ -13,8 +13,7 @@ enum WeakEnum{one, two,three};
 enum WeakEnum2{one2, two2,three2};
 
 
-enum class C2
-  {
+enum class C2 {
     one, two, three, four
       };
 
@@ -29,10 +28,12 @@ enum class C {one, two, three};
   //doesn't work, is weak..
   //  C myEnum3=one;
   WeakEnum myWeakEnum=two;
+  //cannot assign int to enum
+  //  myWeakEnum=1;
   //  myEnum=one;
   //  myEnum2=C2::one;
   strongEnum mStrongEnum=strongEnum::first;
-
+  int c=static_cast<int>(strongEnum::first);
   cout <<"hello, strong enums!"<<endl;
   cout <<" myenum is : "<< myWeakEnum<<endl;
   //for some reason doesn't work w/o cast...

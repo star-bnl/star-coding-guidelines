@@ -80,6 +80,7 @@ void testInitLists()
     { {"Superman", "+1 (212) 545-7890"},
 	{"Batman", "+1 (212) 545-0987"}};
   double *pd= new double [3] {0.5, 1.2, 12.99};
+  double pdp[] {0.5, 1.2, 12.99,30};
 
 
 
