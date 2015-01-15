@@ -185,14 +185,159 @@ C f() {
   C obj = f();
 }</code></pre>
 <p>Compiling and running with gcc gives:</p>
-<pre class="sourceCode C"><code class="sourceCode c">Hello World!</code></pre>
+<pre class="sourceCode C"><code class="sourceCode c">Hello, World!</code></pre>
 <p>So both copies (from local variable to the stack and from the stack to obj) have been optimized away. i.e. RVO is being used even though avoiding the copy constructor has side effect.</p>
 <p>You can avoid this optimization by using the gcc flag <code>-fno-elide-constructors</code>.</p>
 <h3 id="rvalue-reference-and-move-semantics">Rvalue reference and move semantics</h3>
-<p><font color='red'> This section will be completed later.</font><br />Rvalue reference are powerful to enable two things: 1) move semantics and 2) perfect forwarding.</p>
-<p>Recommended <a href="http://isocpp.org/blog/2012/11/universal-references-in-c11-scott-meyers">article</a> for our forthcoming discussion.</p>
+<p>One can find multiple practical definitions of lvalueness or rvalueness. For our purposes, the following is sufficient:</p>
+<ul>
+<li>If you can take its address using the built-in address-of operator (&amp;) then it is an lvalue, otherwise, it is an rvalue. OkTo a lesser degree the if-it-has-a-name rule is the if-it-has-a-name rule is Although it is not completely true, the <a href="http://thbecker.net/articles/rvalue_references/section_05.html">if-it-has-a-name rule</a> is very useful:<br /></li>
+<li>If it has a name then it is an lvalue, otherwise, it is an rvalue.</li>
+</ul>
+<p>Rvalue reference is designated with an &amp;&amp; as opposed to &amp; for lvalue reference. Here is an example of function overloading to handle lvalue and rvalue arguments separately:</p>
+<p><a href="http://ideone.com/RWbvln"><strong>Try it live</strong></a>.</p>
+<pre class="sourceCode C"><code class="sourceCode c"><span class="ot">#include &lt;iostream&gt;</span>
+
+using namespace std;
+ 
+<span class="dt">int</span> foo()
+{
+  <span class="kw">return</span> <span class="dv">5</span>;
+}
+
+<span class="dt">void</span> print(<span class="dt">int</span> <span class="dt">const</span>&amp; x)
+{
+  cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+  cout&lt;&lt;x&lt;&lt;endl;
+}
+
+<span class="dt">void</span> print(<span class="dt">int</span>&amp;&amp; x)
+{
+  cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+  cout&lt;&lt;x&lt;&lt;endl;
+}
+ 
+<span class="dt">int</span> main()
+{
+  std::cout &lt;&lt; <span class="st">&quot;Hello, World!</span><span class="ch">\n</span><span class="st">&quot;</span>;
+
+  <span class="dt">int</span> x =<span class="dv">6</span>;
+  print(x);  <span class="co">// call print on an lvalue</span>
+  print(foo()); <span class="co">// call print on an rvalue</span>
+}</code></pre>
+<p>Now this looks cool. However, the real power of the ability to distinguish between rvalues and lvalues in C++11 is to enable two things: 1) move semantics 2) perfect forwarding.</p>
+<p><strong>Move semantics</strong>:<br />The move semantics allow to get rid of expensive copies from temporary (rvalue) objects when a move is intended. Now that we can detect temporary objects using rvalue references we can overload the copy/assignment functions to do the less expensive move from the temporary object by simply pointing the current object's pointers to the temporary object's resources and nullifying the latter's pointers. To add to the multitude of examples of move semantics implementation here is one:</p>
+<p><a href="http://ideone.com/hKQvOj"><strong>Try it live</strong></a>.</p>
+<pre class="sourceCode C"><code class="sourceCode c"><span class="ot">#include &lt;cstddef&gt;</span>
+<span class="ot">#include &lt;iostream&gt;</span>
+
+using namespace std;
+
+class dataHandler
+{
+  private:
+    <span class="dt">int</span>* mData;
+
+  public:
+    dataHandler(<span class="dt">int</span> x=-<span class="dv">999</span>): mData(new <span class="dt">int</span>(x)) {cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;}
+
+    <span class="co">// copy constructor</span>
+    dataHandler(<span class="dt">const</span> dataHandler&amp; x): mData(new <span class="dt">int</span>(x.data())) {cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;}
+
+    <span class="co">// copy assignment operator</span>
+    dataHandler&amp; operator=(<span class="dt">const</span> dataHandler&amp; rhs)
+    {
+      cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+
+      <span class="kw">if</span>(this == &amp;rhs) <span class="kw">return</span> *this;
+      *(this-&gt;mData) = *(rhs.mData); <span class="co">// copy value</span>
+      <span class="kw">return</span> *this;
+    }
+
+    <span class="co">// move constructor</span>
+    dataHandler(dataHandler&amp;&amp; x)
+    {
+      cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+      this-&gt;mData = x.mData;
+      x.mData = nullptr;
+    }
+
+    <span class="co">// move assignment operator</span>
+    dataHandler&amp; operator=(dataHandler&amp;&amp; rhs)
+    {
+      cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+
+      <span class="kw">if</span>(this == &amp;rhs) <span class="kw">return</span> *this;
+
+      this-&gt;mData = rhs.mData;
+      rhs.mData = nullptr;
+
+      <span class="kw">return</span> *this;
+    }
+
+    ~dataHandler(){ cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl; <span class="kw">if</span>(mData) delete mData;}
+
+    <span class="kw">inline</span> <span class="dt">int</span> data() <span class="dt">const</span> { <span class="kw">return</span> *mData;}
+    <span class="kw">inline</span> <span class="dt">void</span> data(<span class="dt">int</span> <span class="dt">const</span> d) { *mData = d;}
+};
+
+dataHandler get_a_dataHandler()
+{
+  dataHandler t(<span class="dv">6</span>);
+  <span class="kw">return</span> t;
+}
+
+<span class="dt">int</span> main()
+{
+  cout&lt;&lt;<span class="st">&quot;Testing move semantics...&quot;</span>&lt;&lt;endl;
+  dataHandler t0;
+  t0 = get_a_dataHandler(); <span class="co">// should call move assignment operator.</span>
+
+  dataHandler t1(get_a_dataHandler()); <span class="co">// should call move constructor (unless optimized away. See RVO/elision). </span>
+ 
+  cout&lt;&lt;<span class="st">&quot;... GoodBye! ...&quot;</span>&lt;&lt;endl;
+
+  <span class="kw">return</span> <span class="dv">0</span>;
+}</code></pre>
+<p>An rvalue reference itself is not necessarily an rvalue. For example, inside the move constructor the variable <code>x</code> is an rvalue reference, but it is an lvalue (you can take its address, it has a name). This case is important when one wants to construct base classes in a move function of the derived class. The base class move function should be invoked and this can be achieved by statically casting the variable x to an rvalue reference, i.e. hiding its name which can be acheived using std::move.</p>
+<pre class="sourceCode C"><code class="sourceCode c">Derived(Derived&amp;&amp; rhs) 
+  : Base(rhs) <span class="co">// wrong: rhs is an lvalue</span>
+{
+  <span class="co">// Derived-specific stuff</span>
+}
+
+Derived(Derived&amp;&amp; rhs) 
+  : Base(std::move(rhs)) <span class="co">// good, calls Base(Base&amp;&amp; rhs)</span>
+{
+  <span class="co">// Derived-specific stuff</span>
+}</code></pre>
+<p>std::move hides the name of its arguments (static casting to an rvalue reference).</p>
+<p><strong>Perfect forwarding</strong>:<br />There is one subtlety with rvalues and deduced types. The rvalueness/lvalueness of a deduced type follows that of the initializer. For example, in a function template:</p>
+<pre class="sourceCode C"><code class="sourceCode c">template&lt;typename T&gt;
+<span class="dt">void</span> print(T&amp;&amp; x) { cout&lt;&lt;x&lt;&lt;endl;}</code></pre>
+<p>So calling print on a lvalue makes <code>x</code> an lvalue reference, same if <code>x</code> is an rvalue. Now when does this matter? It doesn't matter inside <code>print</code> itself since <code>x</code> is an lvalue there anyway. It matters when you want to pass <code>x</code> to another function, do you pass it as an lvalue (just <code>x</code>) or hide its name using std::move? The answer obviously depends on the nature of <code>x</code>, you want to preserve that. This can be achieved using std::forward. std:forward allows rvalue references as rvalues and lvalue references as lvalues.</p>
+<p><strong>Recommendation</strong>:<br />- Classes should have move constructor and assignment operator OR explicitly delete them.<br />- Strive to define your move semantics so that they cannot throw exceptions and declare them so using <code>noexcept</code>.<br />- Use std::move to pass argument to base classes in move constructor and assignment operator.<br />- Use std:forward to forward arguments to classes constructors in templated functions or classes.<br />- Remember that an rvalue reference is not necessarily an rvalue itself.<br />- Take advantage of RVO/elision, don't be afraid to return by value.</p>
 <h3 id="smart-pointers">Smart pointers</h3>
-<p><font color='red'> To be completed.</font></p>
+<p>It is a modern C++ idiom to get rid of naked pointers whenever possible. However, it is currently difficult to devise an error free scheme where smart pointers can live in harmony with ROOT object ownership and management rules. For example:</p>
+<pre class="sourceCode C"><code class="sourceCode c"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;memory&gt;</span>
+<span class="ot">#include &quot;TH1F.h&quot;</span>
+<span class="ot">#include &quot;TFile.h&quot;</span>
+
+<span class="dt">int</span> main()
+{
+  TFile f(<span class="st">&quot;out.root&quot;</span>, <span class="st">&quot;recreate&quot;</span>);
+  f.cd();
+  std::unique_ptr&lt;TH1F&gt; h {new TH1F(<span class="st">&quot;h&quot;</span>, <span class="st">&quot;h&quot;</span>, <span class="dv">100</span>, -<span class="dv">5</span>, <span class="dv">5</span>)};
+  h-&gt;FillRandom(<span class="st">&quot;gaus&quot;</span>, <span class="dv">10000</span>);
+  h-&gt;Write();
+  f.Close();
+
+  <span class="kw">return</span> <span class="dv">0</span>;
+}</code></pre>
+<p>The histogram which is handled by a unique pointer was owned by the current gDirectory. Since I politely closed the file before I exit my program the histogram was destroyed by ROOT memory management guy. Now at the end of main() my pointer goes out of scope and its resource needs to be freed, but it has already been freed!</p>
+<p>I also imagine that STAR &quot;WhiteBoard&quot; of StMakers won't be easy to marry with smart pointers either.</p>
+<p><strong>Recommendation</strong>: - Do not use smart pointers.</p>
 <h3 id="references">References</h3>
 <p>Most of the examples in this document are modified versions of those in:<br />- <a href="http://en.wikipedia.org/wiki/C%2B%2B11">C++11 wiki page</a>.<br />- Stroustrup's <a href="http://www.stroustrup.com/C++11FAQ.html">C++11 FAQ</a>.</p>
 </body>
