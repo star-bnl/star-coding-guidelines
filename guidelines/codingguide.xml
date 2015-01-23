@@ -1150,17 +1150,17 @@
                         Foo::Foo() : Foo("example") { }
                     </CODE_SNIPPET>
                     <p>
-                        A subclass, per default, inherits all functions of the base class.
+                        A derived class, per default, inherits all functions of the base class.
                         This is not the case for constructors.
                         Since C++11 it is possible to explicitly inherit the constructors of a base class.
-                        This can be a significant simplification for subclasses that don't need custom constructor logic.
+                        This can be a significant simplification for derived classes that don't need custom constructor logic.
                     </p>
                     <CODE_SNIPPET>
                         class Base {
                         public:
                         Base();
-                        explicit Base(int number);
-                        explicit Base(const string&amp; name);
+                        Base(int number);
+                        Base(const string&amp; name);
                         ...
                         };
                         
