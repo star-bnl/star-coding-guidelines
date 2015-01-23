@@ -2205,6 +2205,52 @@
                 </BAD_CODE_SNIPPET>
             </BODY>
         </STYLEPOINT>
+
+        <STYLEPOINT title="Range-for statement" cpp11="yes">
+          <SUMMARY>
+            Use reference to elements in range-for statements especially when dealing with large objects. Prefer ordinary loops when you need the index information.
+          </SUMMARY>
+          <BODY>
+            <DEFINITION>
+              C++ syntax is extended to support easier iteration over a list of elements. For example:  
+              <CODE_SNIPPET>
+                int main()
+                {
+
+                   vector&lt;int&gt; v {1,2,3,4,5};
+
+                   for(auto&amp; i:v)  // reference to element
+                   {
+                      cout&lt;&lt;i&lt;&lt;endl;
+                      i +=1;        // modifies element value
+                   }
+
+                   for(auto i:v)   // copy of element
+                   {
+                      cout&lt;&lt;i&lt;&lt;endl;
+                   }
+                   return 0;
+                }
+              </CODE_SNIPPET>
+              Range-for statements work for any type where <code>begin()</code> and <code>end()</code> are defined to return iterators.  
+            </DEFINITION>
+
+            <PROS>
+              The use of range-for loops increases code readability. 
+            </PROS>
+
+            <CONS>
+              <p> Programmers often need both, the elements of an iterable collection and its index. This is not directly supported in C++11. </p>
+              <p> Unless optimized away by compiler, using a copy of element could come at a performance cost if the element type is large. </p>
+            </CONS>
+
+            <DECISION>
+              <p>Range-for loops are useful and should be used.</p>
+              <p>Ordinary loops should be preferred when programmer needs the element index. Avoid having your own counter.</p>
+              <p>Using reference to elements is encouraged when dealing with large objects. Use <code>const</code> reference when you don't need to modify the object state.</p>
+          </DECISION>
+          </BODY>
+        </STYLEPOINT>
         
         <STYLEPOINT title="Integer Types">
             <SUMMARY>
