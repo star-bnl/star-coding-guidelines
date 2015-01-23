@@ -1687,9 +1687,9 @@
         <STYLEPOINT title="Smart Pointers">
             
             <SUMMARY>
-                <a href="http://en.cppreference.com/w/cpp/memory/unique_ptr"><code>std::unique_ptr</code></a> and <a href="http://en.cppreference.com/w/cpp/memory/shared_ptr"><code>std::shared_ptr</code></a> should be used consistently instead of non-owning raw pointers.
-                Never use owning raw pointers, and thus never use <code>delete</code>.
-                The use of raw pointers may need an explanation in form of a comment.
+              It is a modern C++ idiom to get rid of naked pointers whenever possible. However, it is currently difficult to devise an error free scheme where smart pointers
+              can live in harmony with ROOT object ownership and management rules. Avoid using smart pointers in STAR code. This decision could be revisited in the future if conflict 
+              with ROOT is resolved.
             </SUMMARY>
             <BODY>
                 <DEFINITION>
@@ -1713,83 +1713,54 @@
                     <p>
                         Example:
                         <CODE_SNIPPET>
-                            {
-                            std::shared_ptr&lt;int&gt; first;
-                            {
-                            std::unique_ptr&lt;int&gt; second(new int);
-                            auto third = std::make_shared&lt;int&gt;();
-                            first = third;
-                            }
-                            // only second is freed automatically here
-                            }
-                            // first and third are automatically freed here
+                          {
+                             std::shared_ptr&lt;int&gt; first;
+                             {
+                                std::unique_ptr&lt;int&gt; second(new int);
+                                auto third = std::make_shared&lt;int&gt;();
+                                first = third;
+                             }
+                             // only second is freed automatically here
+                          }
+                          // first and third are automatically freed here
                         </CODE_SNIPPET>
                         When exiting the inner scope, only <code>second</code> is freed automatically, because the last
                         reference to it went out of scope. But even though  <code>third </code> went out of scope here,
                         no free occurred because <code>first</code> still has a reference.  Only when <code>first</code>
                         went out of scope and as it is the last reference, <code>third </code> is automatically freed.
                     </p>
-                    <p>
-                        A <a href="http://en.cppreference.com/w/cpp/memory/weak_ptr">weak pointer (<code>weak_ptr&lt;T&gt;</code>)</a> can be used to break cyclic ownership.
-                    </p>
-                    
                 </DEFINITION>
+
                 <PROS>
                     Smart pointers are extremely useful for preventing memory leaks, and
                     are essential for writing exception-safe code. They also formalize
                     and document the ownership of dynamically allocated memory.
                 </PROS>
+
                 <CONS>
-                    Smart pointers enable sharing or transfer of ownership and can thus act as a tempting alternative to careful design of ownership semantics.
-                    This could lead to confusing code and even bugs in which memory is never deleted.
+                  Smart pointers are not easy to work with in an environment where ROOT is used (another possible conflict is with STAR "WhiteBoard" of markers).
+                  <CODE_SNIPPET>
+                    int main()
+                    {
+                       TFile f("out.root", "recreate");
+                       f.cd();
+                       std::unique_ptr&lt;TH1F&gt; h {new TH1F("h", "h", 100, -5, 5)};
+                       h->FillRandom("gaus", 10000);
+                       h->Write();
+                       f.Close();
+
+                       return 0;
+                    }
+                  </CODE_SNIPPET>
+
+                  The histogram which is handled by a unique pointer was owned by the current gDirectory. Since I politely closed the file before I exit my program 
+                  the histogram was destroyed by ROOT memory management agent. Now at the end of main() the pointer to teh histogram goes out of scope and its resource needs to be freed, 
+                  but it has already been freed!
                 </CONS>
+
                 <DECISION>
-                    <dl>
-                        <dt><code>std::unique_ptr</code></dt>
-                        <dd>Straightforward and risk-free. This should be your default for any pointer.</dd>
-                        <dt><code>std::shared_ptr</code></dt>
-                        <dd>
-                            If you really need to share ownership, use a <code>shared_ptr</code>.
-                            You should avoid designs that require shared ownership, though, as it incurs an overhead.
-                            <code>unique_ptr</code> on the other hand is without overhead.
-                        </dd>
-                    </dl>
+                  Avoid using smart pointers in STAR code.
                 </DECISION>
-                <EXTRA>
-                    <p>
-                        The following code appears to require shared ownership:
-                        <BAD_CODE_SNIPPET>
-                            void function(shared_ptr&lt;int&gt; value)
-                            {
-                            *value = 0;
-                            }
-                            
-                            void otherFunction()
-                            {
-                            auto ptr = make_shared&lt;int&gt;();
-                            function(ptr);
-                            ...
-                            }
-                        </BAD_CODE_SNIPPET>
-                        Instead the code really has unique ownership in <code>otherFunction()</code>.
-                        There is no reason that <code>function()</code> and <code>otherFunction()</code> need
-                        to share ownership:
-                        <CODE_SNIPPET>
-                            void function(int *value) // caller retains ownership
-                            {
-                            *value = 0;
-                            }
-                            
-                            void otherFunction()
-                            {
-                            unique_ptr&lt;int&gt; ptr{new int};
-                            function(ptr.get());
-                            ...
-                            }
-                        </CODE_SNIPPET>
-                        There would be a reason to share ownership if the owner of the object is a different thread.
-                    </p>
-                </EXTRA>
             </BODY>
         </STYLEPOINT>
         
