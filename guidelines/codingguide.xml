@@ -911,6 +911,10 @@
                         {}
                     </CODE_SNIPPET>
                     <p>
+                        See an example of initialization via <code>std::initializer_list</code>
+                        in <a href="#Brace_Initialization"> Brace Initialization</a>.
+                    </p>
+                    <p>
                         Non explicit intialization:
                     </p>
                     <CODE_SNIPPET>
@@ -943,10 +947,6 @@
                           C* c2 = new C;   // C::mY will be zero-initialized.
                         }
                     </CODE_SNIPPET>
-                    <p>
-                        See an example of initialization via <code>std::initializer_list</code>
-                        in <a href="#Brace_Initialization"> Brace Initialization</a>.
-                    </p>
                 </DEFINITION>
                 
                 <DECISION>
