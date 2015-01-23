@@ -856,36 +856,21 @@
             <SUMMARY>
                 Declare and initialize members variables in the same order.
                 Prefer initialization (in the constructor initializer list or in-class) to assignment (in the constructor function body).
-                Do not perform unmanaged resource acquisition in the constructor.
             </SUMMARY>
             <BODY>
                 <CPP11 title="in-class member initialization">
-                    Since C++11, it is possible to initialize struct/class member variables in the class definition.
-                    Thus, if there is no explicit initialization of this member variable in the constructor, this assignment will be used for initialization.
+                    C++98 allows in-class member initialization for static members only. C++11 allows in-class member initialization for any variable.
                     <CODE_SNIPPET>
-                        class MyClass {
-                        public:
-                        MyClass() = default;
-                        MyClass(int z) : a(z) {}
-                        
-                        int data() const {
-                        return a;
-                        }
-                        
-                        private:
-                        int a = 1234;  // in-class initialization
-                        };
-                        
-                        int main() {
-                        MyClass firstClass;
-                        MyClass secondClass{5678};
-                        
-                        std::cout &#60;&#60; firstClass.data()
-                        &#60;&#60; ' ' &#60;&#60; secondClass.data();
-                        return 0;
-                        }
+                    Class foo
+                    {
+                      public:
+                        int x = 1;
+                    };
                     </CODE_SNIPPET>
-                    The program above prints "1234 5678".
+                    This is basically equivalent to using initialization lists in constructors. The advantage of in-class initialization is that it allows
+                    consistent default initialization when there are multiple constructors and saves a lot of typing resulting in cleaner codes.  
+                    
+                    Constructor initialization overrides in-class initialization.
                 </CPP11>
                 
                 <DEFINITION>
@@ -895,7 +880,8 @@
                         Compilers often issue a warning if this rule is broken, but not always.
                     </p>
                     <p>
-                        If a member variable is not explicitly initialized in the constructor initializer list the default constructor of that variable is called.
+                        If a member variable is not explicitly initialized in the constructor initializer list and it is a non-POD the default constructor of that variable is called. If the variable
+                        is a POD and the class instance is created with the <code>new</code> operator the variable will be zero-initialized. Otherwise, PODs are left uninitialized.
                         Therefore, if a member variable is assigned to in the constructor function body, the member variable may get initialized unnecessarily with the default constructor.
                     </p>
                     <p>
@@ -906,17 +892,6 @@
                     <p>
                         Examples:
                     </p>
-                    <p>
-                        In-class member initialization:
-                    </p>
-                    <CODE_SNIPPET>
-                        // MyClass.h
-                        class MyClass {
-                        // ...
-                        private:
-                        int mValue = 1234;
-                        };
-                    </CODE_SNIPPET>
                     <p>
                         Initialization list:
                     </p>
@@ -934,6 +909,39 @@
                         mValue(0),
                         mVector()
                         {}
+                    </CODE_SNIPPET>
+                    <p>
+                        Non explicit intialization:
+                    </p>
+                    <CODE_SNIPPET>
+                        struct S
+                        {
+                          int x;
+                          S(): x(10) {}
+                        };
+                        
+                        class C
+                        {
+                          public:
+                            int mX;
+                            int mY;
+                            S mS;
+                        
+                            // mS and mY are not explicitely initialized in the initializer list
+                            // mS default consturctor will always be called. 
+                            // mY is a POD therefore it will be:
+                            //    Zero-initialized if instance of C is created with new operator.
+                            //    Otherwise, left un-initialized.
+                            C(): mX(5) { cout&lt;&lt;mX&lt;&lt;" "&lt;&lt;mS.x&lt;&lt;" "&lt;&lt;mY&lt;&lt;endl; }
+                        
+                        };
+                        
+                        int main()
+                        {
+                          C c0; // C::mY will not be initialized.
+                          C* c1 = new C(); // C::mY will be zero-initialized. 
+                          C* c2 = new C;   // C::mY will be zero-initialized.
+                        }
                     </CODE_SNIPPET>
                     <p>
                         See an example of initialization via <code>std::initializer_list</code>
