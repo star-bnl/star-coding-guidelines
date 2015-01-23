@@ -1026,7 +1026,7 @@
                         Thus, a move of a <code>std::vector</code> does not need to copy all data, but only the pointer to the data.
                         Additionally, the source object must be told that it does not own the data anymore, to inhibit the <code>free</code> from the destructor.
                         In most cases the move constructor/assignment operator therefore modifies the source object (e.g. setting the data pointer to <code>nullptr</code>).
-                        See rvalue reference for more details on ove semantics.
+                        See <a href="#Rvalue_reference_and_move_semantics">rvalue reference and move semantics</a> for more details on ove semantics.
                     </CPP11>
                     The copy and move constructors are implicitly invoked by the compiler or generic containers in some situations, e.g. passing objects by value or from <code>std::vector</code>.
                 </DEFINITION>
@@ -2465,6 +2465,191 @@
                         to an <code>auto</code>-typed variable.</p>
                 </DECISION>
             </BODY>
+        </STYLEPOINT>
+
+        <STYLEPOINT title="Rvalue reference and move semantics" cpp11="yes">
+          <SUMMARY>
+            Classes should have move constructor and assignment operator OR explicitly have them deleted using <code>= delete</code> specifier.
+          </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                  <CPP11 title="rvalue reference">
+                    One can find multiple rules of thumb for recongnizing the lvalueness or rvalueness of an object. For our purposes, the following are sufficient:
+                    <p>If you can take its address using the built-in address-of operator (&amp;) then it is an lvalue, otherwise, it is an rvalue.</p>
+                    <p>Another useful rule of thumb that is useful but not strictly correct is the <a href="http://thbecker.net/articles/rvalue_references/section_05.html">if-it-has-a-name rule</a>: 
+                      if it has a name then it is an lvalue, otherwise, it is an rvalue.</p>
+
+                    <p>
+                    Rvalue reference is designated with an &amp;&amp; as opposed to &amp; for lvalue reference. 
+                    Here is an example of function overloading to handle lvalue and rvalue arguments separately:  
+                    <CODE_SNIPPET>
+                      #include &lt;cstddef&gt;
+                      int foo()
+                      {
+                         return 5;
+                      }
+
+                      void print(int const&amp; x)
+                      {
+                         cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                         cout&lt;&lt;x&lt;&lt;endl;
+                      }
+
+                      void print(int&amp;&amp; x)
+                      {
+                         cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                         cout&lt;&lt;x&lt;&lt;endl;
+                      }
+
+                      int main()
+                      {
+                         std::cout &lt;&lt; "Hello, World!\n";
+
+                         int x =6;
+                         print(x);  // call print on an lvalue
+                         print(foo()); // call print on an rvalue
+                      }
+                    </CODE_SNIPPET>
+                    Now this looks cool. However, the real power of the ability to distinguish between rvalues and lvalues in C++11 is to enable two things: 
+                    1) move semantics 2) perfect forwarding. 
+                    </p>
+                  </CPP11>
+
+                  <p>
+                  The move semantics allow to get rid of expensive copies from temporary (rvalue) objects when a move is intended. Now that we can 
+                  detect temporary objects using rvalue references we can overload the copy/assignment functions to do the less expensive move from the temporary object 
+                  by simply pointing the current object's pointers to the temporary object's resources and nullifying the latter's pointers. To add to the multitude of 
+                  examples of move semantics implementation here is one:  
+                  </p>
+                  
+                  <CODE_SNIPPET>
+                  #include &lt;cstddef&gt;
+                  
+                  class dataHandler
+                  {
+                    private:
+                      int  mNumberOfElements;
+                      int* mData;
+                  
+                    public:
+                      dataHandler(int n=10): mNumberOfElements(n), mData(new int[mNumberOfElements]) {cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;}
+                  
+                      // copy constructor
+                      dataHandler(const dataHandler&amp; x): mNumberOfElements(x.mNumberOfElements), mData(new int[x.mNumberOfElements]) 
+                      {
+                        cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                        for(int i=0;i&lt;this->mNumberOfElements;i++){ this->mData[i] = x.mData[i]; }
+                      }
+                  
+                      // copy assignment operator
+                      dataHandler&amp; operator=(const dataHandler&amp; rhs)
+                      {
+                        cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                  
+                        if(this == &amp;rhs) return *this;
+                        if(this.mNumberOfElements != rhs.mNumberOfElements) 
+                        {
+                          // this should never happen and should throw an exception. 
+                          // we will just terminate the program instead of throwing an exception in this demo example.
+                          exit(1);
+                        }
+
+                        for(int i=0;i&lt;this->mNumberOfElements;i++){ this->mData[i] = x.mData[i]; }
+                        return *this;
+                      }
+                  
+                      // move constructor
+                      dataHandler(dataHandler&amp;&amp; x)
+                      {
+                        cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                        this->mData = x.mData;
+                        this->mNumberOfElements  = x.mNumberOfElements;
+                        x.mData = nullptr;
+                      }
+                  
+                      // move assignment operator
+                      dataHandler&amp; operator=(dataHandler&amp;&amp; rhs)
+                      {
+                        cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                  
+                        if(this == &amp;rhs) return *this;
+                  
+                        this->mData = rhs.mData;
+                        this->mNumberOfElements  = x.mNumberOfElements;
+                        rhs.mData = nullptr;
+                  
+                        return *this;
+                      }
+                  
+                      ~dataHandler(){ cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl; if(mData) delete mData;}
+                  
+                      inline int data() const { return *mData;}
+                  };
+                  
+                  dataHandler get_a_dataHandler()
+                  {
+                    dataHandler t(6);
+                    return t;
+                  }
+                  
+                  int main()
+                  {
+                    cout&lt;&lt;"Testing move semantics..."&lt;&lt;endl;
+                    dataHandler t0;
+                    t0 = get_a_dataHandler(); // should call move assignment operator.
+                  
+                    dataHandler t1(get_a_dataHandler()); // should call move constructor (unless optimized away by the compiler (lookup RVO and copy elision)). 
+                   
+                    return 0;
+                  }
+                  </CODE_SNIPPET>
+                  
+                  An rvalue reference itself is not necessarily an rvalue. For example, inside the move constructor the variable x is an 
+                  rvalue reference, but it is an lvalue (you can take its address, it has a name). This case is important when one 
+                  wants to construct base classes in a move function of the derived class. The base class move function should be invoked 
+                  and this can be achieved by statically casting the variable x to an rvalue reference, i.e. hiding its name which can 
+                  be acheived using std::move.
+                  
+                  <CODE_SNIPPET>
+                  Derived(Derived&amp;&amp; rhs) 
+                    : Base(rhs) // wrong: rhs is an lvalue
+                  {
+                    // Derived-specific stuff
+                  }
+                  
+                  Derived(Derived&amp;&amp; rhs) 
+                    : Base(std::move(rhs)) // good, calls Base(Base&amp;&amp; rhs)
+                  {
+                    // Derived-specific stuff
+                  }
+                  </CODE_SNIPPET>
+                  
+                  std::move hides the name of its arguments (static casting it to an rvalue reference).  
+
+                  <CPP11 title ="perfect forwarding">
+                    There is one subtlety with rvalues and deduced types. The rvalueness/lvalueness of a deduced type follows that of the initializer. For example, 
+                    in a function template:  
+
+                    <CODE_SNIPPET>
+                    template&lt;typename T&gt;
+                    void print(T&amp;&amp; x) { cout&lt;&lt;x&lt;&lt;endl;}
+                    </CODE_SNIPPET>
+
+                    So calling print on a lvalue makes `x` an lvalue reference, same if `x` is an rvalue. Now when does this matter? It doesn't matter inside `print` itself 
+                    since `x` is an lvalue there anyway. It matters when you want to pass `x` to another function, do you pass it as an lvalue (just `x`) or hide its 
+                    name using std::move? The answer obviously depends on the nature of `x`, you want to preserve that. This can be achieved using std::forward. std:forward passes
+                    rvalue references as rvalues and lvalue references as lvalues.  
+                  </CPP11>
+                </DEFINITION>
+                <DECISION>
+                  <p>Classes should have move constructor and assignment operator OR explicitly delete them.  </p>
+                  <p>Strive to define your move semantics so that they cannot throw exceptions and declare them so using <code>noexcept</code> specifier.  </p>
+                  <p>Use <code>std::move</code> to pass argument to base classes in move constructor and assignment operator.  </p>
+                  <p>Use <code>std:forward</code> to forward arguments to classes constructors in templated functions or classes.  </p>
+                  <p>Remember that an rvalue reference is not necessarily an rvalue itself.  </p>
+                  <p>Take advantage of compilers Return Value Optimization (RVO)/elision, don't be afraid to return by value.</p>
+                </DECISION>
+              </BODY>
         </STYLEPOINT>
         
     </CATEGORY>
