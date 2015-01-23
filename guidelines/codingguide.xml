@@ -1261,13 +1261,62 @@
                 class is not designed to be a base class.
             </SUMMARY>
             <BODY>
-                <CPP11 title="override and final">
+                <CPP11 title="override controls: override and final">
                     <p>
-                        Since C++11 it is possible to mark virtual functions as overriding a virtual function from the base class.
-                        This is useful to state the intent and get a compile error if this intent is not fulfilled for some reason (e.g. typo in the function name, mismatching function signature, virtual keyword forgotten in the base class).
-                    </p><p>
-                        The <code>final</code> keyword tells the compiler that subclasses may not override the virtual function anymore.
-                        This is a special case, but useful to limit abuse of your classes by users.
+                      Since C++11 it is possible to mark virtual methods as overriding a virtual methods from the base class using the keyword <code>override</code>.
+
+                      This is useful to state the intent and get a compile error (on otherwise silent errors) if this intent is not fulfilled for some reason 
+                      (e.g. typo in the method name, mismatching method signature, virtual keyword forgotten in the base class).
+                      For example:
+                      <CODE_SNIPPET>
+                      Class Base
+                      {
+                          virtual void a(int);
+                          virtual void f();
+                          virtual void g() const;
+                          void k(); // not virtual
+                          virtual void h(char);
+                      };
+                      
+                      Class Derived : public Base
+                      {
+                          void a(float) override; // doesn't override Base::a(int) (wrong signature)
+                          void f() override; // overrides Base::f()
+                          void g() override; // doesn't override Base::g() (wrong type)
+                          void k() override; // doesn't override Base::k() (Base::k() is not virtual)
+                          void h(char); // overrides Base::h()
+                      };
+                      </CODE_SNIPPET>
+                      
+                      Error given by gcc compiler when there is a problem with an override attempt is  
+                      
+                      <CODE_SNIPPET>
+                      error: ‘void foo::foo()’ marked override, but does not override.
+                      </CODE_SNIPPET>
+                    </p>
+
+                    <p>
+                      The <code>final</code> keyword tells the compiler that derived classes may not override the virtual methods anymore.
+                      This is useful to limit abuse of your classes by users, but it closes the possibility of better implementation of methods in derived classes. 
+                      <CODE_SNIPPET>
+                        Class Base 
+                        {
+                          virtual void f() final;
+                        };
+
+                        Class Derived : Base 
+                        {
+                          void f(); // ill-formed because the virtual method Base::f has been marked final
+                        };
+                      </CODE_SNIPPET>
+                        
+                        It can also be useful to prevent inheritance from classes (if a programmer tries to inherit from a class that is declared final by the 
+                        author it is a sign that the programmer should have been using composition rather than inheritance).
+                      <CODE_SNIPPET>
+                        Class Base final { };
+ 
+                        Class Derived : Base { }; // ill-formed because the class Base has been marked final
+                      </CODE_SNIPPET>
                     </p>
                 </CPP11>
                 <DEFINITION>
@@ -1305,10 +1354,10 @@
                     </p>
                     <p>
                         Do not overuse implementation inheritance.  Composition is
-                        often more appropriate. Try to restrict use of inheritance
-                        to the "is-a" case: <code>Bar</code> subclasses
-                        <code>Foo</code> if it can reasonably be said that
-                        <code>Bar</code> "is a kind of" <code>Foo</code>.
+                        often more appropriate. 
+                    </p>
+                    <p>
+                        State your intent when you want to override a virtual method by using the keyword <code>overrride</code>.
                     </p>
                 </DECISION>
             </BODY>
