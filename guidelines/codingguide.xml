@@ -1954,7 +1954,7 @@
         
         <STYLEPOINT title="Run-Time Type Information (RTTI)">
             <SUMMARY>
-                Avoid using Run Time Type Information (RTTI).
+              Use RTTI with caution. If you find yourself overusing <code>dynamic_cast</code> consider the design of your code and classes.
             </SUMMARY>
             <BODY>
                 <DEFINITION>
@@ -1965,8 +1965,7 @@
                 <CONS>
                     <p>
                         Querying the type of an object at run-time frequently means a
-                        design problem.  Needing to know the type of an
-                        object at runtime is often an indication that
+                        design problem and is often an indication that
                         the design of your class hierarchy is flawed.
                     </p>
                     <p>
