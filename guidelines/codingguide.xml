@@ -970,54 +970,7 @@
                         new member variables, you are not required to have a default
                         constructor.
                     </p>
-                    <p>
-                        Avoid unmanaged resource acquisition in constructors, since the destructor of the class will not be called if an exception is thrown from the constructor.
-                        Therefore, always use C++ <a href="http://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Resource_Acquisition_Is_Initialization">
-                            "resource acquisition is initialization" (RAII)</a>
-                        idiom to ensure resources are properly freed.
-                    </p>
                 </DECISION>
-                <EXTRA>
-                    <p>
-                        An example demonstrating how to avoid unmanaged resource acquisition in constructor.
-                        Instead of
-                    </p>
-                    <BAD_CODE_SNIPPET>
-                        // MyClass.h
-                        class MyClass {
-                        public:
-                        MyClass();
-                        ~MyClass();
-                        private:
-                        Something* mSomething;  // raw pointer
-                        };
-                        // MyClass.cxx
-                        MyClass::MyClass()
-                        : mSomething(new Something())
-                        {}
-                        MyClass::~MyClass()
-                        {
-                        delete mSomething;       // mSomething has to be deleted with its owner
-                        }
-                    </BAD_CODE_SNIPPET>
-                    <p>
-                        do
-                    </p>
-                    <CODE_SNIPPET>
-                        // MyClass.h
-                        class MyClass {
-                        public:
-                        MyClass();
-                        ~MyClass() = delete;   // mSomething is deleted automatically
-                        private:
-                        std::unique_ptr&lt;Something&gt; mSomething; // smart pointer
-                        };
-                        // MyClass.cxx
-                        MyClass::MyClass()
-                        : mSomething(new Something())
-                        {}
-                    </CODE_SNIPPET>
-                </EXTRA>
             </BODY>
         </STYLEPOINT>
         
