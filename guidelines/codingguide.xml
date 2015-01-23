@@ -1010,53 +1010,6 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Explicit Constructors">
-            <SUMMARY>
-                Use the C++ keyword <code>explicit</code> for constructors with
-                one argument.
-            </SUMMARY>
-            <BODY>
-                <DEFINITION>
-                    Normally, if a constructor takes one argument, it can be used
-                    as a conversion.  For instance, if you define
-                    <BAD_CODE_SNIPPET>
-                        class Foo {
-                        public:
-                        Foo(const std::string &amp;name);
-                        };
-                    </BAD_CODE_SNIPPET>
-                    and then pass a string to a
-                    function that expects a <code>Foo</code>, the constructor will
-                    be called to convert the string into a <code>Foo</code> and
-                    will pass the <code>Foo</code> to your function for you.
-                    Declaring a constructor <code>explicit</code> prevents
-                    an implicit conversion.
-                    <CODE_SNIPPET>
-                        class MyClass {
-                        public:
-                        explicit MyClass(int number); //allocate number bytes
-                        explicit MyClass(const std::string &amp;name); // initialize with string name
-                        };
-                    </CODE_SNIPPET>
-                </DEFINITION>
-                <DECISION>
-                    <p>
-                        We require all single argument constructors to be
-                        explicit.
-                    </p>
-                    <p>
-                        Exceptions are copy constructors and classes that are intended to be
-                        transparent wrappers around other classes.
-                    </p>
-                    <p>
-                        Finally, constructors that take only an <code>initializer_list</code> may be
-                        non-explicit. This is to permit construction of your type using the
-                        assignment form for brace init lists (i.e. <code>MyType myObject = {1, 2}
-                        </code>).
-                    </p>
-                </DECISION>
-            </BODY>
-        </STYLEPOINT>
         
         <STYLEPOINT title="Copy (and Move)">
             <SUMMARY>
