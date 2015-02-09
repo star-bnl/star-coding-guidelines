@@ -23,7 +23,7 @@
         The committee based their work on the existing guidelines, expanded them for clarity, and
         added new material where it saw fit. The coding guidlines include the new C++11 standard.
         We have made heavy use of the C++ Google Style guide at <a href="http://google-styleguide.googlecode.com">
-        http://google-styleguide.googlecode.com</a>.
+        http://google-styleguide.googlecode.com</a> using their xml and css style sheets.
     </p>
 
     <p>
@@ -47,10 +47,6 @@
     </p>
  
     </CATEGORY>
-
-
-
-
 
     <OVERVIEW>
         <CATEGORY title="Important Note">
@@ -79,7 +75,7 @@
     <CATEGORY title="Header Files">
         <p>
             In general, every <code>.cxx</code> file should have an associated
-            <code>.h</code> file.
+            <code>.h</code> file. Each header file should contain only one or related class declarations for maintainability and for easier retrieval of class definitions.
         </p>
         <p>
             Correct use of header files can make a huge difference to the
@@ -303,12 +299,12 @@
             scopes, and thus are useful for logically grouping related types and functions and
             preventing name collisions. In C++ it is in general very good practice to use namespaces,
             especially in libraries. However, historically STAR software makes little to no use of namespaces
-            but rather uses a specific naming scheme to indicate the scope
+            but rather uses a specific naming scheme (prefixes) to indicate the scope
             (e.g. <code>StEmc</code>..., <code>StTpc</code>... etc). While certain tools in STAR can handle
             namespaces (such as <code>cons</code>) others would be very cumbersome to adapt.
         </p>
         
-        <STYLEPOINT title="General guideline">
+        <STYLEPOINT title="General Guideline">
             <SUMMARY>
                 Namespaces are for legacy reasons depreciated in STAR. As with every guideline there
                 might be exceptions, especially in end user code. However, care shold be taken to check for
@@ -340,7 +336,7 @@
             
         </STYLEPOINT>
         
-        <STYLEPOINT title="Using declarations and directives">
+        <STYLEPOINT title="Using Declarations and Directives">
             <SUMMARY>
                 Don't write namespace using declarations or using directives
                 in a header file or before an #include.
@@ -370,7 +366,7 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="std namespace">
+        <STYLEPOINT title="std Namespace">
             <SUMMARY>
                 Do not declare anything in namespace <code>std</code>, not even forward
                 declarations of standard library classes.
@@ -604,7 +600,7 @@
                         class Something
                         {
                         private:
-                        static int sId; // but this one too (details at the end of the rule)
+                            static int sId; // but this one too (details at the end of the rule)
                         };
                         namespace NotGlobalScope {
                         Foo fooObject;    // and finally this one as well
@@ -630,7 +626,7 @@
                 </EXTRA>
             </BODY>
         </STYLEPOINT>
-        <STYLEPOINT title="Global variables initialization">
+        <STYLEPOINT title="Global Variables Initialization">
             <SUMMARY>
                 In the rare and justified cases where you use global variables, including file-static variables, static member variables and variables in
                 namespace scope, initialize them statically.
@@ -659,12 +655,12 @@
                 </p>
                 <CODE_SNIPPET>
                     struct Pod {
-                    int indexes[5];
-                    float width;
+                        int indexes[5];
+                        float width;
                     };
                     struct LiteralType {
-                    int value;
-                    constexpr LiteralType() : value(1) {}
+                        int value;
+                        constexpr LiteralType() : value(1) {}
                     };
                     
                     Pod gData;
@@ -675,7 +671,7 @@
                 </p>
                 <BAD_CODE_SNIPPET>
                     class NotPod {
-                    NotPod();
+                        NotPod();
                     };
                     NotPod gBadData;  // dynamic constructor
                 </BAD_CODE_SNIPPET>
@@ -711,7 +707,7 @@
                         // Struct.h:
                         #include &lt;string&gt;
                         struct Struct {
-                        static std::string sString;
+                            static std::string sString;
                         };
                         
                         // Struct.cxx:
@@ -724,8 +720,8 @@
                         std::string gAnotherString = Struct::sString;
                         
                         int main() {
-                        std::cout &lt;&lt; gAnotherString &lt;&lt; std::endl;
-                        return 0;
+                            std::cout &lt;&lt; gAnotherString &lt;&lt; std::endl;
+                            return 0;
                         }
                     </BAD_CODE_SNIPPET>
                     <p>
@@ -736,7 +732,7 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Static Variables in functions">
+        <STYLEPOINT title="Static Variables in Functions">
             <SUMMARY>
                 Static variables in functions (called "function-local static variables" in the C++ terminology)
                 are expensive and need care on destruction.
@@ -764,12 +760,12 @@
                         class Something
                         {
                         public:
-                        int generateId() {
-                        return Something::sId++;
-                        }
+                            int generateId() {
+                            return Something::sId++;
+                            }
                         
                         private:
-                        static int sId; // initialized in .cxx
+                            static int sId; // initialized in .cxx
                         };
                     </CODE_SNIPPET>
                     instead of :
@@ -777,10 +773,10 @@
                         class Something
                         {
                         public:
-                        int generateId() {
-                        static int sId = 0;
-                        return sId++;
-                        }
+                            int generateId() {
+                                static int sId = 0;
+                                return sId++;
+                            }
                         };
                     </BAD_CODE_SNIPPET>
                 </DECISION>
@@ -797,16 +793,16 @@
                         <CODE_SNIPPET>
                             std::string &amp;globalMessage()
                             {
-                            static std::string message = "Hello world.";
-                            return message;
+                                static std::string message = "Hello world.";
+                                return message;
                             }
                             
                             int main()
                             {
-                            std::cout &lt;&lt; globalMessage() &lt;&lt; '\n';
-                            globalMessage() = "Goodbye cruel world.";
-                            std::cout &lt;&lt; globalMessage() &lt;&lt; '\n';
-                            return 0;
+                                std::cout &lt;&lt; globalMessage() &lt;&lt; '\n';
+                                globalMessage() = "Goodbye cruel world.";
+                                std::cout &lt;&lt; globalMessage() &lt;&lt; '\n';
+                                return 0;
                             }
                             // prints:
                             // Hello world.
@@ -816,24 +812,24 @@
                             class BreakTheCode
                             {
                             public:
-                            void setReference(int *value) { mValuePointer = value; }
-                            ~BreakTheCode() { *mValuePointer += 2; }
+                                void setReference(int *value) { mValuePointer = value; }
+                                ~BreakTheCode() { *mValuePointer += 2; }
                             
                             private:
-                            int *mValuePointer = 0;
+                                int *mValuePointer = 0;
                             };
                             
                             BreakTheCode &amp;globalBreaker()
                             {
-                            static BreakTheCode breaker;
-                            return breaker;
+                                static BreakTheCode breaker;
+                                return breaker;
                             }
                             
                             int main()
                             {
-                            int someValue = 1;
-                            globalBreaker().setReference(&amp;someValue);
-                            return 0;
+                                int someValue = 1;
+                                globalBreaker().setReference(&amp;someValue);
+                                return 0;
                             }
                             // globalBreaker::breaker accesses main::someValue after it went out of scope.
                             // This example should be harmless, but if a more complex type instead of int
@@ -852,13 +848,33 @@
         them extensively. This section lists the main dos and don'ts you
         should follow when writing a class.
         
+        <STYLEPOINT title="Constructors">
+            <SUMMARY>
+                Every class should have at least one constructor. All uninitialized variables should be initialized in the constructor.
+            </SUMMARY>
+            <BODY>
+                <p>Every class should have at least one constructor (and a destructor)
+                even if it does nothing or is defined to do nothing. This is good practice even
+                if a default constructor created by the compiler would do the job. It indicates
+                the reader that the coder thought about this and not plainly forgot about it.</p>
+                
+                <p>If a class does not have a constructor there is no guarantee of
+                how objects of that class will be initialized, whilst data members should be explicitly initialized therein. When
+                the constructor dynamically allocates memory, a destructor must be added to return the memory to the free pool
+                when an object gets cleaned up.</p>
+                
+                In the constructor all data member should be initialized, either in the constructor function body or in the constructor initializer list
+                or in-class. See the next item for more.
+            </BODY>
+        </STYLEPOINT>
+       
         <STYLEPOINT title="Initialization">
             <SUMMARY>
                 Declare and initialize members variables in the same order.
                 Prefer initialization (in the constructor initializer list or in-class) to assignment (in the constructor function body).
             </SUMMARY>
             <BODY>
-                <CPP11 title="in-class member initialization">
+                <CPP11 title="In-Class Member Initialization">
                     C++98 allows in-class member initialization for static members only. C++11 allows in-class member initialization for any variable.
                     <CODE_SNIPPET>
                     Class MyClass
@@ -900,8 +916,8 @@
                         class MyClass : public MyBase  {
                         // ...
                         private:
-                        int mValue;
-                        std::vector mVector;
+                            int mValue;
+                            std::vector mVector;
                         };
                         // MyClass.cxx
                         MyClass::MyClass()
@@ -974,7 +990,7 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Virtual functions in constructors and destructors">
+        <STYLEPOINT title="Virtual Functions in Constructors and Destructors">
             <SUMMARY>
                 Do not call virtual functions in constructors and destructors. <br/>
             </SUMMARY>
@@ -999,8 +1015,8 @@
                     <CODE_SNIPPET>
                         class MyClass {
                         public:
-                        MyClass() { MyClass::doSomething(); }    // Good
-                        virtual void doSomething();
+                             MyClass() { MyClass::doSomething(); }    // Good
+                             virtual void doSomething();
                         };
                     </CODE_SNIPPET>
                 </p>
@@ -1009,8 +1025,61 @@
                 </DECISION>
             </BODY>
         </STYLEPOINT>
-        
-        
+    
+    <STYLEPOINT title="Copy Constructors and Assignment Operator">
+        <SUMMARY>
+            Each class should have an assignment operator and a copy constructor when they allocate subsidiary data structures on the heap or consume any other kind of shared resources. Be aware of data slicing for polymorphic classes.
+        </SUMMARY>
+        <BODY>
+            
+            <p>
+                The assignment operator
+                <CODE_SNIPPET>
+                    ClassName&amp; operator=(const ClassName&amp;)
+                </CODE_SNIPPET>
+                    
+                is called when one instance of a class is assigned to another.
+                The copy constructor
+                <CODE_SNIPPET>
+                    ClassName(const ClassName&amp;)
+                </CODE_SNIPPET>
+               
+                
+                defines the behavior of the class when it is passed by value as an argument, returned by
+                value from a function, or used to initialize one instance with the value of another class instance. Defining this
+                constructor, all the class objects are copied properly.
+            </p>
+            
+            <p>It is possible to implement  one using the other. One can safely invoke the copy assignment operator from the constructor as long as the operator is not declared virtual.</p>
+            
+                <p>Exception 1: if the class contains only non-pointer data member the default copy constructor and assignment
+                operator might be used. In this case a comment line should state that they were omitted by purpose.</p>
+                
+                <p>Exception 2: if the design of the class asks specifically demands that no copy is created (e.g. for singletons) the copy constructor and assignement operators should be be disabled by using the <code>delete</code> keyword (C++11) or by making them private (C++98 or older). </p>
+            
+             <SUBSECTION title="The Rule of Three">
+                 <p>
+                 The rule of three is a rule of thumb in C++ that claims that if a class defines one of the following it should probably explicitly define all three:
+                 <ul>
+                 <li>destructor</li>
+                 <li>copy constructor</li>
+                 <li>copy assignment operator</li>
+                 </ul>
+                 The Rule of Three claims that if one of these had to be defined by the programmer, it means that the compiler-generated version does not fit the needs of the class in one case and it will probably not fit in the other cases either.</p>
+                 </SUBSECTION>
+            
+             <SUBSECTION title="A Note on Polymorphic Classes and Data Slicing">
+                 <p>Constructors cannot be virtual. Is a derived polymorphic class accessed through a pointer or reference
+                 to a base class, copying it (through the pointer) could cause data slicing. If this behaviour is not desired the programmer needs to add a virtual <code>clone()</code> function that returns a copy of self.</p>
+             </SUBSECTION>
+             <DECISION>
+                 Most classes that allocate subsidiary data structures on the heap or consume any other kind of shared resources
+                 should have a copy constructor and assignement operator.
+             </DECISION>
+         </BODY>
+    </STYLEPOINT>
+
+
         <STYLEPOINT title="Copy and Move">
             <SUMMARY>
                 Explicitly enable or delete the copy constructor/assignment operator.
@@ -1020,7 +1089,7 @@
                 <DEFINITION>
                     The copy constructor and copy assignment operator are used to create copies of objects.
                     The move constructor and move assignment operator are used to move (semantically) objects.
-                    <CPP11 title="move semantics">
+                    <CPP11 title="Move Semantics">
                         Move semantics were introduced with C++11.
                         In essence, a move is just a copy that can be optimized from the knowledge that the source object is at the end of its life (such objects bind to rvalue references).
                         Thus, a move of a <code>std::vector</code> does not need to copy all data, but only the pointer to the data.
@@ -1054,7 +1123,7 @@
                       Be explicit about your wish for the move semantics, i.e. request defaults or delete them.  
                     </p>
 
-                    <CPP11 title="control of defaults: default and delete">
+                    <CPP11 title="Control of Defaults: default and delete">
                         Since C++11, the programmer can instruct the compiler not to create certain defaults by using the specifier <code>= delete</code>
                         This is particularly useful in two cases: 
                         
@@ -1127,10 +1196,9 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Delegating and inheriting constructors" cpp11="yes">
+        <STYLEPOINT title="Delegating and Inheriting Constructors" cpp11="yes">
             <SUMMARY>
-                Use delegating and inheriting constructors
-                when they reduce code duplication.
+                Use delegating and inheriting constructors when they reduce code duplication. Be aware of self delegation.
             </SUMMARY>
             <BODY>
                 <DEFINITION>
@@ -1140,15 +1208,110 @@
                         constructors. Delegating constructors allow the constructor
                         to forward work to another constructor of the same class,
                         using a special variant of the initialization list
-                        syntax. For example:
+                        syntax.
                     </p>
-                    <CODE_SNIPPET>
-                        Foo::Foo(const string&amp; name) : mName(name) {
-                        ...
-                        }
+                    </DEFINITION>
+                    <SUBSECTION title="Delegating Constructors">
+                        <p>Many classes have multiple constructors, especially in STAR. Often, an empty constructor
+                        sets variables to either 0 or any default parameters, while the non-empty constructors are
+                        used to set the data member to the values provided. Other examples are constructors that take
+                        different arguments, depending on the context the class is used. Often only parts of all data
+                        that defined in the class are known at construction time.</p>
                         
-                        Foo::Foo() : Foo("example") { }
-                    </CODE_SNIPPET>
+                        <p>In many cases this requires to either write constructors with semi-identical code making
+                            code maintenance difficult, or providing a private <code>init()</code> function that is called
+                            internally by the various constructors.</p>
+                        
+                        Here’s an example how it was done in C++98:
+                        
+                        <CODE_SNIPPET>
+                        class A {
+                        public:
+                            A(): num1(0), num2(0) {average=(num1+num2)/2.;}
+                            A(int i): num1(i), num2(0) {average=(num1+num2)/2.;}
+                            A(int i, int j): num1(i), num2(j) {average=(num1+num2)/2.;}
+                        private:
+                            int num1;
+                            int num2;
+                            double average;
+                        };
+                        </CODE_SNIPPET>
+                       
+                        To at least keep the repetitions at a minimum often this is done:
+                        
+                        <CODE_SNIPPET>
+                        class A {
+                        public:
+                            A(): num1(0), num2(0) {init();}
+                            A(int i): num1(i), num2(0) {init();}
+                            A(int i, int j): num1(i), num2(j) {init();}
+                        private:
+                            int num1;
+                            int num2;
+                            double average;
+                            void init(){ average=(num1+num2)/2.;};
+                        };
+                        </CODE_SNIPPET>
+                        
+                        <p>This revision eliminates code duplication but it brings the following new problems:
+                        Other member functions might accidentally call <code>init()</code>, which causes unexpected results.
+                        After we enter a class member function,  all the class members have already been constructed.
+                        It's too late to call member functions to do the construction work of class members.
+                        In other words, <code>init()</code> merely reassigns new values to data members.
+                        It doesn’t really initialize them.</p>
+                        
+                        Verbosity hinders readability and repetition is error-prone. Both get in the way of maintainability.
+                        So, in C++11, we can define one constructor in terms of another:
+                        
+                        <CODE_SNIPPET>
+                        class A {
+                        public:
+                            A(): A(0){}
+                            A(int i): A(i, 0){}
+                            A(int i, int j) {
+                                 num1=i;
+                                 num2=j;
+                                 average=(num1+num2)/2.;
+                            }
+                        private:
+                            int num1;
+                            int num2;
+                            double average;
+                        };
+                        </CODE_SNIPPET>
+                        
+                        <p>Delegating constructors make the program clear and simple. Delegating and target constructors do
+                            not need special labels or disposals to be delegating or target constructors. They have the same
+                            interfaces as other constructors. A delegating constructor can be the target constructor of another
+                            delegating constructor,  forming a delegating chain. Target constructors are chosen by overload
+                            resolution or template argument deduction. In the delegating process, delegating constructors
+                            get control back and do individual operations after their target constructors exit.</p>
+                        
+                        <CONS>
+                        If not careful one can generate a constructor that delegates to itself:
+                        <CODE_SNIPPET>
+                        class C
+                        {
+                        public:
+                            C(int) { }
+                            C() : C(42) { }
+                            C(char) : C(42.0) { }
+                            C(double) : C('a') { }
+                        };
+                        
+                        int main()
+                        {
+                            C c('b');
+                           return 0;
+                        }
+                        </CODE_SNIPPET>
+                        Different compilers handle this case differently. For example,
+                        <code>clang</code> submits an error, <code>gcc</code> compiles and crashes with stack overflow.
+                        </CONS>
+                        
+                        <em>Note that above code is attached to the class definition only for demonstration purposes. In STAR, the use of code in class declarations is strongly discouraged since it reduces readability.</em>
+                    </SUBSECTION>
+                    <SUBSECTION title="Inheriting Constructors">
                     <p>
                         A derived class, per default, inherits all functions of the base class.
                         This is not the case for constructors.
@@ -1174,12 +1337,14 @@
                         don't have to do anything more than calling <code>Base</code>'s
                         constructors.
                     </p>
-                </DEFINITION>
+                    </SUBSECTION>
+
                 <DECISION>
                     <p>
                         Use delegating and inheriting constructors when they reduce code duplication.<br/>
                         Be cautious about inheriting constructors when your derived class has new member
                         variables and use in-class member initialization for the derived class's member variables.
+                        When coding delegating constructors be aware of self delegation.
                     </p>
                 </DECISION>
             </BODY>
@@ -1261,7 +1426,7 @@
                 class is not designed to be a base class.
             </SUMMARY>
             <BODY>
-                <CPP11 title="override controls: override and final">
+                <CPP11 title="Override Controls: override and final">
                     <p>
                       Since C++11 it is possible to mark virtual methods as overriding a virtual methods from the base class using the keyword <code>override</code>.
 
@@ -1449,6 +1614,53 @@
             </BODY>
         </STYLEPOINT>
         
+        <STYLEPOINT title="Access Control Keywords">
+            <SUMMARY>
+                The <code>public</code>, <code>protected</code> and <code>private</code> keywords must be used explicitly
+                in the class declaration in order to make
+                code more readable. It is recommended to list the public data member and methods first
+                since they define the global interface and are most important for the user/reader.
+            </SUMMARY>
+            <BODY>
+            <p>Don't do this:</p>
+            <BAD_CODE_SNIPPET>
+                class Momentum {
+                    double mX;  // w/o access control keyword implicitly private
+                    double mY;
+                    double mZ;
+
+                protected:
+                    bool containsInvalidNumbers() const;
+
+                public:             // should be listed first
+                    double px() const;
+                    double py() const;
+                    double pz() const;
+                    double pT() const;
+                };
+           </BAD_CODE_SNIPPET>
+            <p>Do this:</p>
+            <CODE_SNIPPET>
+                class Momentum {
+                public:
+                    double px() const;
+                    double py() const;
+                    double pz() const;
+                    double pT() const;
+                    
+                protected:
+                     bool containsInvalidNumbers() const;
+                     
+                private:
+                    double mX;
+                    double mY;
+                    double mZ;
+                };
+            </CODE_SNIPPET>
+            </BODY>
+            
+        </STYLEPOINT>
+
         <STYLEPOINT title="Access Control">
             <SUMMARY>
                 Hide internals. Avoid returning handles to internal data managed
@@ -1479,11 +1691,132 @@
                 </p>
             </BODY>
         </STYLEPOINT>
+        
+        <STYLEPOINT title="Friend Decleration">
+            <SUMMARY>
+                The use of friend declerations should be avoided where possible.
+            </SUMMARY>
+            
+            <BODY>
+                <DEFINITION>
+                    Friends are a mechanism to override data hiding. Friends of a class have access to its private data.
+                    Friend is a `limited export' mechanism.
+                </DEFINITION>
+                
+                <CONS>
+                    Friends have three problems:
+                    <ul>
+                    <li>They can change the internal state of objects from outside the definition of the class.</li>
+                    <li>They introduce extra coupling between components, and therefore should be used sparingly.</li>
+                    <li>They have access to everything, rather than being restricted to the members of interest to them.</li>
+                    </ul>
+                </CONS>
+                <DECISION>
+                    To guarantee the encapsulation of a base class is
+                    always preferable to use protected data over friends or public data and then use inheritance.
+                </DECISION>
+            </BODY>
+        </STYLEPOINT>
+
     </CATEGORY>
     
+    <CATEGORY title="ROOT Related Issues">
+        
+        <STYLEPOINT title="ROOT Types">
+            <SUMMARY>
+            Prefer the use of fundamental types built-in C++ over ROOT types, except where absolutely required.
+            </SUMMARY>
+            
+            <BODY>
+                <p>ROOT defines a large set of portable and unportable types such as <CODE>Int_t</CODE>,
+                <CODE>Float_t</CODE>, <CODE>Double_t</CODE>, and many more.
+                There is a priori no reason to use any of those when not needed. Use of builtin C++
+                types makes the code in fact more portable, readable, and often faster (see discussion under
+                "Extended integer types").
+                If fixed size is absolutely required the introduction of extended integer types of
+                fixed size and guaranteed size types in C++11 makes ROOT types redundant.</p>
+               
+                <p>
+                The only exceptions are
+                data member in “persistent” classes (e.g. <code>StEvent</code>) under schema evolution. Here ROOT types
+                need to be used to define the data members.</p>
+                
+              <DECISION>
+                  Avoid the use ROOT definitions of built-in data types and use the built-in C++ types.
+                  Use <code>int</code> instead <code>Int_t</code>, <code>float</code> instead of <code>Float_t</code>,
+                  <code>double</code> instead of <code>Double_t</code>, etc.
+              </DECISION>
+            </BODY>
+        </STYLEPOINT>
+      
+      <STYLEPOINT title="ROOT Mathematical Function">
+          <SUMMARY>
+              Prefer the use of mathematical function available in the C++ standard (<code>&lt;cmath&gt;</code>) over those
+              provided by ROOT.
+          </SUMMARY>
+          
+          <BODY>
+              <p>
+                  ROOT provides a rich set of special mathematical functions often adapted from the old CERNLIB or,
+                  more recently, wrapped GSL functions.  They are heavily used in STAR code. However, ROOT
+                  also provides a set of basic mathematical functions that are already defined in <code>&lt;cmath&gt;</code>.
+                  Examples are <code>TMath::Sqrt()</code>, <code>TMath::Log()</code>, <code>TMath::Sin()</code>, and many more.</p>
+                  
+                  <p>
+                      There is no rational reason to use these ROOT functions when the same functionality is available in the standard
+                  and defined in <code>&lt;cmath&gt;</code>. In most cases they are implemented by calling the built-in functions anyway
+                  and their use reduces readability and portability.</p>
+    
+               <DECISION>
+                   The use of ROOT mathematical function already available in <code>&lt;cmath&lt;</code> is strongly discouraged.
+                    Use <code>sqrt()</code> instead of <code>TMath::Sqrt()</code>, use <code>log()</code> instead
+                   of <code>TMath::Log()</code>, use <code>sin()</code> instead of <code>TMath::Sin()</code>, etc.
+               </DECISION>
+          </BODY>
+      </STYLEPOINT>
+
+
+    </CATEGORY>
+
     <CATEGORY title="Others">
         
-        <STYLEPOINT title="Exceptions">
+            <STYLEPOINT title="Attributes" cpp11="yes">
+                <SUMMARY>
+                    "Attributes" is a new standard syntax aimed at providing some order in the mess of facilities for adding
+                    optional and/or vendor specific information (GNU, IBM, …) into source code. The use of attributes is
+                    discouraged in STAR.
+                </SUMMARY>
+                <BODY>
+                <DEFINITION>
+                    <p>Vendors use a multitude of methods to add  specific information into source code, mostly through preprocessor/macro statements such as
+                    <code>__attribute__</code>, <code>__declspec</code>, and <code>#pragma</code>.
+                    Attributes were added to C++ in order to unify and streamline this procedure.
+                    As such their use for the common (STAR) programmer is limited. An attribute can be used almost everywhere in the C++ program,
+                    and can be applied to almost everything: to types, to variables, to functions, to names, to code blocks, and to entire translation units,
+                    although each particular attribute is only valid where it is permitted by the implementation.</p>
+                
+                    <p>An attribute is placed within double square brackets. There are few attributes defined yet: <code>[[noreturn]]</code>,
+                        <code>[[carries_dependency]]</code>, <code>[[deprecated]]</code>(C++14), and <code>[[deprecated("reason")]]</code>(C++14).
+                        Future attributes are in discussion to support MP.
+                    </p>
+                    Example:
+                    <CODE_SNIPPET>
+                        void boom [[ noreturn ]] ()	// boom() will never return
+                        {
+                                throw "error";
+                        }
+                    </CODE_SNIPPET>
+
+                </DEFINITION>
+                <DECISION>
+                    The use  of attributes is discouraged in STAR. There is a reasonable fear that attributes will be misused.
+                    The recommendation is to use attributes to only control things that do not affect the meaning of a program
+                    but might help detect errors (e.g. [[noreturn]]) or help optimizers (e.g. [[carries_dependency]]).
+                </DECISION>
+                </BODY>
+            </STYLEPOINT>
+                
+            <STYLEPOINT title="Exceptions">
             <SUMMARY>
                 Use C++ exceptions instead of return codes for error handling. Do not use exceptions to return values.
             </SUMMARY>
@@ -1570,6 +1903,7 @@
                         Therefore we strongly recommend that you use
                         <code>const</code> whenever it makes sense to do so.
                     </p>
+                    
                     <p> Use <code>const</code>:
                         <ul>
                             <li>
@@ -1607,12 +1941,75 @@
             </SUMMARY>
             <BODY>
                 <DEFINITION>
-                    Some variables can be declared <code>constexpr</code>
-                    to indicate the variables are true constants,
-                    i.e. fixed at compilation/link time.
-                    Some functions and constructors can be declared <code>constexpr</code>
-                    which enables them to be used
-                    in defining a <code>constexpr</code> variable.
+                    One of the improvements in C++11, generalized constant expressions, allows programs to take
+                    advantage of compile-time computation. It is a feature that, if used correctly, can speed up programs.
+                    The basic idea of constant expressions is to allow certain computations to take place at compile
+                    time—literally while your code compiles—rather than when the program itself is run.
+
+                    <CODE_SNIPPET>
+                        constexpr int multiply(int x, int y)
+                        {
+                             return x*y;
+                        }
+                        
+                        constexpr int factorial(int n)
+                        {
+                             return n &lt;= 1 ? 1 : (n * factorial(n-1));
+                        }
+                    </CODE_SNIPPET>
+                    Then the compiler will evaluate the following statements at compile time instead at run time:
+                    
+                    <CODE_SNIPPET>
+                        const int val multiply(10,10);
+                        const int n5 factorial(5);
+                    </CODE_SNIPPET>
+                    <p>
+                    Another benefit of <code>constexpr</code>, beyond the performance of compile time computation, is that it
+                    allows functions to be used in all sorts of situations that previously would have called for macros.
+                    For example, let's say you want to have a function that computes the the size of an array based on
+                    some multiplier. If you had wanted to do this in C++ without a <code>constexpr</code>, you'd have needed to create
+                    a macro since you can't use the result of a function call to declare an array. But with <code>constexpr</code>,
+                    you can now use a call to a <code>constexpr</code> function inside an array declaration.</p>
+                    Example:
+                    <CODE_SNIPPET>
+                        constexpr int defaultArraySize(int multiplier)
+                        {
+                              return 10*multiplier;
+                        }
+                    </CODE_SNIPPET>
+                    and in the program it is now possible to use:
+                    <CODE_SNIPPET>
+                        int array[defaultArraySize(3)];
+                    </CODE_SNIPPET>
+                    
+                    <p>Note that a <code>constexpr</code> specifier used in an object declaration implies
+                        <code>const</code>. A <code>constexpr</code> specifier used in an function
+                    declaration implies inline. If you declare a class member function to be <code>constexpr</code>,
+                    that marks the function as <code>const</code> as well. If you
+                    declare a variable as <code>constexpr</code>, that in turn marks the variable as
+                    <code>const</code>. However, it doesn't work the other way--a
+                    <code>const</code> function is not a <code>constexpr</code>,
+                        nor is a <code>const</code> variable a <code>constexpr</code>.</p>
+                    
+                    <p>
+                    You can make any object a <code>constexpr</code>. In this case the constructor must be
+                    declared a <code>constexpr</code> as well as the method to be used.
+                    </p>
+                   There are also some limitations:
+                    <ul>
+                    <li>It must consist of single return statement (with a few exceptions)</li>
+                    <li>It can call only other <code>constexpr</code> functions</li>
+                    <li>It can reference only <code>constexpr</code> global variables</li>
+                    </ul>
+                    <p>
+                        Some variables can be declared <code>constexpr</code>
+                        to indicate the variables are true constants,
+                        i.e. fixed at compilation/link time.
+                        Some functions and constructors can be declared <code>constexpr</code>
+                        which enables them to be used
+                        in defining a <code>constexpr</code> variable.
+                    </p>
+                    
                 </DEFINITION>
                 <PROS>
                     Use of <code>constexpr</code> enables
@@ -1620,14 +2017,15 @@
                     rather than just literals;
                     definition of constants of user-defined types; and
                     definition of constants with function calls.
-                </PROS>
+               </PROS>
                 <CONS>
-                    Prematurely marking something as constexpr
+                    Prematurely marking something as <code>constexpr</code>
                     may cause migration problems if later on it has to be downgraded.
                     
                     Current restrictions on what is allowed
-                    in constexpr functions and constructors
+                    in <code>constexpr</code> functions and constructors
                     may invite obscure workarounds in these definitions.
+                    
                 </CONS>
                 <DECISION>
                     <p>
@@ -1683,8 +2081,76 @@
                 </EXTRA>
             </BODY>
         </STYLEPOINT>
+  
+        <STYLEPOINT title="Suffix Return Type Syntax" cpp11="yes">
+            <SUMMARY>
+                C++11 new suffix return value syntax (or extended function declaration syntax) represents another use for <code>auto</code>.
+                It is useful mostly in templates and in methods where the return type is the class itself. The new return syntax,
+                however, is not as easy to read as the standard method and should only be used where necessary. It should not be
+                regarded as an alternative way of defining a simple function.
+            </SUMMARY>
+            <BODY>
+                <p>In all prior versions of C and C++, the return value of a function absolutely had to go before the function:</p>
+                
+                <CODE_SNIPPET>
+                    int multiply (int x, int y);
+                </CODE_SNIPPET>
+                        
+                In C++11, you can now put the return value at the end of the function declaration, substituting <code>auto</code> for the name of the return type.
+                
+                <CODE_SNIPPET>
+                    auto multiply (int x, int y) -&gt; int;
+                 </CODE_SNIPPET>
+                        
+                <p>In the above example the use of the new syntax does not provide any advantage, in fact it makes it less readable.
+                However, there are several cases were the new syntax is in fact the only way to make things work.</p>
+                
+                Consider:
+                
+                    <CODE_SNIPPET>
+                    template&lt;class T, class U&gt;
+                    ??? add(T x, U y)
+                    {
+                        return x+y;
+                    }
+                    </CODE_SNIPPET>
+                        
+                    What can we write as the return type? It's the type of “<code>x+y</code>", of course,
+                    but how can we say that? First idea, use <code>decltype</code>:
+                    
+                    <CODE_SNIPPET>
+                    template&lt;class T, class U&gt;
+                    decltype(x+y) add(T x, U y) // scope problem!
+                    {
+                         return x+y;
+                    }
+                    </CODE_SNIPPET>
+                            
+                    That won't work because x and y are not in scope.
+                    The solution is put the return type where it belongs, after the arguments:
+                        
+                        
+                    <CODE_SNIPPET>
+                    template&lt;class T, class U&gt;
+                    auto add(T x, U y) -&gt; decltype(x+y)
+                    {
+                        return x+y;
+                    }
+                    </CODE_SNIPPET>
+                                
+                    We use the notation auto to mean "return type to be deduced or specified later."
+                    The suffix syntax is not primarily about templates and type deduction, it is really about scope.
+
+                <DECISION>
+                    The use of the new return type syntax is very useful in templates and in methods where the return type
+                    is the class itself. See also <code>decltype</code>. The new return syntax, however, is not as easy to read as the
+                    standard method and should only be used where necessary and to simplify the code. It should not be
+                    regarded as an alternative way of defining a simple function. Use the suffix syntax only if absolutely required.
+                </DECISION>
+            </BODY>
+         </STYLEPOINT>
         
-        <STYLEPOINT title="Smart Pointers">
+        <STYLEPOINT title="Smart Pointers" cpp11="yes">
             
             <SUMMARY>
               It is a modern C++ idiom to get rid of naked pointers whenever possible. However, it is currently difficult to devise an error free scheme where smart pointers
@@ -1693,7 +2159,7 @@
             </SUMMARY>
             <BODY>
                 <DEFINITION>
-                    <CPP11 title="smart pointers">
+                    <CPP11 title="Smart Pointers">
                         Smart pointers have existed long before C++11.
                         But since C++11 the standard library contains the classes <code>unique_ptr&lt;T&gt;</code>,
                         <code>shared_ptr&lt;T&gt;</code>, and <code>weak_ptr&lt;T&gt;</code>.
@@ -1764,16 +2230,17 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Magic numbers">
+        <STYLEPOINT title="Magic Numbers (Hard Coded Numbers)">
             <SUMMARY>
                 <p>
-                    Avoid magic numbers.
+                    Avoid magic numbers (hard coded numbers).
                 </p>
             </SUMMARY>
             <BODY>
                 <p>Avoid spelling literal constants like <code>42</code> or
-                    <code>3.141592</code> in code.
-                    Use symbolic names and expressions instead. Names add information and introduce
+                    <code>3.141592</code> in code.  Hard-coded numbers within the code reduce portability and make maintainability
+                    harder. The use of symbolic names and expressions (declared ) is a valid solution. Make use of <code>const</code>
+                    and <code>constexpr</code>. Names add information and introduce
                     a single point of maintenance.
                 </p>
                 <p>
@@ -1790,8 +2257,8 @@
                     // File Widget.h
                     class Widget {
                     private:
-                    static const int sDefaultWidth;           // value provided in definition
-                    static constexpr int DefaultHeight = 600; // value provided in declaration
+                        static const int sDefaultWidth;           // value provided in definition
+                        static constexpr int DefaultHeight = 600; // value provided in declaration
                     };
                 </CODE_SNIPPET>
                 <CODE_SNIPPET>
@@ -1800,6 +2267,10 @@
                     constexpr int Widget::DefaultHeight;   // definition required only if reference/pointer to
                     // DefaultHeight is needed
                 </CODE_SNIPPET>
+                <SUBSECTION title="STAR Database">
+                    <p>For values which are likely to change with time, a database approach
+                    should be considered. Refer to the STAR database Web page area for more information.</p>
+                 </SUBSECTION>
             </BODY>
         </STYLEPOINT>
         
@@ -2150,7 +2621,7 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Increment and Decrement operators">
+        <STYLEPOINT title="Increment and Decrement Operators">
             <SUMMARY>
                 Prefer the prefix form of the increment (<code>++i</code>) and decrement 
                 (<code>--i</code>) operators because it has simpler semantics.
@@ -2206,7 +2677,7 @@
             </BODY>
         </STYLEPOINT>
 
-        <STYLEPOINT title="Range-for statement" cpp11="yes">
+        <STYLEPOINT title="Range-for Statement" cpp11="yes">
           <SUMMARY>
             Use reference to elements in range-for statements especially when dealing with large objects. Prefer ordinary loops when you need the index information.
           </SUMMARY>
@@ -2252,40 +2723,102 @@
           </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Integer Types">
+        <STYLEPOINT title="Integer Types" cpp11="yes">
             <SUMMARY>
-                Per default, use <code>int</code> if you need an integer type.
-                Prefer signed integers over unsigned integers and thus <code>std::int64_t</code> over <code>unsigned int</code> if you need more bits.
+                Per default, use <code>int</code> if you need an integer type. If you need to guarantee a specific size use the new extended integer
+                types defined in <code>&lt;cstdint&gt;</code>.
             </SUMMARY>
             <BODY>
                 <p>
-                    The C++ standard only loosely specifies the sizes of its built-in integer types.
-                </p>
-                <p>
-                    If you need something other than <code>int</code>, consider one of the <a href="http://en.cppreference.com/w/cpp/header/cstdint">integer types in <code>&lt;cstdint&gt;</code></a>.
-                </p>
-                <SUBSECTION title="On Unsigned Integers">
-                    <p>
-                        Using unsigned types to represent numbers that are never
-                        negative may be a source of problems as demonstrated here:
-                    </p>
-                    <BAD_CODE_SNIPPET>
-                        for (unsigned int i = foo.getLength() - 1; i &gt;= 0; --i) ...
-                    </BAD_CODE_SNIPPET>
-                    <p>
-                        This code will never terminate!
-                        A compiler might notice the issue and warn you, but do not count on it.  Equally bad
-                        bugs can occur when comparing signed and unsigned
-                        variables.
-                    </p>
-                    <p>
-                        To avoid such situation we recommend to consistently use
-                        <code>int</code>:
-                    </p>
+                    There are five standard signed integer types in C++:
                     <CODE_SNIPPET>
-                        for (int i = static_cast&lt;int&gt;(foo.getLength()) - 1; i &gt;= 0; --i) ...
+                    signed char
+                    short int
+                    int
+                    long int
+                    long long int
                     </CODE_SNIPPET>
+                   and five unsigned integer types
+                   <CODE_SNIPPET>
+                    unsigned char
+                    unsigned short int
+                    unsigned int
+                    unsigned long int
+                    unsigned long long int
+                    </CODE_SNIPPET>
+
+                    The C++ standard only loosely specifies the sizes of its built-in integer types and only guarantees that their sizes are:
+                    <CODE_SNIPPET>
+                        signed char = unsigned char ≤ short int = unsigned short int ≤ int = unsigned int ≤ long int = unsigned long int ≤ long
+                        long int = unsigned long long int
+                    </CODE_SNIPPET>
+                </p>
+                <CPP11 title="Extended Integer Types">
+                    <p>Already implemented by many compilers the C++11 standard makes these types now official.</p>
+                    
+                    Signed integer type with width of exactly 8, 16, 32 and 64 bits respectively with no padding
+                    bits and using 2's complement for negative values (provided only if the implementation directly
+                    supports the type).
+                    <CODE_SNIPPET>
+                        int8_t
+                        int16_t
+                        int32_t
+                        int64_t
+                    </CODE_SNIPPET>
+                    Fastest signed integer type with width of at least 8, 16, 32 and 64 bits respectively.
+                    <CODE_SNIPPET>
+                        int_fast8_t
+                        int_fast16_t
+                        int_fast32_t
+                        int_fast64_t
+                    </CODE_SNIPPET>
+                    Smallest signed integer type with width of at least 8, 16, 32 and 64 bits respectively.
+                    <CODE_SNIPPET>
+                        int_least8_t
+                        int_least16_t
+                        int_least32_t
+                        int_least64_t
+                    </CODE_SNIPPET>
+                    Maximum width integer type.
+                    <CODE_SNIPPET>
+                        intmax_t
+                    </CODE_SNIPPET>
+                    Integer type capable of holding a pointer.
+                    <CODE_SNIPPET>
+                        intptr_t
+                    </CODE_SNIPPET>
+                    All types exist also as unsigned version in which case they are preceeded by a <code>u</code>.
+                </CPP11>
+
+                <p>
+                    While these types are sufficient for most tasks, there are times where the precise size has to be defined.
+                    In this case consider one of the <a href="http://en.cppreference.com/w/cpp/header/cstdint">integer types in <code>&lt;cstdint&gt;</code></a>.
+                    Already before C++11 these types were implemented in most compilers but C++11 makes it official. Three types are defined in header
+                    <code>&lt;cstdint&gt;</code>: Exact-Width Types, Minimum-Width Types, and Fastest Minimum-Width Types.
+                </p>
+                <SUBSECTION title="Exact-Width Types">
+                    <p>This set identify types with precise sizes. The general form is <code>int</code>N<code>_t</code> for signed types
+                        and <code>uint</code>N<code>_t</code> for unsigned types,
+                    with N indicating the number of bits. Note, however, that not all systems can support all the types. For example, there
+                    could be a system for which the smallest usable memory size is 16 bits; such a system would not support the
+                        <code>int8_t</code> and <code>uint8_t</code> types.</p>
+               </SUBSECTION>
+                <SUBSECTION title="Minimum-Width Types">
+                    <p>The minimum-width types guarantee a type that is at least a certain number of bits in size. These types always exist.
+                    For example, a system that does not support 8-bit units could define <code>int_least_8_t</code> as a 16-bit type.</p>
                 </SUBSECTION>
+                <SUBSECTION title="Fastest Minimum-Width Types">
+                    <p>For a particular system, some integer representations can be faster than others. For example, <code>int_least16_t</code> might be
+                    implemented as <code>short</code>, but the system might do arithmetic faster using type <code>int</code>. So <code>&lt;cstdint&gt;</code>
+                    also defines the fastest
+                    type for representing at least a certain number of bits. These types always exist. In some cases, there might be
+                    no clear-cut choice for fastest; in that case, the system simply specifies one of the choices.</p>
+                </SUBSECTION>
+                <DECISION>
+                    In general the standard integer types should be used since they are typically also the “fastest” types on the respective architecture.
+                    In cases where the exact size matters, e.g. unpacking of raw data the extended types the extended integer types can be used. The use
+                    of ROOT types is discouraged unless it is absolute necessary (see discussion under "ROOT Related Issues").
+                </DECISION>
             </BODY>
         </STYLEPOINT>
         
@@ -2377,9 +2910,18 @@
         
         <STYLEPOINT title="auto" cpp11="yes">
             <SUMMARY>
+                If the compiler is able to determine the type of a variable from its
+                initialization, you don't need to provide the type. This is achieved by using the
+                <code>auto</code> keyword.
+                <p>
                 Use <code>auto</code> to avoid type names that are just clutter.
                 Continue to use manifest type declarations when it helps readability,
                 and never use <code>auto</code> for anything but local variables.
+                </p>
+                <p>
+                Use <code>auto</code> against verbosity, not consistency. In cases where the rhs
+                expression is an integer or floating point literal the use of auto is strongly discouraged.
+                </p>
             </SUMMARY>
             <BODY>
                 <DEFINITION>
@@ -2399,12 +2941,12 @@
                         C++ type names can sometimes be long and cumbersome,
                         especially when they involve templates or namespaces. In a statement like
                         <BAD_CODE_SNIPPET>
-                            sparse_hash_map&lt;string, int&gt;::iterator iter = myMap.find(val);
+                            map&lt;string, string&gt;::iterator itr = address_book.begin();
                         </BAD_CODE_SNIPPET>
                         the return type is hard to read, and obscures the primary
                         purpose of the statement. Changing it to
                         <CODE_SNIPPET>
-                            auto iter = myMap.find(val);
+                            auto itr = address_book.begin();
                         </CODE_SNIPPET>
                         makes it more readable.
                     </p>
@@ -2457,23 +2999,152 @@
                         interface, e.g. as a constant in a header, then a programmer
                         might change its type while only intending to change its
                         value, leading to a more radical API change than intended.</p>
+                    
+                    <p>
+                        There is a certain danger using <code>auto</code> with numerical literals.
+                        <BAD_CODE_SNIPPET>
+                            auto i = 3;      // i is an int
+                            auto x = 10;     // x is an int
+                            auto y = 10.2;   // y is an double
+                            auto l = 2;      // l is an int
+                        </BAD_CODE_SNIPPET>
+                        This might not be what was intended. To make it clear to the compiler
+                        one would need to be more explicit:
+                        <BAD_CODE_SNIPPET>
+                            auto i = 3U;      // i is an unsigned int
+                            auto x = 10F;     // x is a float
+                            auto y = 10.2L;   // y is a long double
+                            auto l = 2LL;     // l is an long long
+                        </BAD_CODE_SNIPPET>
+                        Nothing is gained using the suffix notation. If the type has to be explicitly defined
+                        than it is much clearer to write:
+                        <CODE_SNIPPET>
+                            unsigned int i = 3;
+                            float x = 10;
+                            long double y = 10.2;
+                            long long l = 2;
+                        </CODE_SNIPPET>
+                    </p>
                 </CONS>
                 <DECISION>
                     <p><code>auto</code> is permitted for local variables only.
                         Do not use <code>auto</code> for file-scope or namespace-scope
-                        variables, or for class members. Never assign a braced initializer list
-                        to an <code>auto</code>-typed variable.</p>
+                        variables, or for class members. Do not use <code>auto</code> for numeric literals.
+                        Never assign a braced initializer list to an <code>auto</code>-typed variable.</p>
                 </DECISION>
             </BODY>
         </STYLEPOINT>
 
-        <STYLEPOINT title="Rvalue reference and move semantics" cpp11="yes">
+        <STYLEPOINT title="Non-member begin() and end()" cpp11="yes">
+            <SUMMARY>
+                The non-member <code>begin()</code> and <code>end()</code> functions are a new addition to the standard library,
+                promoting uniformity, consistency and enabling more generic programming. They work with
+                all STL containers, but more than that they are overloadable, so they can be extended to
+                work with any type. Overloads for C-like arrays are also provided.
+                The use of non-member <code>begin()</code>  and <code>end()</code> is encouraged.
+            </SUMMARY>
+            <BODY>
+                <DEFINITION>
+                    In STL all containers have a non-static member <code>begin()</code> and <code>end()</code> methods that return an iterator
+                    to the beginning and the end of the container. Therefor iterating over a container could look like this:
+                    <CODE_SNIPPET>
+                        std::vector&lt;int&gt; v;
+                        for(auto it = v.begin(); it != v.end(); ++it)
+                        std::cout &lt;&lt; *it &lt;&lt; std::endl;
+                    </CODE_SNIPPET>
+                    The problem here is that not all user-defined containers have <code>begin()</code> and <code>end()</code>, which makes them
+                    impossible to use with the STL algorithms or any other user-defined template function that requires
+                    iterators. That is even more problematic when using C arrays.
+                    The non-member <code>begin()</code> and <code>end()</code> methods are extensible, in the sense they can be overloaded for
+                    any type (including C arrays).
+                    <CODE_SNIPPET>
+                        std::vector&lt;int&gt; v;
+                        for(auto it = begin(v); it != end(v); ++it)
+                        std::cout &lt;&lt; *it &lt;&lt; std::endl;
+                    </CODE_SNIPPET>
+                    To adopt any custom container all one must do is create your own iterator that supports <code>*</code>,
+                    prefix increment (<code>++itr</code>) and <code>!=</code> .
+                </DEFINITION>
+                <DECISION>
+                    The use of the non-member version of <code>begin()</code> and <code>end()</code> allows one to write very generic methods and is hence encouraged.
+                </DECISION>
+
+            </BODY>
+        </STYLEPOINT>
+
+<STYLEPOINT title="static_assert and type traits" cpp11="yes">
+    <SUMMARY>
+        <code>static_assert()</code> performs an assertion check at compile-time.
+        Type traits and <code>static_assert</code> is mostly for
+        template class developer . Since the use of templates in STAR is minimal, these new C++11
+        features will be rarely used, if at all. There’s no argument against using this feature
+        if needed.
+   </SUMMARY>
+    <BODY>
+        <DEFINITION>
+            <code>static_assert()</code> performs an assertion check at compile-time. If the assertion is true, nothing happens. If the assertion is false, the compiler displays the specified error message.
+
+            <CODE_SNIPPET>
+                    template &lt;typename T, size_t Size&gt;
+                    class MyVector
+                    {
+                        static_assert(Size &gt; 3, "Size is too small");
+                        T points[Size];
+                    };
+                    
+                    int main()
+                    {
+                        MyVector &lt;int, 16&gt; a1;
+                        MyVector &lt;double, 2&gt; a2;  // will produce compile error
+                        return 0;
+                    }
+            </CODE_SNIPPET>
+            The form of the output depends on the platform. One the Mac using LLVM it prints:
+            <CODE_SNIPPET>
+                sassert.cpp:12:5: error: static_assert failed "Size is too small."
+                static_assert(Size > 3, "Size is too small.");
+            </CODE_SNIPPET>
+            Note that since static_assert is evaluated at compile time, it cannot be used to
+            check assumptions that depends on run-time values.
+
+            <p>
+                <code>static_assert()</code> becomes more useful when used together with type traits. These are a
+                series of classes that provide information about types at compile time. They are available
+                in the <code>&lt;type_traits&gt;</code> header. There are several categories of classes in this header:
+                    helper classes, for creating compile-time constants, type traits classes, to get
+                    type information at compile time, and type transformation classes, for getting new
+                    types by applying transformation on existing types.
+            </p>
+            <CODE_SNIPPET>
+                template &lt;typename T1, typename T2&gt;
+                    auto add(T1 t1, T2 t2) -&gt; decltype(t1 + t2)
+                    {
+                        static_assert(std::is_integral&lt;T1&gt;::value,
+                                      "Type T1 must be integral");
+                        static_assert(std::is_integral&lt;T2&gt;::value,
+                                      "Type T2 must be integral");
+                        return t1 + t2;
+                    }
+            </CODE_SNIPPET>
+
+        </DEFINITION>
+        <DECISION>
+            There’s no argument against using this feature if needed. Note that <code>static_assert()</code>
+            does not violate STAR’s messaging scheme since the assert error messages are printed
+            at compile not run time.
+
+        </DECISION>
+        
+    </BODY>
+</STYLEPOINT>
+
+        <STYLEPOINT title="Rvalue Reference and Move Semantics" cpp11="yes">
           <SUMMARY>
             Classes should have move constructor and assignment operator OR explicitly have them deleted using <code>= delete</code> specifier.
           </SUMMARY>
             <BODY>
                 <DEFINITION>
-                  <CPP11 title="rvalue reference">
+                  <CPP11 title="rvalue Reference">
                     One can find multiple rules of thumb for recongnizing the lvalueness or rvalueness of an object. For our purposes, the following are sufficient:
                     <p>If you can take its address using the built-in address-of operator (&amp;) then it is an lvalue, otherwise, it is an rvalue.</p>
                     <p>Another useful rule of thumb that is useful but not strictly correct is the <a href="http://thbecker.net/articles/rvalue_references/section_05.html">if-it-has-a-name rule</a>: 
@@ -2626,7 +3297,7 @@
                   
                   std::move hides the name of its arguments (static casting it to an rvalue reference).  
 
-                  <CPP11 title ="perfect forwarding">
+                  <CPP11 title ="Perfect Forwarding">
                     There is one subtlety with rvalues and deduced types. The rvalueness/lvalueness of a deduced type follows that of the initializer. For example, 
                     in a function template:  
 
@@ -2676,6 +3347,7 @@
             </BODY>
         </STYLEPOINT>
     </CATEGORY>
+    
     
     <PARTING_WORDS>
         <p>
