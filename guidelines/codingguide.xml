@@ -21,7 +21,7 @@
     
     <p>
         The committee based their work on the existing guidelines, expanded them for clarity, and
-        added new material where it saw fit. The coding guidlines include the new C++11 standard.
+        added new material where it saw fit. The coding guidelines include the new C++11 standard.
         We have made heavy use of the C++ Google Style guide at <a href="http://google-styleguide.googlecode.com">
         http://google-styleguide.googlecode.com</a> using their xml and css style sheets.
     </p>
@@ -307,7 +307,7 @@
         <STYLEPOINT title="General Guideline">
             <SUMMARY>
                 Namespaces are for legacy reasons depreciated in STAR. As with every guideline there
-                might be exceptions, especially in end user code. However, care shold be taken to check for
+                might be exceptions, especially in end user code. However, care should be taken to check for
                 possible side effects. Namespaces should be entirely avoided in the context of <code>StEvent</code>.
             </SUMMARY>
             <BODY>
@@ -931,7 +931,7 @@
                         in <a href="#Brace_Initialization"> Brace Initialization</a>.
                     </p>
                     <p>
-                        Non explicit intialization:
+                        Non explicit initialization:
                     </p>
                     <CODE_SNIPPET>
                         struct MySturct
@@ -947,8 +947,8 @@
                             int mY;
                             MySturct mS;
                         
-                            // mS and mY are not explicitely initialized in the initializer list
-                            // mS default consturctor will always be called. 
+                            // mS and mY are not explicitly initialized in the initializer list
+                            // mS default constructor will always be called.
                             // mY is a POD therefore it will be:
                             //    Zero-initialized if instance of MyClass is created with new operator.
                             //    Otherwise, left un-initialized.
@@ -1055,7 +1055,7 @@
                 <p>Exception 1: if the class contains only non-pointer data member the default copy constructor and assignment
                 operator might be used. In this case a comment line should state that they were omitted by purpose.</p>
                 
-                <p>Exception 2: if the design of the class asks specifically demands that no copy is created (e.g. for singletons) the copy constructor and assignement operators should be be disabled by using the <code>delete</code> keyword (C++11) or by making them private (C++98 or older). </p>
+                <p>Exception 2: if the design of the class asks specifically demands that no copy is created (e.g. for singletons) the copy constructor and assignment operators should be be disabled by using the <code>delete</code> keyword (C++11) or by making them private (C++98 or older). </p>
             
              <SUBSECTION title="The Rule of Three">
                  <p>
@@ -1070,11 +1070,11 @@
             
              <SUBSECTION title="A Note on Polymorphic Classes and Data Slicing">
                  <p>Constructors cannot be virtual. Is a derived polymorphic class accessed through a pointer or reference
-                 to a base class, copying it (through the pointer) could cause data slicing. If this behaviour is not desired the programmer needs to add a virtual <code>clone()</code> function that returns a copy of self.</p>
+                 to a base class, copying it (through the pointer) could cause data slicing. If this behavior is not desired the programmer needs to add a virtual <code>clone()</code> function that returns a copy of self.</p>
              </SUBSECTION>
              <DECISION>
                  Most classes that allocate subsidiary data structures on the heap or consume any other kind of shared resources
-                 should have a copy constructor and assignement operator.
+                 should have a copy constructor and assignment operator.
              </DECISION>
          </BODY>
     </STYLEPOINT>
@@ -1095,19 +1095,19 @@
                         Thus, a move of a <code>std::vector</code> does not need to copy all data, but only the pointer to the data.
                         Additionally, the source object must be told that it does not own the data anymore, to inhibit the <code>free</code> from the destructor.
                         In most cases the move constructor/assignment operator therefore modifies the source object (e.g. setting the data pointer to <code>nullptr</code>).
-                        See <a href="#Rvalue_reference_and_move_semantics">rvalue reference and move semantics</a> for more details on ove semantics.
+                        See <a href="#Rvalue_reference_and_move_semantics">rvalue reference and move semantics</a> for more details on move semantics.
                     </CPP11>
                     The copy and move constructors are implicitly invoked by the compiler or generic containers in some situations, e.g. passing objects by value or from <code>std::vector</code>.
                 </DEFINITION>
                 <DECISION>
                     <p>
-                      Assignment operator and a copy constructor should be explicietly deleted, implemented or defaults should be requested.
+                      Assignment operator and a copy constructor should be explicitly deleted, implemented or defaults should be requested.
                     </p>
                     <p>
                       Do not implement your own copy/assignment when member-wise copy is desired and request the compiler to generate the defaults instead.
                       <CODE_SNIPPET>
                         ClassName(const ClassName &amp;other) = default;
-                        ClassName&amp; operator=(const ClassName&amp;) = dafualt;
+                        ClassName&amp; operator=(const ClassName&amp;) = default;
                       </CODE_SNIPPET>
                       instead of
                       <BAD_CODE_SNIPPET>
@@ -1178,7 +1178,7 @@
                     </CPP11>
 
                     <p>
-                      Polymorphic class design implies pointer semantics. Since copy consturctors/assignment operators, etc. cannot be made virtual, making a base class copyable
+                      Polymorphic class design implies pointer semantics. Since copy constructors/assignment operators, etc. cannot be made virtual, making a base class copyable
                       could result in objects slicing.
                     </p>
                     <p>
@@ -1407,7 +1407,7 @@
                 <DECISION>
                     <p>
                         Always write a destructor for a base class, because the implicitly generated
-                        one is public and nonvirtual.
+                        one is public and non-virtual.
                     </p>
                 </DECISION>
                 <EXTRA>
@@ -1420,7 +1420,7 @@
         
         <STYLEPOINT title="Inheritance">
             <SUMMARY>
-                When using inheritance, make it <code>public</code> and declare overriden methods
+                When using inheritance, make it <code>public</code> and declare overridden methods
                 as <code>override</code> or <code>final</code>.
                 However, composition is often more appropriate than inheritance especially if a
                 class is not designed to be a base class.
@@ -1522,7 +1522,7 @@
                         often more appropriate. 
                     </p>
                     <p>
-                        State your intent when you want to override a virtual method by using the keyword <code>overrride</code>.
+                        State your intent when you want to override a virtual method by using the keyword <code>override</code>.
                     </p>
                 </DECISION>
             </BODY>
@@ -1692,9 +1692,9 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Friend Decleration">
+        <STYLEPOINT title="Friend Declaration">
             <SUMMARY>
-                The use of friend declerations should be avoided where possible.
+                The use of friend declarations should be avoided where possible.
             </SUMMARY>
             
             <BODY>
@@ -2169,11 +2169,11 @@
                     There are two main semantics for ownership: unique and shared ownership.
                     <p>
                         Unique ownership ensures that there can be only one smart pointer to the object.
-                        If that smart pointer goes out of scope it will free the pointee.
+                        If that smart pointer goes out of scope it will free the pointer.
                     </p>
                     <p>
                         Shared ownership allows to have multiple pointers to an object without deciding who is the exclusive owner.
-                        Thus the owners can be freed in any order and the pointer will stay valid until the last one is freed, in which case the pointee is also freed.
+                        Thus the owners can be freed in any order and the pointer will stay valid until the last one is freed, in which case the pointer is also freed.
                         Note that <code>shared_ptr&lt;T&gt;</code> is thread-safe and thus enables sharing ownership over multiple threads.
                     </p>
                     <p>
@@ -2220,7 +2220,7 @@
                   </CODE_SNIPPET>
 
                   The histogram which is handled by a unique pointer was owned by the current gDirectory. Since I politely closed the file before I exit my program 
-                  the histogram was destroyed by ROOT memory management agent. Now at the end of main() the pointer to teh histogram goes out of scope and its resource needs to be freed, 
+                  the histogram was destroyed by ROOT memory management agent. Now at the end of main() the pointer to the histogram goes out of scope and its resource needs to be freed,
                   but it has already been freed!
                 </CONS>
 
@@ -2787,7 +2787,7 @@
                     <CODE_SNIPPET>
                         intptr_t
                     </CODE_SNIPPET>
-                    All types exist also as unsigned version in which case they are preceeded by a <code>u</code>.
+                    All types exist also as unsigned version in which case they are preceded by a <code>u</code>.
                 </CPP11>
 
                 <p>
@@ -3145,7 +3145,7 @@
             <BODY>
                 <DEFINITION>
                   <CPP11 title="rvalue Reference">
-                    One can find multiple rules of thumb for recongnizing the lvalueness or rvalueness of an object. For our purposes, the following are sufficient:
+                    One can find multiple rules of thumb for recognizing the lvalueness or rvalueness of an object. For our purposes, the following are sufficient:
                     <p>If you can take its address using the built-in address-of operator (&amp;) then it is an lvalue, otherwise, it is an rvalue.</p>
                     <p>Another useful rule of thumb that is useful but not strictly correct is the <a href="http://thbecker.net/articles/rvalue_references/section_05.html">if-it-has-a-name rule</a>: 
                       if it has a name then it is an lvalue, otherwise, it is an rvalue.</p>
@@ -3279,7 +3279,7 @@
                   rvalue reference, but it is an lvalue (you can take its address, it has a name). This case is important when one 
                   wants to construct base classes in a move function of the derived class. The base class move function should be invoked 
                   and this can be achieved by statically casting the variable x to an rvalue reference, i.e. hiding its name which can 
-                  be acheived using std::move.
+                  be achieved using std::move.
                   
                   <CODE_SNIPPET>
                   Derived(Derived&amp;&amp; rhs) 
@@ -3331,7 +3331,7 @@
             like all good rules, these sometimes have exceptions.
         </p>
         
-        <STYLEPOINT title="Existing Non-conformant Code">
+        <STYLEPOINT title="Existing Non-Conformant Code">
             <SUMMARY>
                 It is permissible to deviate from the rules when dealing with code that does not
                 conform to these guidelines. 
