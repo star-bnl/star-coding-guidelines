@@ -22,8 +22,10 @@
         <p>
             The committee based their work on the existing guidelines, expanded them for clarity, and
             added new material where it saw fit. We have made heavy use of the Google Style guide
-            at <a href="http://google-styleguide.googlecode.com">
-                http://google-styleguide.googlecode.com</a>.
+            at <a href="http://google-styleguide.googlecode.com"> http://google-styleguide.googlecode.com</a>
+            using their xml and css style sheets. Some of the guidelines included are from the original
+            Google document, some were modified versions by the ALICE collaboration. Where they matched
+            the STAR guidelines we used their text to minimize efforts.
         </p>
         
         <p>
@@ -44,8 +46,6 @@
         
         
     </CATEGORY>
-
-   START EDITING HERE
    
 <OVERVIEW>
     <CATEGORY title="Important Note">
@@ -86,8 +86,10 @@
         <STYLEPOINT title="General Naming Rules">
             <SUMMARY>
                 Names should be meaningful; abbreviations should be avoided.
-                They follow camel case convention. Types and variables should be nouns,
-                while functions should be "command" verbs.    </SUMMARY>
+                They follow camel case convention. Types and variables, as well as
+                access functions should be nouns,
+                while functions should be "command" verbs.
+            </SUMMARY>
             <BODY>
                 <SUBSECTION title="How to Name">
                     <p>
@@ -144,6 +146,8 @@
                         string table_name;  // Bad - uses underscore.
                         string tablename;   // Bad - all lowercase.
                     </BAD_CODE_SNIPPET>
+                    <p>Note, that STAR follows the CamelCase convention even for acronyms:
+                        <code>StFmsHit</code>, <code>StTpcHit</code>, etc.</p>
                 </SUBSECTION>
                 
                 <SUBSECTION title="Capitalization Rules">
@@ -162,7 +166,7 @@
                         // Good. These show proper names with no abbreviations.
                         int numberOfDnsConnections;   // Most people know what "DNS" stands for.
                         int priceCount;               // Price count, it makes sense.
-                        int daqRate;                  // In ALICE everyone knows what DAQ stands for.
+                        int daqRate;                  // In STAR everyone knows what DAQ stands for.
                     </CODE_SNIPPET>
                     <BAD_CODE_SNIPPET>
                         // Bad. Abbreviations can be confusing or ambiguous outside a small group.
@@ -174,40 +178,39 @@
                     </p>
                     <CODE_SNIPPET>
                         for (int i = 0 ; i &lt; 10 ; i++) { // Good.
-                        prices[i] = 0;
+                            prices[i] = 0;
                         }
                     </CODE_SNIPPET>
                     <BAD_CODE_SNIPPET>
                         for (auto i = &amp;prices[0]; i &lt; &amp;prices[10]; ++i) { // Bad
-                        *i = 0;                        // i is not of integer type
+                            *i = 0;                        // i is not of integer type
                         }
-                    </BAD_CODE_SNIPPET>
-                    <p>
-                        Never abbreviate by leaving out letters. <br/>
-                        Exception:
-                        You may use <code>it</code> for iterator names or their names prefix.
-                    </p>
-                    <CODE_SNIPPET>
-                        // Good
-                        std::vector&lt;int &gt; myVector;
-                        auto it = myVector.begin();
-                        auto itMyVector = myVector.begin();
-                        auto myVectorIterator = myVector.begin();
-                    </CODE_SNIPPET>
-                    <BAD_CODE_SNIPPET>
-                        auto myVectorIt = myVector.begin();       // Bad. It is abbreviated, but not a prefix.
                     </BAD_CODE_SNIPPET>
                 </SUBSECTION>
             </BODY>
         </STYLEPOINT>
-        
+ 
+        <STYLEPOINT title="Specific STAR Naming Rules">
+            <SUMMARY>
+            Each class name should begin with <code>St</code> and the appropriate three letter acronym (only first letter capitalized) to indicate its origin and prevent name clashes.
+            </SUMMARY>
+            <BODY>
+                <p>
+            The <code>St</code> will identify a STAR class to separate it from system, or external libraries classes, e.g.: <code>StTpcTrack</code>.
+            The three letter acronym typically reflects the context within STAR in which the class operates (sub-detector, sub-project)
+            and reduces the possibility of name clashes for common packages. Classes unrelated to specific packages may retain only the <code>St</code> prefix.</p>
+                </BODY>
+        </STYLEPOINT>
+
+
         <STYLEPOINT title="File Names">
             <p>    </p>
             <SUMMARY>
-                C++ code file names are derived from the class (or the namespace)
-                names. <br/>
-                Program file names and utility file names, which do not define a class
-                or a namespace, start with a lower case letter.<br/>
+                C++ code file names are derived from the class names. Following STAR's naming convention they hence always start
+                with <code>St</code>.
+                Each header file should contain only one or related class declarations for maintainability and for easier retrieval
+                of class definitions.
+                Files that contain only function code (e.g. Maker) and are unrelated to a specific class should start also with <code>St</code> followed by a descriptive name of the purpose of the code.
             </SUMMARY>
             <BODY>
                 <p>
@@ -216,24 +219,15 @@
                 </p>
                 <p>
                     Inline functions should go directly into your
-                    <code>.h</code> file. However, if they include a lot of code, they may go into a third file that
-                    ends in <code>.inl</code>.  This rule applies to templates too.
+                    <code>.h</code> file.
                 </p>
-                <p>
-                    Do not use filenames that already exist
-                    in <code>/usr/include</code>, such as <code>db.h</code>.
-                </p>
-                <p>
+                 <p>
                     Examples of acceptable file names:
                 </p>
                 <CODE_SNIPPET>
-                    MyClass.h       // The class declaration.
-                    MyClass.cxx     // The class definition.
-                    MyClass.inl     // Inline functions that include lots of code.
-                    myUtilities.h   // Utility functions/definitions
-                    testMyClass.cxx // Test program
+                    StTpcHit.h       // The class declaration.
+                    StTpcHit.cxx     // The class definition.
                 </CODE_SNIPPET>
-                
                 <p>
                     Having upper case letters in a file name might theoretically lead to problems for case-insensitive operating systems.
                     However, as the file name corresponds to the class name it seems important to keep the same case as well.
@@ -267,25 +261,12 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Interface Names">
-            <SUMMARY>
-                <a href="#Interfaces">Pure interfaces</a> must be suffixed with "Interface".
-            </SUMMARY>
-            <BODY>
-                <CODE_SNIPPET>
-                    // pure interface
-                    class UrlTableInterface { ...
-                </CODE_SNIPPET>
-            </BODY>
-        </STYLEPOINT>
-        
         <STYLEPOINT title="Variable Names">
             <SUMMARY>
                 Variable names follow camel case convention and start with
                 a lower case letter: <code>myLocalVariable</code>.
                 <ul>
                     <li>Class member variables are prefixed with <code>m</code>.</li>
-                    <li>Static class member variables are prefixed with <code>s</code>.</li>
                     <li>No <code>m</code> prefix for struct members.</li>
                     <li>Global variables are prefixed with <code>g</code>.</li>
                     <li><code>constexpr</code> variables are capitalized.</li>
@@ -392,9 +373,9 @@
                 <SUBSECTION title="Accessors and Mutators">
                     <p>
                         Accessors and mutators match
-                        the name of the variable they are getting and setting and use
-                        the prefixes <code>get</code> and <code>set</code>. The prefixes
-                        <code>get</code> and <code>set</code> are not exclusive for accessors and mutators and they could
+                        the name of the variable they are getting and setting. For the latter use
+                        the prefixes <code>set</code>. Do not to use the <code>get</code> prefix as done in ROOT.
+                        The prefix <code>set</code> is not exclusive for mutators and could
                         be used for other functions, if applicable.
                         This shows an excerpt of a class whose instance variable is
                         <code>mNumberOfEntries</code>:
@@ -402,11 +383,11 @@
                     <CODE_SNIPPET>
                         class MyClass {
                         public:
-                        ...
-                        int getNumberOfEntries() const { return mNumberOfEntries; }
-                        void setNumberOfEntries(int numberOfEntries) { mNumberOfEntries = numEntries; }
+                            ...
+                            int numberOfEntries() const { return mNumberOfEntries; }
+                            void setNumberOfEntries(int val) { mNumberOfEntries = val; }
                         private:
-                        int mNumberOfEntries;
+                            int mNumberOfEntries;
                         };
                     </CODE_SNIPPET>
                 </SUBSECTION>
@@ -454,8 +435,8 @@
         <STYLEPOINT title="Enumerator Names">
             <SUMMARY>
                 Enumerations and enumerators (the type and the values) follow camel case
-                convention and start with an upper case letter:
-                <code> MyEnumType</code>, <code>MyEnumValue</code>.
+                convention and start with <code>St</code> followed by an upper case letter:
+                <code> StBeamPolarizationAxis</code>, <code>StDetectorId</code>.
                 <ul>
                     <li>Enumerators in unscoped enumerations should have a common
                         prefix/postfix derived from the enumerations name. </li>
@@ -480,9 +461,9 @@
                 </p>
                 <CODE_SNIPPET>
                     enum Something {
-                    SomethingSmall,   // the type name as prefix
-                    SomethingBig,
-                    SomethingElse
+                        SomethingSmall,   // the type name as prefix
+                        SomethingBig,
+                        SomethingElse
                     };
                     
                     void add(Something);
@@ -496,9 +477,9 @@
                 </p>
                 <CODE_SNIPPET>
                     enum MallocAlignment {
-                    AlignOnVector,    // the "Align" prefix taken from the type name
-                    AlignOnCacheline,
-                    AlignOnPage
+                        AlignOnVector,    // the "Align" prefix taken from the type name
+                        AlignOnCacheline,
+                        AlignOnPage
                     }
                     
                     template&lt;MallocAlignment A&gt; void* malloc(size_t);
@@ -511,9 +492,9 @@
                 </p>
                 <CODE_SNIPPET>
                     enum class Something : int {
-                    Small,
-                    Big,
-                    Unknown
+                        Small,
+                        Big,
+                        Unknown
                     };
                     
                     void add(Something);
@@ -535,19 +516,15 @@
         
         <STYLEPOINT title="Macro Names">
             <SUMMARY>
-                All uppercase letters and underscores, prefixed with the sub/project name, i.e. <code>MY_PROJECT_PKG1_MY_MACRO</code>.
+                All uppercase letters and underscores, prefixed with ST (for STAR) and the sub/project name, i.e. <code>ST_PROJECT_PKG1_MY_MACRO</code>.
             </SUMMARY>
             <BODY>
                 <p>
-                    For the rules on Macro usage see <a href="#Preprocessor_Macros">here</a>.
-                </p>
-                <p>
-                    They must be named with all uppercase letters and underscores, prefixed with the
+                    Macros must be named with all uppercase letters and underscores, prefixed with the
                     sub/project name.
                 </p>
                 <CODE_SNIPPET>
-                    #define O2_VERTEX_ROUND(x) ...
-                    #define O2_CORE_PI_ROUNDED 3.0
+                    #define ST_TRIGGER_BIT_SHIFT_TODAY 2
                 </CODE_SNIPPET>
                 Be sure to never put an underscore as prefix nor use a double underscore.
                 First it doesn't follow our naming convention.
@@ -558,6 +535,401 @@
                 </BAD_CODE_SNIPPET>
             </BODY>
         </STYLEPOINT>
+        
+        <STYLEPOINT title="STAR StRoot Makers Naming Standards">
+            <SUMMARY>
+                This section attempts to explain the code directory structure and layout in STAR
+                the rules and assumptions triggered in the make system (cons) solely on the basis
+                of the name choice the existing exceptions to the rules.
+            </SUMMARY>
+            <BODY>
+                <p>The following naming convention keeps consistency between STAR code and
+                    packages written by many users.
+                    Not only it enables users to
+                    have a feel for what-does-what but also, it allows managers to define basic
+                    default set of compilation rules depending
+                    sometimes naming convention. Naming conventions
+                    in general are fundamental to all large projects
+                    and although N
+                    users will surely have N best-solution,
+                    the rules should be enforced as much as possible.</p>
+                
+                <SUBSECTION title="The Directory Structure Under the StRoot Tree">
+                    <p>The <code>StRoot/</code> tree Is of the following form:</p>
+                    <table>
+                        <tr>
+                            <td><code>StRoot</code></td>
+                            <td><code>XXX/</code></td>
+                            <td>Only base class that should be freely named. Example: <code>StarClassLibrary</code>,
+                                <code>StarRoot</code>, <code>Star2Root</code>.
+                                <p>User discouraged, request should be accompanied with a strong reasoning.</p> </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td><code>StXXX/</code></td>
+                            <td>A directory tree which will contain a base class many makers will use and derive from.
+                                In this category, <code>XXX</code> can be anything. For example, <code>StChain</code>,
+                                <code>StEvent</code>, <code>StEventUtilities</code>.
+                                <p>User discouraged, request should be accompanied with a strong reasoning.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td><code>StXXXMaker/</code></td>
+                            <td>A tree for a Maker, that is, code compiled in this tree will be assembled as
+                                one self-sufficient package. A maker is a particular class deriving from
+                                <code>StMaker</code>. Its purpose is to run from within a chain (<code>StChain</code>)
+                                of makers and perform a specific task.
+                                
+                                <p>In this category, sub-name convention are as follows:</p>
+                                <ul>
+                                    <li> <code>StXXXDbMaker</code> a maker containing the database
+                                        calls for the sub-system <code>XXX</code></li>
+                                    <li>  <code>StXXXSimulationMaker</code> or <code>StXXXSimulatorMaker</code>
+                                        a simulation maker for the subsystem <code>XXX</code></li>
+                                    <li>  <code>StXXXCalibMaker</code> or <code>StXXXCalibrationMaker</code>
+                                        a calibration maker for the sub-system <code>XXX</code></li>
+                                    <li>  <code>StXXXMixerMaker</code> a data/simulation mixer code
+                                        for he sub-system <code>XXX</code></li>
+                                    <li>  <code>StXXXDisplayMaker</code> a self-explained named
+                                        Graphical tool</li>
+                                    <li>  <code>StXXTagMaker</code> a maker collecting tags for
+                                        the sub-system or analysis <code>XXX</code></li>
+                                </ul>
+                                while <code>XXX</code> is in principle a detector sub-system identification
+                                (3 to 4 letters uniquely designating the sub-system), it may also be anything
+                                but a detector sub-system (<code>StAssociationMaker</code>,
+                                <code>StMiniMcMaker</code>, <code>StDbMaker</code>) or of the
+                                form <code>XXX</code>=analysis or physics study.</td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td><code>StXXXRaw*/</code></td>
+                            <td>Any directory with named with the word Raw will make our make system
+                                include the necessary path for the Run-Time-System DAQ reader files
+                                automatically. This convention is additive to any other description
+                                and convention herein.
+                                
+                                <p>Example: <code>StEmcRawMaker</code> is a "maker" as described above)
+                                    and a code base using the DAQ reader and so would be the expectation
+                                    for <code>Stl3RawReaderMaker</code> or <code>StFgtRawMaker</code>.</p></td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td><code>StXXXUtil/</code> and <code>StXXXUtilities/</code> </td>
+                            <td>Code compiled in a Util or Utilities tree should be code which do
+                                not perform any action (nor a maker) but constitute by itself a set
+                                of utility classes and functions. Other classes may depend on a
+                                Utility library.
+                                <ul>
+                                    <li> <code>XXXUtil</code> : <code>XXX</code> IS a sub-system detector.</li>
+                                    <li> <code>XXXUtilities</code> : <code>XXX</code> IS NOT a detector
+                                        sub-system (this is reserved)</li>
+                                </ul>
+                            </td>
+                            
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td><code>StXXXPool/</code></td>
+                            <td>This tree will contain a set of sub-directories chosen by the user,
+                                each sub-directory maybe a self-contained project with no relation
+                                with anything else. Each sub-directory will therefore lead to the
+                                creation of a separate library. The naming convention for the
+                                library creation is as follow :
+                                <ul>
+                                    <li> If the subdirectory is named like <code>StYYY</code>, the
+                                        library will inherit the same name. Beware of potential name
+                                        clash in this case</li>
+                                    <li> If the subdirectory has an arbitrary name <code>YYY</code>,
+                                        the final library name will be have the name <code>StXXXPoolYYY</code>.</li>
+                                </ul>
+                                The Pool category has some special compilation internal rules: if it
+                                does not compile, it may be removed from compilation entirely. As such,
+                                codes appearing in Pool directory trees cannot be part of a production
+                                maker dependency. A typical usage for this structure is to provide a
+                                Pool (or collection) of lose codes not used in production (utility
+                                tools for sub-systems, analysis codes or utilities).
+                                <code>XXX</code> can be easer a Physics Work Group acronym or a
+                                detector sub-system acronym.</td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td><code>StXXXClient</code>/</td>
+                            <td>This tree will behave like the Pool trees in terms of library naming creation
+                                (separate libraries will be created, one per compilable sub-directory).
+                                <code>XXX</code> can be anything relevant for a sub-system. Client directories
+                                MUST compile (unlike the pools) and may be part of a dependency of a data
+                                processing chain. Its general goal is to provide a different tree structure
+                                for a set of code providing a "service" widely used across makers.
+                                For example, the Run Time System (RTS) have a Client tree containing DAQ
+                                related reading codes.</td>
+                        </tr>
+                    </table>
+                </SUBSECTION>
+                <SUBSECTION title="Trees and Implicit/Hidden Rules">
+                    <p> </p>
+                    <table>
+                        <tr>
+                            <td><code>StRoot/</code> </td>
+                            <td><code>StXXX/</code> and <code>/.</code></td>
+                            <td><code>README</code></td>
+                            <td>A basic documentation in plain text (not
+                                mandatory). If exists, the software guide
+                                will display the information contained in
+                                this file</td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>doc/</code></td>
+                            <td>A directory containing more elaborate
+                                documentation, either in html or in LaTeX.
+                                Note that if a file named index.html
+                                exists, the software guide will link to it.</td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>local/</code></td>
+                            <td>A subdirectory containing stand-alone
+                                Makefiles for the package and/or
+                                standalone configuration files.
+                                <p>This directory is persona non grata. It was
+                                    introduced due to unfortunate momentary laps of reason,
+                                    power surge or extreme special transitional needs.
+                                    Do not use.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>examples/</code></td>
+                            <td>A directory having a collection of code
+                                using the Maker or utility package of
+                                interest (case insensitive)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>macros/</code></td>
+                            <td>A directory containing root macros
+                                example making use of the maker
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>kumac/</code></td>
+                            <td>This is an obsolete directory name (from
+                                staf time) but still considered by the make
+                                system. It may also appears in the pams/
+                                tree structure.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>test/</code></td>
+                            <td>This directory may contain test programs
+                                (executables should in principle not
+                                appear in our standard but be assembled)
+                                <p>This directory is persona non grata. It was
+                                    introduced due to unfortunate momentary laps of reason,
+                                    power surge or extreme special transitional needs.
+                                    Do not use.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>html/</code></td>
+                            <td>A directory possibly containing cross-linked
+                                information for Web purposes.
+                                However, note that the documentation is,
+                                since 2002, auto-generated via the
+                                doxygen documentation system (see the
+                                sofi page for more information).
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>images/</code></td>
+                            <td>A directory containing images such as
+                                bitmap, pixmaps or other images used by
+                                your program but NOT assembled by any
+                                part of the build process. XPM files
+                                necessary for Qt for example should not
+                                be placed in this directory as explicit rules
+                                exists in <code>cons</code> to handle those (but <code>cons</code>
+                                will ignore the xpm placed in <code>images/</code>).
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>wrk/</code> and
+                                <code>run/</code></td>
+                            <td>Discouraged for users.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td><code>include/</code></td>
+                            <td>A directory containing a set of common
+                                include files.
+                                <p>This directory is persona non grata. It was
+                                    introduced due to unfortunate momentary laps of reason,
+                                    power surge or extreme special transitional needs.
+                                    Do not use.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td>Any other name</td>
+                            <td>Will be searched for code one level down
+                                only.
+                                All compiled code will be assembled in
+                                one library named after to <code>StXXX...</code>.
+                                Each sub-directory will be compiled
+                                separately that is, each must contain code
+                                using explicit include path as the only
+                                default search paths for includes will be
+                                the one described by <code>CPPPATH</code> and its
+                                own directory.
+                                
+                                <p>However, if there is a need for <code>StRoot/StXXX</code>
+                                    sub-directories compilation to include every available sub-paths
+                                    (other than the exceptions noted above) <a id="footnote_a">(a)</a> as a list
+                                    of default path in a compiler option or if you want a default
+                                    include/ directory <a id="footnote_b">(b)</a> to be always added in a
+                                    default include path compiler option statement, you may request this
+                                    feature to be enabled. To do that, send an Email to STARSOFI.</p>
+                                
+                                <p>Include statement can ALWAYS refer to
+                                    the relative path after the
+                                    <code>StRoot/portion</code> as the <code>StRoot/</code> path is
+                                    a default in <code>CPPPATH</code></p>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td><code>StXXXPool/</code> and
+                                <code>StXXXClient/</code> and
+                                <code>./</code></td>
+                            <td><code>doc/</code><br/>
+                                <code>local/</code><br/>
+                                <code>examples/</code><br/>
+                                <code>macros/</code><br/>
+                                <code> kumac/</code><br/>
+                                <code>test/</code><br/>
+                                <code>html/</code><br/>
+                                <code>images/</code><br/>
+                                <code>wrk/</code><br/>
+                                <code>run/</code><br/>
+                                <code>include/</code>
+                            </td>
+                            <td>As noted above (i.e. the content of those
+                                directories will be skipped by the make
+                                system).
+                                
+                                <p>
+                                    <code>local/</code>, <code>test/</code>, and <code>include/</code>
+                                    are legacy names and should not be used.
+                                </p>
+                                <p>
+                                    <code>wrk/</code> and <code>run/</code> are are
+                                    discouraged for users.
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td>Any other name</td>
+                            <td>The presence of every sub-directory will
+                                create a different dynamic library. Note
+                                that this is NOT the case with the other
+                                name format (all compiled code would go
+                                in a unique library name)
+                                <p>The convention is as follows:</p>
+                                <ul>
+                                    <li> If the name starts with <code>St</code>, for example
+                                        <code>StZZZ</code>, a library <code>StZZZ.so</code> will be
+                                        created containing every compiled code
+                                        available in <code>StZZZ</code> directory. In this form, the sub-directory
+                                        MUST be self-sufficient i.e. all code and include
+                                        (apart from the default paths) must be
+                                        in the sub-directory <code>StZZZ</code></li>
+                                    <li> If the name does NOT start with <code>St</code>, for
+                                        example <code>WWW</code>, a library
+                                        <code>StXXXPoolWWW.so</code> will be created
+                                        containing all compile code available in
+                                        <code>WWW</code> directory.</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </table>
+                </SUBSECTION>
+                
+                <SUBSECTION title="Current Patterned Exceptions">
+                    <p> </p>
+                    <table>
+                        <tr>
+                            <td><code>StEventDisplay.* </code></td>
+                            <td>Directories within this pattern will be compiled using the extra
+                                include path pointed by the environment variable <code>QTDIR</code>.
+                                The moc program will run on any include containing the <code>Q_OBJECT</code> directive,
+                                <code>-DR__QT</code> define is added to <code>CXXFLAGS</code>. </td>
+                        </tr>
+                        <tr>
+                            <td><code>StDbLib</code><br/>
+                                <code>StDbBroker</code></td>
+                            <td>Those are special. Compilation will consider MySQL includes and the
+                                created dynamic library will be linked against MySQL </td>
+                        </tr>
+                        <tr>
+                            <td><code>St.*Db.*</code></td>
+                            <td>Any directory following this pattern will use the MySQL include as an extra include path for the <code>CPPPATH</code> directive </td>
+                        </tr>
+                        <tr>
+                            <td><code>StTrsMaker</code> <br/>
+                                <code>StRTSClient</code></td>
+                            <td> Are two exceptions of kind (b) [<a href="#footnote_b">see above</a>]
+                                and use their own <code>include/</code> directory as a general extraneous include path. </td>
+                        </tr>
+                        <tr>
+                            <td><code>StHbtMaker</code></td>
+                            <td> For this maker, a pre-defined list of sub-directories is being
+                                added to the (<code>CPPPATH</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code>StAssociationMaker</code><br/>
+                                <code>StMuDSTMaker</code><br/>
+                                <code>.*EmcUtil</code><br/>
+                                <code>StEEmcPool</code><br/>
+                                <code>StTofPool</code><br/>
+                                <code>StRichPool</code><br/>
+                                <code>Sti.* </code>
+                            </td>
+                            <td> This form will include in the <code>CPPPATH</code> every sub-directories
+                                found one level below.
+                                Only <code>macros/</code>, <code>examples/</code>, and <code>doc/</code>
+                                are excluded withing
+                                this form noted in (a) [<a href="#footnote_a">see above</a>]. For the
+                                Pool directory, the extraneous rule
+                                mentioned here is additive to the one of Pool directories.</td>
+                        </tr>
+                    </table>
+                </SUBSECTION>
+            </BODY>
+        </STYLEPOINT>
+
     </CATEGORY>
     
     <CATEGORY title="Formatting">
@@ -573,6 +945,7 @@
             they
             can all read and understand everyone's code easily.
         </p>
+        
         
         <STYLEPOINT title="Line Length">
             <SUMMARY>
@@ -596,10 +969,10 @@
                 <CODE_SNIPPET>
                     // Good. One statement per line.
                     if (condition) {
-                    doSomething();
+                         doSomething();
                     }
                     else {
-                    doAnotherThing;
+                         doAnotherThing;
                     }
                 </CODE_SNIPPET>
                 <BAD_CODE_SNIPPET>
@@ -611,13 +984,13 @@
         
         <STYLEPOINT title="Spaces vs. Tabs">
             <SUMMARY>
-                Indent with 2 spaces. Use only spaces, no tabs.
+                Indent code with at least 2 spaces. Prefer spaces over tabs.
             </SUMMARY>
             <BODY>
                 <p>
                     Spaces are used for indentation. Do not use tabs in your code.
                     You should set your editor to emit spaces when you hit the tab
-                    key.
+                    key. The indent of a tab depends on the setting of the editor/viewer.
                 </p>
             </BODY>
         </STYLEPOINT>
@@ -625,7 +998,9 @@
         <STYLEPOINT title="Function Declarations and Definitions">
             <SUMMARY>
                 A function declaration is on one line if possible. Otherwise the parameters that do not
-                fit are on the next line(s).
+                fit are on the next line(s). A function definition should not be part of the class declaration
+                in the header file. Inline function should be defined in the header file but only below the class
+                declaration.
             </SUMMARY>
             <BODY>
                 <p>
@@ -639,8 +1014,8 @@
                 <CODE_SNIPPET>
                     ReturnType ClassName::functionName(Type parName1, Type parName2)
                     {
-                    doSomething();
-                    ...
+                        doSomething();
+                        ...
                     }
                 </CODE_SNIPPET>
                 <p>
@@ -649,6 +1024,34 @@
                 <CODE_SNIPPET>
                     inline int getValue() const { return mValue; }
                 </CODE_SNIPPET>
+                <p>Function/Method definition shall not be in the class declaration body. This reduces readability of the
+                class.</p>
+                <p>Bad Example:</p>
+                <BAD_CODE_SNIPPET>
+                    class MyClass {
+                    public:
+                        double energy() const {return mEnergy;}
+                        double momentum() const {
+                            double p2 = mEnergy*mEnergy - mMass2;
+                            return sqrt(p2;)
+                        }
+                     };
+                </BAD_CODE_SNIPPET>
+                <p>Good Example:</p>
+                <CODE_SNIPPET>
+                    class MyClass {
+                    public:
+                         double energy() const;
+                         double momentum() const;
+                    };
+                    
+                    inline double MyClass::energy() const {return mEnergy;}
+                    inline double MyClass::momentum() const {
+                        double p2 = mEnergy*mEnergy - mMass2;
+                        return sqrt(p2;)
+                    }
+               </CODE_SNIPPET>
+                
             </BODY>
         </STYLEPOINT>
         
@@ -669,8 +1072,8 @@
                     int value = myStruct.value;
                 </CODE_SNIPPET>
                 <p>
-                    When declaring a pointer or reference there are two widely used and equivalent methods: one, usually preferred in the C++ community, and another,
-                    introduced by Kerningham and Ritchie (the founders of C).
+                    When declaring a pointer or reference there are two widely used and equivalent methods: one,
+                    usually preferred in the C++ community, and another, introduced by Kerningham and Ritchie (the founders of C).
                 </p>
                 <CODE_SNIPPET>
                     // Good.
@@ -687,6 +1090,9 @@
                     char * myCharacter;       // Bad - spaces on both sides of *
                     const string &amp; myString;  // Bad - spaces on both sides of &amp;
                 </BAD_CODE_SNIPPET>
+                <DECISION>
+                    STAR favors the typical C++ notation, which should be the preferred style.
+                </DECISION>
             </BODY>
         </STYLEPOINT>
         
@@ -719,14 +1125,16 @@
                     Example of single-argument assignments:
                 </p>
                 <CODE_SNIPPET>
-                    int x = 3;                           // preferred style
+                    int x = 3;                           // preferred style (must using auto)
                     std::string name = "Some Name";
                     
                     int x { 3 };                         // also possible
                     std::string name{ "Some Name" };
                     std::string name = { "Some Name" };
                 </CODE_SNIPPET>
-                
+                <p>
+                    Note that when using <code>auto</code>, initialization through braces cannot be used.
+                </p>
                 <p>
                     Using <code>{}</code> for initialization is more consistent, more correct, and avoids
                     having to know about old-style pitfalls [1].
@@ -782,13 +1190,19 @@
                     goBackToNormal();
                     }
                 </BAD_CODE_SNIPPET>
+                <p>
+                    Do not use preprocessor directives to comment out code. If it's obsolete remove it. One can always
+                    retrieve it using CVS.
+                </p>
             </BODY>
         </STYLEPOINT>
         
         <STYLEPOINT title="Classes">
             <SUMMARY>
-                Access specifiers in a class or a struct are indented by 2 spaces.
-                The sections they delimit are themselves indented by 2 more spaces.
+                Access specifiers in a class or a struct should not be indented. Lines containing methods and data member
+                should be indented by at least 2 spaces, typically 4. Access specifiers should be ordered as <code>public</code>,
+                <code>protected</code>, <code>private</code>. Declarations within a access specifier are to be ordered as
+                Constructor, Destructor, Methods, Data Members.
             </SUMMARY>
             <BODY>
                 <p>
@@ -796,19 +1210,19 @@
                 </p>
                 <CODE_SNIPPET>
                     class MyClass : public BaseClass {
-                    public:         // 2 spaces indent.
-                    MyClass();    // 4 spaces indent.
-                    ~MyClass() {}
+                    public:
+                        MyClass();    // 4 spaces indent
+                        ~MyClass();
                     
-                    void someFunction();
-                    void someFunctionThatDoesNothing() {}
-                    void setSomeValue(int value) { mSomeValue = value; }
+                        void someFunction();
+                        void someFunctionThatDoesNothing();
+                        void setSomeValue(int value);
                     
                     private:
-                    bool someInternalFunction(); // notice that the method is before the data members
+                        bool someInternalFunction();
                     
-                    int mSomeValue;
-                    int mSomeOtherValue;
+                        int mSomeValue;
+                        int mSomeOtherValue;
                     };
                 </CODE_SNIPPET>
                 <p>
@@ -844,13 +1258,13 @@
                     <CODE_SNIPPET>
                         class A {
                         private:             // Early declaration of a private data member
-                        int x;
+                            int x;
                         
                         public:
-                        decltype(x) foo(); // Needs x to be already declared
+                             decltype(x) foo(); // Needs x to be already declared
                         
                         private:             // the rest of the private section
-                        float y;
+                             float y;
                         };
                     </CODE_SNIPPET>
                 </EXTRA>
@@ -871,9 +1285,9 @@
                     : mSomeVar(var),             // 2 space indent
                     mSomeOtherVar(var + 1)     // lined up
                     {
-                    ...
-                    doSomething();
-                    ...
+                        ...
+                        doSomething();
+                        ...
                     }
                 </CODE_SNIPPET>
                 <p>
@@ -899,7 +1313,7 @@
                     namespace {
                     
                     void doSomething() {  // Good.  No extra indentation within namespace.
-                    ...
+                        ...
                     }
                     
                     } // namespace
@@ -931,57 +1345,27 @@
         
         <STYLEPOINT title="Braces">
             <SUMMARY>
-                As a base rule, the left curly brace is on the same line as the start of
-                the statement. In control constructs, the braces must be used even if their body
-                consists of only one statement.
+                In control constructs (<code>if</code> statements, <code>for</code> loops etc.),
+                it is recommended to use curly braces even when the body of the statement fits on one line.
             </SUMMARY>
             <BODY>
-                <p>
-                    The left curly brace is on the same line as the start of the statement.
-                </p>
-                Example:
-                <CODE_SNIPPET>
-                    if (condition) { // Correct. Curly brace on the same line.
-                    }
-                    else {
-                    }
-                </CODE_SNIPPET>
-                <BAD_CODE_SNIPPET>
-                    if (condition)   // Bad. Curly brace on new line.
-                    {
-                    }
-                    else
-                    {
-                    }
-                </BAD_CODE_SNIPPET>
-                <p> </p>
-                <p>Exception: Class, struct and namespace declarations always have the opening brace on the start of a line. This applies also to functions, unless they are inlined.
-                </p>
-                Example:
-                <CODE_SNIPPET>
-                    class Debug
-                    {
-                    };
-                </CODE_SNIPPET>
-                <p>In control constructs (<code>if</code> statements, <code>for</code> loops etc.),
-                    use curly braces even when the body of the statement fits on one line:</p>
                 <CODE_SNIPPET>
                     // Good. Curly braces even for one statement body.
                     if (condition) {
-                    return true;
+                        return true;
                     }
                     
                     for (int i = 0; i &#60; 10; ++i) {
-                    doSomething(i);
+                        doSomething(i);
                     }
                 </CODE_SNIPPET>
                 <BAD_CODE_SNIPPET>
                     // Bad. No curly braces.
                     if (true)
-                    return true;
+                        return true;
                     
                     for (int i = 0; i &#60; 10; ++i)
-                    doSomething(i);
+                        doSomething(i);
                 </BAD_CODE_SNIPPET>
             </BODY>
         </STYLEPOINT>
@@ -998,8 +1382,8 @@
             </SUMMARY>
             <BODY>
                 <p>
-                    Technically there is no right or wrong for whitespace as C++ does not really care about whitespaces.
-                    But on the other hand whitespaces can make a significant difference in whether code feels foreign or easy to understand to a developer.
+                    Technically there is no right or wrong for whitespace as C++ does not really care about white spaces.
+                    But on the other hand white spaces can make a significant difference in whether code feels foreign or easy to understand to a developer.
                     Thus, it is important that all developers become accustomed to the same style.
                     This makes the communication via code much easier and enjoyable for everybody involved.
                     Using one common whitespace style throughout a project also reduces unnecessary whitespace changes and thus makes diffs easier to read.
@@ -1010,22 +1394,21 @@
                 <CODE_SNIPPET>
                     int someFunction(int parameter) // No extra spaces inside parenthesis.
                     {
-                    bool test = parameter &gt; 4;    // Use spaces around binary operators.
-                    double value = -otherValue;   // No space between a unary operator and its operand.
+                        bool test = parameter &gt; 4;    // Use spaces around binary operators.
+                        double value = -otherValue;   // No space between a unary operator and its operand.
                     
-                    if (!test) {                  // Use one space after each keyword.
-                    return 1;
-                    }
+                        if (!test) {                  // Use one space after each keyword.
+                            return 1;
+                        }
                     
-                    std::vector&lt;std::vector&lt;int&gt;&gt; someMatrix;
-                    // No extra spaces between angle brackets (templates).
+                        std::vector&lt;std::vector&lt;int&gt;&gt; someMatrix;
+                        // No extra spaces between angle brackets (templates) in C++11.
                     
-                    std::string hello = "Hello World.";
-                    std::transform(hello.begin(), hello.end(), hello.begin(), [](char c) {
-                    return c + 1;
-                    });                           // This is the common style to embed lambdas (since C++11)
-                    // in function calls.
-                    return 0;
+                        std::string hello = "Hello World.";
+                        std::transform(hello.begin(), hello.end(), hello.begin(), [](char c) {
+                             return c + 1;
+                        });                           // This is the common style to embed lambdas (since C++11) in function calls.
+                        return 0;
                     }
                 </CODE_SNIPPET>
                 <p>
@@ -1065,7 +1448,7 @@
         </STYLEPOINT>
     </CATEGORY>
     
-    <!--CATEGORY title="Comments">
+    <CATEGORY title="Comments">
      <p>
      Though a pain to write, comments are absolutely vital to keeping our
      code readable.  The following rules describe what you should
@@ -1082,46 +1465,6 @@
      one may be you!
      </p>
      
-     <CWG2>
-     <p>
-     <span style="color:#006600;">Barth: </span>
-     This will need a new iteration when we decide on a code documentation tool (e.g.
-     </p>
-     <p>
-     We need to remember to add something about encouraging the usage of unicode in comments. See below.
-     </p>
-     <Matthias>
-     (this was before in the Formatting section about non-ASCII characters that has been removed.)
-     It isn't clear whether this rule also affects comments. Because I really want to encourage Unicode (e.g. proper math formulas) in comments.
-     Example:
-     <CODE_SNIPPET>
-     inline void FitC::Filter(Track &amp;track, const HitInfo &amp;measurementModel,
-     const float_v m, const float_v weight) const
-     {
-     const float_v sigma2   = measurementModel.sigma2;
-     const float_v sigma216 = measurementModel.sigma216;
-     const Matrix&lt;float_v, 5&gt; F = track.C.slice&lt;0, 5, 0, 2&gt;()
-     * measurementModel.transposed(); //  CHᵀ
-     const float_v HCH = measurementModel * F.slice&lt;0, 2&gt;();     // HCHᵀ
-     const float_v residual = measurementModel
-     * track.slice&lt;0, 2&gt;() - m;   // ζ  = Hr - m
-     float_v denominator = HCH;
-     denominator(HCH &lt; sigma216) += sigma2;
-     const float_v zetawi = residual / denominator;      // (V + HCHᵀ)⁻¹ ζ
-     track -= F * zetawi;                       // r -= CHᵀ (V + HCHᵀ)⁻¹ ζ
-     track.C -= F * (weight / (sigma2 + HCH))* F.transposed();
-     // C -= CHᵀ (V + HCHᵀ)⁻¹ HC
-     track.Chi2(HCH &lt; sigma216) += residual * zetawi;
-     // χ² += ζ (V + HCHᵀ)⁻¹ ζ
-     track.NDF += weight;
-     }
-     </CODE_SNIPPET>
-     Also, C++11 introduced prefixes for string literals.
-     Thus <code>u8"some text"</code> is an UTF-8 containing "some text".
-     I'm not sure whether we should mention this here.
-     </Matthias>
-     </CWG2>
-     
      <STYLEPOINT title="Comment Style">
      <SUMMARY>
      Use either the <code>//</code> or <code>/* */</code> syntax, as long
@@ -1136,82 +1479,51 @@
      </BODY>
      </STYLEPOINT>
      
-     <STYLEPOINT title="File Comments">
-     <SUMMARY>
-     Start each file with license boilerplate,
-     followed by a description of its contents.
-     </SUMMARY>
-     <BODY>
-     <SUBSECTION title="Legal Notice and Author Line">
-     
-     <p>
-     Every file should contain license boilerplate.
-     Choose the appropriate boilerplate for the license used by the project
-     (for example, Apache 2.0, BSD, LGPL, GPL).
-     </p>
-     <p>
-     If you make significant changes to a file with an author line,
-     consider deleting the author line.
-     </p>
-     </SUBSECTION>
-     
-     <SUBSECTION title="File Contents">
-     <p>
-     Every file should have a comment at the top describing its contents.
-     </p>
-     <p>
-     Generally a <code>.h</code> file will describe the classes
-     that are declared in the file with an overview of what they
-     are for and how they are used. A <code>.cpp</code> file
-     should contain more information about implementation details
-     or discussions of tricky algorithms. If you feel the
-     implementation details or a discussion of the algorithms
-     would be useful for someone reading the <code>.h</code>,
-     feel free to put it there instead, but mention in the
-     <code>.cpp</code> that the documentation is in the
-     <code>.h</code> file.
-     </p>
-     <p>
-     Do not duplicate comments in both the <code>.h</code> and
-     the <code>.cpp</code>. Duplicated comments diverge.
-     </p>
-     </SUBSECTION>
-     </BODY>
+     <STYLEPOINT title="File Comment Block">
+         <SUMMARY>
+             Every file should have a comment at the top describing its contents.
+             It should contains the CVS macros $Id$ and $Log$, the primary/original author,
+             as well as a brief description of the class.
+         </SUMMARY>
+         <BODY>
+             <p>Example:</p>
+             <CODE_SNIPPET>
+                /***************************************************************************
+                 *
+                 * $Id$
+                 *
+                 * Author: Richard Lionheart, July 1191
+                 ***************************************************************************
+                 *
+                 * Description: text ...
+                 *
+                 ***************************************************************************
+                 *
+                 * $Log$
+                 *
+                 ***************************************************************************/
+             </CODE_SNIPPET>
+             <p>
+                 Generally a <code>.h</code> file will describe the classes
+                 that are declared in the file with an overview of what they
+                 are for and how they are used. A <code>.cxx</code> file
+                 should contain more information about implementation details
+                 or discussions of tricky algorithms. If you feel the
+                 implementation details or a discussion of the algorithms
+                 would be useful for someone reading the <code>.h</code>,
+                 feel free to put it there instead, but mention in the
+                 <code>.cxx</code> that the documentation is in the
+                 <code>.h</code> file.
+             </p>
+             <p>
+                 Do not duplicate comments in both the <code>.h</code> and
+                 the <code>.cpp</code>. Duplicated comments diverge.
+             </p>
+
+          </BODY>
      </STYLEPOINT>
      
-     <STYLEPOINT title="Class Comments">
-     <SUMMARY>
-     Every class definition should have an accompanying comment that
-     describes what it is for and how it should be used.
-     </SUMMARY>
-     <BODY>
-     <CODE_SNIPPET>
-     // Iterates over the contents of a GargantuanTable.  Sample usage:
-     //    GargantuanTableIterator* iter = table-&gt;NewIterator();
-     //    for (iter-&gt;Seek("foo"); !iter-&gt;done(); iter-&gt;Next()) {
-     //      process(iter-&gt;key(), iter-&gt;value());
-     //    }
-     //    delete iter;
-     class GargantuanTableIterator {
-     ...
-     };
-     </CODE_SNIPPET>
-     <p>
-     If you have already described a class in detail in the
-     comments at the top of your file feel free to simply state
-     "See comment at top of file for a complete description", but
-     be sure to have some sort of comment.
-     </p>
-     <p>
-     Document the synchronization assumptions the class makes, if
-     any.  If an instance of the class can be accessed by multiple
-     threads, take extra care to document the rules and invariants
-     surrounding multithreaded use.
-     </p>
-     </BODY>
-     </STYLEPOINT>
-     
-     <STYLEPOINT title="Function Comments">
+    <STYLEPOINT title="Function Comments">
      <SUMMARY>
      Declaration comments describe use of the function; comments at
      the definition of a function describe operation.
@@ -1221,75 +1533,24 @@
      <p>
      Every function declaration should have comments immediately
      preceding it that describe what the function does and how to
-     use it.  These comments should be descriptive ("Opens the
-     file") rather than imperative ("Open the file"); the comment
+     use. This is <em>only</em> necessary of the name of the function
+     is not explicative enough.
+     </p>
+     <p>
+     These comments should be descriptive ("Resets the counter")
+     rather than imperative ("Reset the counter"); the comment
      describes the function, it does not tell the function what
      to do.  In general, these comments do not describe how the
      function performs its task.  Instead, that should be left to
      comments in the function definition.
      </p>
      <p>
-     Types of things to mention in comments at the function
-     declaration:
-     </p>
-     <ul>
-     <li> What the inputs and outputs are.
-     </li>
-     <li> For class member functions:  whether the object
-     remembers reference arguments beyond the
-     duration of the method call, and whether it will
-     free them or not.
-     </li>
-     <li> If the function allocates memory that the caller
-     must free.
-     </li>
-     <li> Whether any of the arguments can be a null pointer.
-     </li>
-     <li> If there are any performance implications of how a
-     function is used.
-     </li>
-     <li> If the function is re-entrant.  What are its
-     synchronization assumptions?
-     </li>
-     </ul>
-     <p>
-     Here is an example:
-     </p>
-     <CODE_SNIPPET>
-     // Returns an iterator for this table.  It is the client's
-     // responsibility to delete the iterator when it is done with it,
-     // and it must not use the iterator once the GargantuanTable object
-     // on which the iterator was created has been deleted.
-     //
-     // The iterator is initially positioned at the beginning of the table.
-     //
-     // This method is equivalent to:
-     //    Iterator* iter = table-&gt;NewIterator();
-     //    iter-&gt;Seek("");
-     //    return iter;
-     // If you are going to immediately seek to another place in the
-     // returned iterator, it will be faster to use NewIterator()
-     // and avoid the extra seek.
-     Iterator* GetIterator() const;
-     </CODE_SNIPPET>
-     <p>
-     However, do not be unnecessarily verbose or state the
-     completely obvious.  Notice below that it is not necessary
-     to say "returns false otherwise" because this is implied.
-     </p>
-     <CODE_SNIPPET>
-     // Returns true if the table cannot hold any more entries.
-     bool IsTableFull();
-     </CODE_SNIPPET>
-     <p>
      When commenting constructors and destructors, remember that
      the person reading your code knows what constructors and
      destructors are for, so comments that just say something like
-     "destroys this object" are not useful.  Document what
-     constructors do with their arguments (for example, if they
-     take ownership of pointers), and what cleanup the destructor
-     does.  If this is trivial, just skip the comment.  It is
-     quite common for destructors not to have a header comment.
+     "destroys this object" are not useful. It is
+     quite common for destructors and constructors not to have a
+     header comment.
      </p>
      </SUBSECTION>
      
@@ -1326,17 +1587,14 @@
      <p>
      Each class data member (also called an instance variable or
      member variable) should have a comment describing what it is
-     used for.  If the variable can take sentinel values with
-     special meanings, such as a null pointer or -1, document this.
-     For example:
+     used for. This is <em>only</em> necessary of the name of the variable
+     is not explicative enough.
      </p>
-     <CODE_SNIPPET>
+     This for example is a unnecessary comment
+     <BAD_CODE_SNIPPET>
      private:
-     // Keeps track of the total number of entries in the table.
-     // Used to ensure we do not go over the limit. -1 means
-     // that we don't yet know how many entries the table has.
-     int num_total_entries_;
-     </CODE_SNIPPET>
+         int mHitCounter;   // hit counter
+     </BAD_CODE_SNIPPET>
      </SUBSECTION>
      
      <SUBSECTION title="Global Variables">
@@ -1347,7 +1605,7 @@
      </p>
      <CODE_SNIPPET>
      // The total number of tests cases that we run through in this regression test.
-     const int kNumTestCases = 6;
+     const int gNumTestCases = 6;
      </CODE_SNIPPET>
      </SUBSECTION>
      </BODY>
@@ -1368,9 +1626,9 @@
      // Divide result by two, taking into account that x
      // contains the carry from the add.
      for (int i = 0; i &lt; result-&gt;size(); i++) {
-     x = (x &lt;&lt; 8) + (*result)[i];
-     (*result)[i] = x &gt;&gt; 1;
-     x &amp;= 1;
+         x = (x &lt;&lt; 8) + (*result)[i];
+         (*result)[i] = x &gt;&gt; 1;
+         x &amp;= 1;
      }
      </CODE_SNIPPET>
      </SUBSECTION>
@@ -1383,8 +1641,9 @@
      <CODE_SNIPPET>
      // If we have enough memory, mmap the data portion too.
      mmap_budget = max&lt;int64&gt;(0, mmap_budget - index_-&gt;length());
-     if (mmap_budget &gt;= data_size_ &amp;&amp; !MmapData(mmap_chunk_bytes, mlock))
-     return;  // Error already logged.
+     if (mmap_budget &gt;= data_size_ &amp;&amp; !MmapData(mmap_chunk_bytes, mlock)) {
+         return;  // Error already logged.
+     }
      </CODE_SNIPPET>
      <p>
      Note that there are both comments that describe what the
@@ -1398,7 +1657,7 @@
      <CODE_SNIPPET>
      DoSomething();                  // Comment here so the comments line up.
      DoSomethingElseThatIsLonger();  // Comment here so there are two spaces between
-     // the code and the comment.
+                                     // the code and the comment.
      { // One space before comment when opening a new scope is allowed,
      // thus the comment lines up with the following comments and code.
      DoSomethingElse();  // Two spaces before line comments normally.
@@ -1416,7 +1675,7 @@
      bool success = CalculateSomething(interesting_value,
      10,
      false,
-     NULL);  // What are these arguments??
+     NULL);  // What are these arguments?
      </BAD_CODE_SNIPPET>
      <p>
      versus:
@@ -1480,115 +1739,107 @@
      </BODY>
      </STYLEPOINT>
      
-     <STYLEPOINT title="TODO Comments">
-     <SUMMARY>
-     Use <code>TODO</code> comments for code that is temporary, a
-     short-term solution, or good-enough but not perfect.
-     </SUMMARY>
-     <BODY>
-     <p>
-     <code>TODO</code>s should include the string <code>TODO</code> in
-     all caps, followed by the
-     
-     name, e-mail address, or other
-     identifier
-     of the person who can best provide context about the problem
-     referenced by the <code>TODO</code>.  A colon is optional.  The main
-     purpose is to have a consistent <code>TODO</code> format that can be
-     searched to find the person who can provide more details upon request.
-     A <code>TODO</code> is not a commitment that the person referenced
-     will fix the problem.  Thus when you create a <code>TODO</code>, it is
-     almost always your
-     
-     name
-     that is given.
-     </p>
-     
-     <CODE_SNIPPET>
-     // TODO(kl@gmail.com): Use a "*" here for concatenation operator.
-     // TODO(Zeke) change this to use relations.
-     </CODE_SNIPPET>
-     <p>
-     If your <code>TODO</code> is of the form "At a future date do
-     something" make sure that you either include a very specific
-     date ("Fix by November 2005") or a very specific event
-     ("Remove this code when all clients can handle XML responses.").
-     </p>
-     </BODY>
-     <CWG2>
-     <span style="color:#006600;">Barth: </span>
-     I disagree with email and name. Git/SVN is here for that. Otherwise we could put our initials at each comment... Ideally though it should reference a JIRA issue.
-     Realistically, todo's are used often with a future date is "when someone has time"...
-     </CWG2>
-     </STYLEPOINT>
-     
-     <STYLEPOINT title="Deprecation Comments">
-     <SUMMARY>
-     Mark deprecated interface points with <code>DEPRECATED</code> comments.
-     </SUMMARY>
-     <BODY>
-     <p>
-     You can mark an interface as deprecated by writing a comment containing
-     the word <code>DEPRECATED</code> in all caps.  The comment goes either
-     before the declaration of the interface or on the same line as the
-     declaration.
-     </p>
-     
-     <p>
-     After the word <code>DEPRECATED</code>, write your name, e-mail address,
-     or other identifier in parentheses.
-     </p>
-     <p>
-     A deprecation comment must include simple, clear directions for people to
-     fix their callsites.  In C++, you can implement a deprecated function as
-     an inline function that calls the new interface point.
-     </p>
-     <p>
-     Marking an interface point <code>DEPRECATED</code> will not magically
-     cause any callsites to change.  If you want people to actually stop using
-     the deprecated facility, you will have to fix the callsites yourself or
-     recruit a crew to help you.
-     </p>
-     <p>
-     New code should not contain calls to deprecated interface points.  Use
-     the new interface point instead.  If you cannot understand the
-     directions, find the person who created the deprecation and ask them for
-     help using the new interface point.
-     </p>
-     
-     </BODY>
-     <CWG2>
-     <span style="color:#006600;">Barth: </span>
-     There is a correct way of deprecating in C++ that should be described here:  String_t Name() const __attribute__ ((deprecated));
-     Putting a comment is useless.
-     </CWG2>
-     </STYLEPOINT>
-     
-     </CATEGORY-->
+     </CATEGORY>
     
+    <CATEGORY title="Other">
+        
+        <STYLEPOINT title="Printing Messages in STAR">
+            <SUMMARY>
+                For printing messages in the STAR framework use the <code>StMessage</code> message manager package.
+            </SUMMARY>
+            <BODY>
+            <p>
+                The so called STAR logger is documented <a href="http://www.star.bnl.gov/cgi-bin/protected/cvsweb.cgi/~checkout~/StRoot/StStarLogger/doc/StStarlogger.html">here</a>.
+            </p>
+            <p>
+                For all messages from a given portion of code, use a unique string, like:
+            </p>
+                
+            <CODE_SNIPPET>
+            LOG_XXX &lt;&lt; "StZdcVertexMaker::Init(): idid not find ZdcCalPars." &lt;&lt; endm;
+            </CODE_SNIPPET>
+            where <code>XXX</code> is either
+                <CODE_SNIPPET>
+                    DEBUG
+                    INFO
+                    WARN
+                    ERROR
+                    FATAL
+                    QA
+                </CODE_SNIPPET>
+                    Then, you can filter in/out the wanted / unwanted messages using
+                    the logger filter mechanism. The Logger
+                    is well documentation and its use is encouraged.
+            </BODY>
+        </STYLEPOINT>
+        
+        <STYLEPOINT title="Handling Error Conditions in STAR Framework">
+            <SUMMARY>
+                To exit your code on an error condition in the STAR framework,
+                return one of the STAR defined return codes from your Maker.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    The error codes are defined in the <code>ERreturnCodes</code> enumeration.
+                </p>
+                <CODE_SNIPPET>
+                enum EReturnCodes {
+                    kStOk=0,  // OK
+                    kStWarn,  // Warning, something wrong but work can be continued
+                    kStEOF,  // End Of File
+                    kStErr,  // Error, drop this and go to the next event
+                    kStFatal      // Fatal error, processing impossible
+                };
+                </CODE_SNIPPET>
+                
+                <p>
+                    Outside Makers in your application code AND for testing conditions that should
+                    never happen and indicate disaster if they do, we recommend the use of
+                    <code>assert()</code> (it aborts the program if the assertion is false).
+                    Don't use <code>exit()</code>.
+                </p>
+                <p>
+                Generally speaking though, it is BAD to just abort the program and should be avoided.
+                Better to message an error and propagate up a fatal error flag.
+                Unless your Maker is a fundamental and base maker (DAQ detecting a corruption,
+                db finding an unlikely condition which should really never happen, IO maker not able to stream, ...)
+                the use of <code>assert()</code> is prohibited as a single detector sub-system error shall
+                not lead to an entire
+                chain abort. The use of clear messages with level <code>FATAL</code> is emphasized.
+                </p>
+           </BODY>
+        </STYLEPOINT>
+ 
+ 
+ 
+    </CATEGORY>
+
     <CATEGORY title="Exceptions to the Rules">
         <p>
             The coding conventions described above have to be followed.  However,
             like all good rules, these sometimes have exceptions.
         </p>
         
-        <STYLEPOINT title="Existing Non-conformant Code">
+        <STYLEPOINT title="Existing Non-Conformant Code">
             <SUMMARY>
                 It is permissible to deviate from the rules when dealing with code that does not
-                conform to this style guide. For example, in naming something that is analogous to an existing C or C++ entity then the existing naming convention
+                conform to this style guide. For example, in naming something that is analogous
+                to an existing C or C++ entity then the existing naming convention
                 scheme can be followed.
             </SUMMARY>
             <BODY>
                 <p>
                     To modify code that was written to
-                    specifications other than those presented by this guide, it may be necessary to deviate from these rules in order to stay consistent with
-                    the local conventions in that code.  In case of doubt the original author or the person currently
+                    specifications other than those presented by this guide, it may be necessary to
+                    deviate from these rules in order to stay consistent with
+                    the local conventions in that code.  In case of doubt the original author or
+                    the person currently
                     responsible for the code should be consulted.  Remember that <em>consistency</em>
                     also includes local consistency.
                 </p>
                 <p>
-                    For example, importing a full class from somewhere else
-                    , e.g. AliRoot, it is allowed to keep the naming scheme
+                    For example, when importing a full class from somewhere else
+                    it is allowed to keep the naming scheme
                     and the style as is. To use the "correct" naming and formatting scheme (described
                     in this document),  then to be consistent, the whole coding standard must be applied to the
                     whole class. <br/>
@@ -1611,18 +1862,15 @@
         <p>
             The point about having style guidelines is to have a common
             vocabulary of coding so people can concentrate on what the programmer
-            is saying, rather than on how he/she is saying it. Global style rules are presented here so people know the vocabulary. However,
+            is saying, rather than on how he/she is saying it. Global style rules
+            are presented here so people know the vocabulary. However,
             local style is also important.  If the code added to a file
             looks drastically different from the existing code around it,
             the discontinuity throws readers out of their rhythm when they
             go to read it. Try to avoid this.
         </p>
         
-        <p>
-            OK, enough writing about writing code; the code itself is much
-            more interesting. Have fun!
-        </p>
-    </PARTING_WORDS>
+     </PARTING_WORDS>
     
     <REFERENCES>
         <p>
