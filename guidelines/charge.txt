@@ -1,0 +1,95 @@
+Date: 10/31/14, 3:31 PM
+
+
+    Greetings everyone,
+
+    With the onset of the C++11 standard now available in
+recent version of the gcc compiler, STAR needs to be serious
+about approaching and integrating modern language features
+into its framework.
+
+    Historically, the STAR coding and naming convention
+& standard available at
+https://drupal.star.bnl.gov/STAR/comp/sofi/soft-n-libs/standards
+were an initial attempt made in the early 2000 to provide both
+guidance to our programmers as well as helped set boundaries
+and limitations in terms of the features to be used in the STAR
+environment. While STAR has been rather opened in its approach
+(the rule are not strict, unlike other experiment that have
+for example banned the use of templates), our guidance are
+rather obsolete and from an era where C++ was seen as an
+extension of C. We had only a few coding style, naming and
+guidance and prevented some features from being used and
+reviewed those during the software peer-review process and
+upon the inclusion of new code in the framework.
+
+
+C++11 and its slew of new language features raise the need to
+revisit our coding standard and the question of whether the
+whole slew of language features are desirable or some should
+be discouraged or prevented arise. Now one could raise the
+question of why would a language construct would be forbidden:
+a simple example would be the use of digraphs and trigraphs which
+were not welcomed on STAR/C++ (but not officially  forbidden) -
+it makes the code less readable and less portable. With C++11,
+there may be more fundamental problems than that ... and code
+clarity and readability and clarity MUST remain a core focus
+during your evaluation.
+
+
+In order to make a move forward, I have asked you all to serve
+on committee which charges would be to
+
+- make explicit and detailed recommendations and advices on
+  what language feature and construct should be used or
+  forbidden while moving to C++11 - we crucially need this
+  guidance before we have C++11 fully allowed in STAR ...
+
+- revise our coding standard and recommendations i.e. refresh
+  our document to reflect modern computing practices as well as
+  reflect the C++11 recommendations (banned features, context
+  and validity of use of some constructs, ...).
+
+  NB: Though, I would also request to avoid making drastic
+      changes related to our naming conventions (and/or justify
+      it thoroughly) as modifying our accumulation of 15 years
+      of coding would be quite some work
+
+- Make any other recommendation that would help the integration
+  of new packages (do we reshape the peer review process?),
+  enhance code portability and long term maintainability of our
+  code as well as achieve knowledge preservation (is more
+  documentation realistic? should a STAR note be required for
+  simulation packages? ...)
+
++ Possibly but not mandatory, your work will require you
+  to inform yourself of the C++11 standards - you may come
+  across a "language difference primer" that would be most
+  helpful as a STAR tutorial (or design one). If so, please
+  do not hesitate as such document would be of great help
+  to our future programmers.
+
+
+
+    I would further like to ask Thomas to serve as the chair
+of this mini-commitee and would wish to have a draft report by
+December 15th if possible (opened for discussion and your time
+constraints).
+
+    If any questions, please ask otherwise, I will leave
+the organization of the discussion in the careful hands of
+Thomas.
+    
+    Many thanks to have agreed to help with this topic,
+
+
+
+-- 
+                 Dr. Jerome LAURET
+                 RHIC/STAR Software and Computing project Leader
+      ,,,,,      Physics Department, Brookhaven National Laboratory
+     ( o o )     Bldg 510a, Upton, NY 11973
+ ---m---U---m---------------------------------------------
+ E-mail: jlauret@bnl.gov
+
+
