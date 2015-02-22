@@ -476,7 +476,7 @@
                 </CODE_SNIPPET>
                 
                 <p>
-                    Use a default initial value or ? to reduce mixing data flow with control
+                    Use a default initial value or ternary operator (?:) to reduce mixing data flow with control
                     flow.
                 </p>
                 <BAD_CODE_SNIPPET>
