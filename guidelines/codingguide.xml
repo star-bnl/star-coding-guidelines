@@ -1282,7 +1282,7 @@
                         
                         <CONS>
                         If not careful one can generate a constructor that delegates to itself:
-                        <CODE_SNIPPET>
+                        <BAD_CODE_SNIPPET>
                         class C
                         {
                         public:
@@ -1297,7 +1297,7 @@
                             C c('b');
                            return 0;
                         }
-                        </CODE_SNIPPET>
+                        </BAD_CODE_SNIPPET>
                         Different compilers handle this case differently. For example,
                         <code>clang</code> submits an error, <code>gcc</code> compiles and crashes with stack overflow.
                         </CONS>
@@ -1342,7 +1342,37 @@
                 </DECISION>
             </BODY>
         </STYLEPOINT>
-        
+
+        <STYLEPOINT title="Destructors">
+            <SUMMARY>
+                Every class must free resources (objects, IO handlers, etc.) it allocated
+                during its lifetime.  The base class destructors must be declared virtual
+                if they are public.
+            </SUMMARY>
+            
+            <BODY>
+                <p>
+                    In polymorphic design a special care is needed in implementing
+                    base class destructors. If deletion through a pointer to a base
+                    <code>Base</code> should be allowed, then the <code>Base</code>
+                    destructor must be public and virtual. Otherwise, it should be
+                    protected and can be non-virtual.
+                </p>
+                
+                <DECISION>
+                    <p>
+                        Always write a destructor for a base class, because the implicitly generated
+                        one is public and non-virtual.
+                    </p>
+                </DECISION>
+                <EXTRA>
+                    In some class designs the destructors (of all classes in the inheritance tree) do nothing (implying that the classes and their members never allocate any resources).
+                    Typically, such designs do not have any virtual functions at all, and the virtual destructor would be the only reason for the existence of a vtable.
+                    Then a virtual destructor may be unnecessary and may be omitted.
+                </EXTRA>
+            </BODY>
+        </STYLEPOINT>
+
         <STYLEPOINT title="Structs vs. Classes">
             <SUMMARY>
                 Use a <code>struct</code> only for passive objects that carry data;
@@ -1381,35 +1411,7 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Destructors">
-            <SUMMARY>
-                Every class must free resources (objects, IO handlers, etc.) it allocated
-                during its lifetime.  The base class destructors must be declared virtual
-                if they are public.
-            </SUMMARY>
-            
-            <BODY>
-                <p>
-                    In polymorphic design a special care is needed in implementing
-                    base class destructors. If deletion through a pointer to a base
-                    <code>Base</code> should be allowed, then the <code>Base</code>
-                    destructor must be public and virtual. Otherwise, it should be
-                    protected and can be non-virtual.
-                </p>
-                
-                <DECISION>
-                    <p>
-                        Always write a destructor for a base class, because the implicitly generated
-                        one is public and non-virtual.
-                    </p>
-                </DECISION>
-                <EXTRA>
-                    In some class designs the destructors (of all classes in the inheritance tree) do nothing (implying that the classes and their members never allocate any resources).
-                    Typically, such designs do not have any virtual functions at all, and the virtual destructor would be the only reason for the existence of a vtable.
-                    Then a virtual destructor may be unnecessary and may be omitted.
-                </EXTRA>
-            </BODY>
-        </STYLEPOINT>
+        
         
         <STYLEPOINT title="Inheritance">
             <SUMMARY>
