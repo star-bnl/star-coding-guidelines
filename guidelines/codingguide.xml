@@ -1379,12 +1379,15 @@
                 everything else is a <code>class</code>.
             </SUMMARY>
             <BODY>
+              <DEFINITION>
                 <p>
-                    The <code>struct</code> and <code>class</code> keywords behave
-                    almost identically in C++.  We add our own semantic meanings
-                    to each keyword, so you should use the appropriate keyword for
-                    the data-type you're defining.
+                  The <code>struct</code> and <code>class</code> keywords behave
+                  almost identically in C++.  We add our own semantic meanings
+                  to each keyword, so you should use the appropriate keyword for
+                  the data-type you're defining.
                 </p>
+              </DEFINITION>
+              <DECISION>
                 <p>
                     <code>structs</code> should be used for passive objects that carry
                     data, and may have associated constants, but lack any functionality
@@ -1408,6 +1411,7 @@
                     Note that member variables in structs and classes have
                     <a HREF="#Variable_Names">different naming rules</a>.
                 </p>
+              </DECISION>
             </BODY>
         </STYLEPOINT>
         
@@ -1471,7 +1475,7 @@
                       </CODE_SNIPPET>
                         
                         It can also be useful to prevent inheritance from classes (if a programmer tries to inherit from a class that is declared final by the 
-                        author it is a sign that the programmer should have been using composition rather than inheritance).
+                        author it is an indication that composition is more appropriate than inheritance in that case).
                       <CODE_SNIPPET>
                         Class Base final { };
  
@@ -1480,11 +1484,11 @@
                     </p>
                 </CPP11>
                 <DEFINITION>
-                    When a sub-class inherits from a base class, it includes the
-                    definitions of all the data and operations that the parent
+                    When a clase inherits from a base class, it includes the
+                    definitions of all the data and operations that the
                     base class defines.  In practice, inheritance is used in two
                     major ways in C++: implementation inheritance, in which
-                    actual code is inherited by the child, and interface inheritance, in which only
+                    actual code is inherited by the derived class, and interface inheritance, in which only
                     method names are inherited.
                 </DEFINITION>
                 <PROS>
@@ -1499,10 +1503,10 @@
                 </PROS>
                 <CONS>
                     For implementation inheritance, because the code implementing
-                    a sub-class is spread between the base and the sub-class, it
+                    a derived class is spread between the base and the derived class, it
                     can be more difficult to understand an implementation.  The
-                    sub-class cannot override functions that are not virtual, so
-                    the sub-class cannot change implementation.  The base class
+                    derived class cannot override functions that are not virtual, so
+                    the derived class cannot change implementation.  The base class
                     may also define some data members, so that specifies physical
                     layout of the base class.
                 </CONS>
@@ -1723,11 +1727,12 @@
             </SUMMARY>
             
             <BODY>
+              <DEFINITION>
                 <p>ROOT defines a large set of portable and unportable types such as <CODE>Int_t</CODE>,
                 <CODE>Float_t</CODE>, <CODE>Double_t</CODE>, and many more.
                 There is a priori no reason to use any of those when not needed. Use of builtin C++
                 types makes the code in fact more portable, readable, and often faster (see discussion under
-                "Extended integer types").
+                <a href="#Integer_Types">"Extended integer types"</a>).
                 If fixed size is absolutely required the introduction of extended integer types of
                 fixed size and guaranteed size types in C++11 makes ROOT types redundant.</p>
                
@@ -1735,6 +1740,7 @@
                 The only exceptions are
                 data member in “persistent” classes (e.g. <code>StEvent</code>) under schema evolution. Here ROOT types
                 need to be used to define the data members.</p>
+            </DEFINITION>
                 
               <DECISION>
                   Avoid the use ROOT definitions of built-in data types and use the built-in C++ types.
@@ -1751,7 +1757,8 @@
           </SUMMARY>
           
           <BODY>
-              <p>
+            <DEFINITION>
+            <p>
                   ROOT provides a rich set of special mathematical functions often adapted from the old CERNLIB or,
                   more recently, wrapped GSL functions.  They are heavily used in STAR code. However, ROOT
                   also provides a set of basic mathematical functions that are already defined in <code>&lt;cmath&gt;</code>.
@@ -1762,6 +1769,7 @@
                   and defined in <code>&lt;cmath&gt;</code>. In most cases they are implemented by calling the built-in functions anyway
                   and their use reduces readability and portability.</p>
     
+              </DEFINITION>
                <DECISION>
                    The use of ROOT mathematical function already available in <code>&lt;cmath&lt;</code> is strongly discouraged.
                     Use <code>sqrt()</code> instead of <code>TMath::Sqrt()</code>, use <code>log()</code> instead
@@ -1978,7 +1986,7 @@
                     </CODE_SNIPPET>
                     
                     <p>Note that a <code>constexpr</code> specifier used in an object declaration implies
-                        <code>const</code>. A <code>constexpr</code> specifier used in an function
+                        <code>const</code>. A <code>constexpr</code> specifier used in a function
                     declaration implies inline. If you declare a class member function to be <code>constexpr</code>,
                     that marks the function as <code>const</code> as well. If you
                     declare a variable as <code>constexpr</code>, that in turn marks the variable as
@@ -2113,13 +2121,13 @@
                     What can we write as the return type? It's the type of “<code>x+y</code>", of course,
                     but how can we say that? First idea, use <code>decltype</code>:
                     
-                    <CODE_SNIPPET>
+                    <BAD_CODE_SNIPPET>
                     template&lt;class T, class U&gt;
                     decltype(x+y) add(T x, U y) // scope problem!
                     {
                          return x+y;
                     }
-                    </CODE_SNIPPET>
+                    </BAD_CODE_SNIPPET>
                             
                     That won't work because x and y are not in scope.
                     The solution is put the return type where it belongs, after the arguments:
@@ -2199,7 +2207,7 @@
                 </PROS>
 
                 <CONS>
-                  Smart pointers are not easy to work with in an environment where ROOT is used (another possible conflict is with STAR "WhiteBoard" of markers).
+                  Smart pointers are not easy to work with in an environment where ROOT is used (another possible conflict is with STAR "WhiteBoard" of <code>StMaker</code>s).
                   <CODE_SNIPPET>
                     int main()
                     {
@@ -2420,7 +2428,7 @@
         
         <STYLEPOINT title="Run-Time Type Information (RTTI)">
             <SUMMARY>
-              Use RTTI with caution. If you find yourself overusing <code>dynamic_cast</code> consider the design of your code and classes.
+              Use RTTI with caution. If you find yourself overusing <code>dynamic_cast</code> consider reviewing the design of your code and classes.
             </SUMMARY>
             <BODY>
                 <DEFINITION>
@@ -2674,7 +2682,8 @@
 
         <STYLEPOINT title="Range-for Statement" cpp11="yes">
           <SUMMARY>
-            Use reference to elements in range-for statements especially when dealing with large objects. Prefer ordinary loops when you need the index information.
+            Range-for loops are useful and should be used. Use reference to elements  (or <code>const</code>) in range-for statements especially when 
+            dealing with large objects. Prefer ordinary loops when you need the index information.
           </SUMMARY>
           <BODY>
             <DEFINITION>
@@ -2812,7 +2821,7 @@
                 <DECISION>
                     In general the standard integer types should be used since they are typically also the “fastest” types on the respective architecture.
                     In cases where the exact size matters, e.g. unpacking of raw data the extended types the extended integer types can be used. The use
-                    of ROOT types is discouraged unless it is absolute necessary (see discussion under "ROOT Related Issues").
+                    of ROOT types is discouraged unless it is absolute necessary (see discussion under <a href="#ROOT_Related_Issues">"ROOT Related Issues"</a>).
                 </DECISION>
             </BODY>
         </STYLEPOINT>
@@ -2849,23 +2858,24 @@
         </STYLEPOINT>
         
         <STYLEPOINT title="0 and nullptr">
-            <SUMMARY>
-                Use <code>0</code> for integers, <code>nullptr</code> for pointers,
-                and <code>'\0'</code> for chars.
-            </SUMMARY>
-            <BODY>
-                <p> 
-                    <code>nullptr</code> is a pointer literal of type <code>std::nullptr_t</code>. On the other hand, <code>NULL</code> is a macro equivalent the integer <code>0</code>. Using <code>NULL</code> could bring to unexpected problems. For example imagine you have the following two function declarations:
-                    <BAD_CODE_SNIPPET>
-                        void function(int number);
-                        void function(char *name);
-                        
-                        function( NULL );
-                    </BAD_CODE_SNIPPET>
-                    Because <code>NULL</code> is <code>0</code>, and <code>0</code> is an integer, the first version of func will be called instead. 
-                    In C++11, <code>nullptr</code> is a new keyword that can (and should!) be used to represent <code>NULL</code> pointers.
-                </p>
-            </BODY>
+          <SUMMARY>
+            Use <code>0</code> for integers, <code>nullptr</code> for pointers,
+            and <code>'\0'</code> for chars.
+          </SUMMARY>
+          <BODY>
+            <p> 
+              <code>nullptr</code> is a pointer literal of type <code>std::nullptr_t</code>. On the other hand, <code>NULL</code> 
+              is a macro equivalent the integer <code>0</code>. Using <code>NULL</code> could bring to unexpected problems. For example imagine you have the following two function declarations:
+              <BAD_CODE_SNIPPET>
+                void function(int number);
+                void function(char *name);
+
+                function( NULL );
+              </BAD_CODE_SNIPPET>
+              Because <code>NULL</code> is <code>0</code>, and <code>0</code> is an integer, the first version of func will be called instead. 
+              In C++11, <code>nullptr</code> is a new keyword that can (and should!) be used to represent <code>NULL</code> pointers.
+            </p>
+          </BODY>
         </STYLEPOINT>
         
         <STYLEPOINT title="sizeof">
@@ -2905,7 +2915,7 @@
         
         <STYLEPOINT title="auto" cpp11="yes">
             <SUMMARY>
-                If the compiler is able to determine the type of a variable from its
+                If the compiler is able to deduce the type of a variable from its
                 initialization, you don't need to provide the type. This is achieved by using the
                 <code>auto</code> keyword.
                 <p>
@@ -3135,7 +3145,8 @@
 
         <STYLEPOINT title="Rvalue Reference and Move Semantics" cpp11="yes">
           <SUMMARY>
-            Classes should have move constructor and assignment operator OR explicitly have them deleted using <code>= delete</code> specifier.
+             Rvalue reference are used to achieve move semantics and perfect forwarding. See <a href="#Move_Constructor_and_Assignment_Operator"> Move Consturctor and Assignment Operator</a> 
+             for the guideline on the move semantics.
           </SUMMARY>
             <BODY>
                 <DEFINITION>
@@ -3276,13 +3287,15 @@
                   and this can be achieved by statically casting the variable x to an rvalue reference, i.e. hiding its name which can 
                   be achieved using std::move.
                   
-                  <CODE_SNIPPET>
+                  <BAD_CODE_SNIPPET>
                   Derived(Derived&amp;&amp; rhs) 
                     : Base(rhs) // wrong: rhs is an lvalue
                   {
                     // Derived-specific stuff
                   }
                   
+                </BAD_CODE_SNIPPET>
+                  <CODE_SNIPPET>
                   Derived(Derived&amp;&amp; rhs) 
                     : Base(std::move(rhs)) // good, calls Base(Base&amp;&amp; rhs)
                   {
@@ -3301,14 +3314,13 @@
                     void print(T&amp;&amp; x) { cout&lt;&lt;x&lt;&lt;endl;}
                     </CODE_SNIPPET>
 
-                    So calling print on a lvalue makes `x` an lvalue reference, same if `x` is an rvalue. Now when does this matter? It doesn't matter inside `print` itself 
-                    since `x` is an lvalue there anyway. It matters when you want to pass `x` to another function, do you pass it as an lvalue (just `x`) or hide its 
-                    name using std::move? The answer obviously depends on the nature of `x`, you want to preserve that. This can be achieved using std::forward. std:forward passes
+                    So calling print on a lvalue makes <code>x</code> an lvalue reference, same if <code>x</code> is an rvalue. Now when does this matter? It doesn't matter inside <code>print</code> itself 
+                    since <code>x</code> is an lvalue there anyway. It matters when you want to pass <code>x</code> to another function, do you pass it as an lvalue (just <code>x</code>) or hide its 
+                    name using <code>std::move</code>? The answer obviously depends on the nature of <code>x</code>, you want to preserve that. This can be achieved using <code>std::forward</code>. std:forward passes
                     rvalue references as rvalues and lvalue references as lvalues.  
                   </CPP11>
                 </DEFINITION>
                 <DECISION>
-                  <p>Classes should have move constructor and assignment operator OR explicitly delete them.  </p>
                   <p>Strive to define your move semantics so that they cannot throw exceptions and declare them so using <code>noexcept</code> specifier.  </p>
                   <p>Use <code>std::move</code> to pass argument to base classes in move constructor and assignment operator.  </p>
                   <p>Use <code>std:forward</code> to forward arguments to classes constructors in templated functions or classes.  </p>
