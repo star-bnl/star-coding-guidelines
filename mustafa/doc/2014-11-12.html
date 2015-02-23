@@ -151,7 +151,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>Now, if we maintain the STAR guideline on copy assignment/constructor it will be a good practice to ask programmers to be explicit about their desires for the move counterparts (that is if we eventually allow the move semantics).</p>
 <p><strong>Recommendation:</strong><br />- Pay attention to the Rule of Five.<br />- Be explicit about your intentions for the move semantics.</p>
 <h3 id="in-class-member-initializers">In-class member initializers</h3>
-<p>C++98 allows in-class member initialization for static members only. C++11 allows in-class member initialization for any variable. For example:</p>
+<p>C++98 allows in-class member initialization for const static members only. C++11 allows in-class member initialization for any variable. For example:</p>
 <pre class="sourceCode C"><code class="sourceCode c">Class foo
 {
   public:
