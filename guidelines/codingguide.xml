@@ -9,6 +9,8 @@
         Anselm Vossen <br/>
     </address>
     
+    <address><p><em>Draft Version 1.0, February 23, 2015</em></p></address>
+    
     <CATEGORY title="Introduction">
     <p>
         This document is a draft of new C++ coding guidelines compiled for the STAR
@@ -42,7 +44,7 @@
     
     <p>
         Note that this guide is not a C++ tutorial: we assume that the
-        reader is familiar with the language. We marked parts of the guidlines that address
+        reader is familiar with the language. We marked parts of the guidelines that address
         specifically new C++11 features.
     </p>
  
@@ -854,7 +856,7 @@
             </SUMMARY>
             <BODY>
                 <p>Every class should have at least one constructor (and a destructor)
-                  even if it does nothing or is defined to do nothing, or compiler defaults should be explicitely 
+                  even if it does nothing or is defined to do nothing, or compiler defaults should be explicitly
                   requested using the <code>default</code> specifier. This is good practice, it indicates to
                 the reader that the coder thought about this and not plainly forgot about it.</p>
                 
@@ -1030,8 +1032,8 @@
     
         <STYLEPOINT title="Copy Constructor and Assignment Operator">
           <SUMMARY>
-            Each class should have an assignment operator and a copy constructor impelemented or explicitely deleted. Exception is when the class doesn't allocate subsidiary 
-            data structures on the heap, in this case compiler defaults can be explicitely requested. Be aware of data slicing for polymorphic classes.
+            Each class should have an assignment operator and a copy constructor implemented or explicitly deleted. Exception is when the class doesn't allocate subsidiary
+            data structures on the heap, in this case compiler defaults can be explicitly requested. Be aware of data slicing for polymorphic classes.
           </SUMMARY>
           <BODY>
 
@@ -1044,8 +1046,8 @@
               <CODE_SNIPPET>
                 class NonCopyable 
                 {
-                NonCopyable(const NonCopyable&amp;) = delete;
-                NonCopyable&amp; operator=(const NonCopyable&amp;) = delete;
+                    NonCopyable(const NonCopyable&amp;) = delete;
+                    NonCopyable&amp; operator=(const NonCopyable&amp;) = delete;
                 };
               </CODE_SNIPPET>
 
@@ -1054,8 +1056,8 @@
               <CODE_SNIPPET>
                 Class MyClass
                 {
-                void f(double i);
-                void f(int) = delete;
+                    void f(double i);
+                    void f(int) = delete;
                 };
               </CODE_SNIPPET>
 
@@ -1064,8 +1066,8 @@
               <CODE_SNIPPET>
                 Class MyClass 
                 {
-                MyClass() = default; //The default constructor is explicitly requested.
-                MyClass(...);
+                    MyClass() = default; // default constructor is explicitly requested.
+                    MyClass(...);
                 };
               </CODE_SNIPPET>
 
@@ -1140,11 +1142,11 @@
                         If your polymorphic class needs to be copyable, consider using a virtual <code>clone()</code> method.
                         This way copying can be implemented without slicing and be used more naturally for pointers:
                         <CODE_SNIPPET>
-                            void someFunction(SomeInterface *object)
-                            {
+                        void someFunction(SomeInterface *object)
+                        {
                             SomeInterface *objectCopy = object->clone();
                             ...
-                            }
+                        }
                         </CODE_SNIPPET>
                     </p>
 
@@ -1484,7 +1486,7 @@
                     </p>
                 </CPP11>
                 <DEFINITION>
-                    When a clase inherits from a base class, it includes the
+                    When a class inherits from a base class, it includes the
                     definitions of all the data and operations that the
                     base class defines.  In practice, inheritance is used in two
                     major ways in C++: implementation inheritance, in which
@@ -2490,7 +2492,7 @@
                     <p>
                         RTTI has legitimate uses but is prone to abuse, so you must
                         be careful when using it.  You may use it freely
-                        in unittests, but avoid it when possible in other code.
+                        in unit tests, but avoid it when possible in other code.
                         In particular, think twice before using RTTI in new code.
                         If you find yourself needing to write code that behaves differently
                         based on the class of an object, consider one of the following
@@ -2872,7 +2874,8 @@
 
                 function( NULL );
               </BAD_CODE_SNIPPET>
-              Because <code>NULL</code> is <code>0</code>, and <code>0</code> is an integer, the first version of func will be called instead. 
+              Because <code>NULL</code> is <code>0</code>, and <code>0</code> is an integer,
+              the first version of <code>function</code> will be called instead.
               In C++11, <code>nullptr</code> is a new keyword that can (and should!) be used to represent <code>NULL</code> pointers.
             </p>
           </BODY>
@@ -3145,7 +3148,7 @@
 
         <STYLEPOINT title="Rvalue Reference and Move Semantics" cpp11="yes">
           <SUMMARY>
-             Rvalue reference are used to achieve move semantics and perfect forwarding. See <a href="#Move_Constructor_and_Assignment_Operator"> Move Consturctor and Assignment Operator</a> 
+             Rvalue reference are used to achieve move semantics and perfect forwarding. See <a href="#Move_Constructor_and_Assignment_Operator"> Move Constructor and Assignment Operator</a>
              for the guideline on the move semantics.
           </SUMMARY>
             <BODY>

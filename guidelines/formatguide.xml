@@ -2,6 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="styleguide.xsl"?>
 <GUIDE title="STAR C++ Naming &amp; Formatting Guidelines">
     
+
     <address>
         Authors:<br/>
         Mustafa Mustafa <br/>
@@ -9,6 +10,8 @@
         Anselm Vossen <br/>
     </address>
     
+    <address><p><em>Draft Version 1.0, February 23, 2015</em></p></address>
+   
     <CATEGORY title="Introduction">
         <p>
             This document is a draft of new naming &amp; formatting guidelines compiled for the STAR
@@ -291,8 +294,8 @@
                     <CODE_SNIPPET>
                         class Something {
                         private:
-                        string mTableName;
-                        static int sGlobalState;
+                            string mTableName;
+                            static int sGlobalState;
                         };
                     </CODE_SNIPPET>
                 </SUBSECTION>
@@ -304,8 +307,8 @@
                     </p>
                     <CODE_SNIPPET>
                         struct UrlTableProperties {
-                        string name;
-                        int numberOfEntries;
+                            string name;
+                            int numberOfEntries;
                         }
                     </CODE_SNIPPET>
                 </SUBSECTION>
@@ -404,10 +407,10 @@
                     <CODE_SNIPPET>
                         class MyClass {
                         public:
-                        void setValid(bool isValid) const { mValid = isValid; }
-                        bool isValid() const { return mValid; }
+                            void setValid(bool isValid) const { mValid = isValid; }
+                            bool isValid() const { return mValid; }
                         private:
-                        bool mValid;
+                            bool mValid;
                         };
                     </CODE_SNIPPET>
                 </SUBSECTION>
@@ -424,7 +427,7 @@
                     namespace MyNamespace {
                     void MyClass::doSomething()
                     {
-                    ...
+                        ...
                     }
                     }
                 </CODE_SNIPPET>
@@ -1106,8 +1109,8 @@
                 </p>
                 <CODE_SNIPPET>
                     if (thisOneThing &gt; thisOtherThing &amp;&amp;
-                    aThirdThing == aFourthThing &amp;&amp;
-                    yetAnother &amp;&amp; lastOne) {
+                        aThirdThing == aFourthThing &amp;&amp;
+                        yetAnother &amp;&amp; lastOne) {
                     ...
                     }
                 </CODE_SNIPPET>
