@@ -346,9 +346,8 @@
                 Regular functions follow camel case convention and start with a lower case
                 letter: <code>myFunction()</code>.
                 
-                <ul><li>Accessors and mutators match the name of the variable and are
-                    prefixed with <code>get</code> and <code>set</code>:
-                    <code>getMyMemberVariable()</code>, <code>setMyMemberVariable()</code>.</li>
+                <ul><li>Accessors and mutators match the name of the variable. Accessors should follow the name of the variable (DO NOT prefix it with <code>get</code>) and mutators are prefixed with <code>set</code>, for example:
+                    <code>myMemberVariable()</code>, <code>setMyMemberVariable()</code>.</li>
                 <li> Functions (including accessors) returning a boolean value should be prefixed with
                     <code>is</code> or <code>has</code>. </li>
                 </ul>
@@ -374,7 +373,7 @@
                     <p>
                         Accessors and mutators match
                         the name of the variable they are getting and setting. For the latter use
-                        the prefixes <code>set</code>. Do not to use the <code>get</code> prefix as done in ROOT.
+                        the prefixes <code>set</code>. Do not use the <code>get</code> prefix as done in ROOT.
                         The prefix <code>set</code> is not exclusive for mutators and could
                         be used for other functions, if applicable.
                         This shows an excerpt of a class whose instance variable is
