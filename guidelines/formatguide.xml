@@ -1230,7 +1230,7 @@
                 </p>
                 <ul>
                     <li> The base class name should be on the same line as the
-                        subclass name, subject to the 100-character limit.
+                        derived class name, subject to the 100-character limit.
                     </li>
                     <li> Except for the first instance, the access specifier keywords should be preceded
                         by a blank line. This rule is optional for small classes.
