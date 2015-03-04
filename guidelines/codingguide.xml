@@ -323,9 +323,9 @@
                     namespace StMyStuff //$NMSPC
                     {
                     
-                    Class AClass : public TNamed {....};
+                    class AClass : public TNamed {....};
             
-                    Class BClass : public TNamed {....};
+                    class BClass : public TNamed {....};
                     
                     } // namespace StMyStuff
                     </CODE_SNIPPET>
@@ -879,7 +879,7 @@
                 <CPP11 title="In-Class Member Initialization">
                     C++98 allows in-class member initialization for const static members only. C++11 allows in-class member initialization for any variable.
                     <CODE_SNIPPET>
-                    Class MyClass
+                    class MyClass
                     {
                       public:
                         int x = 1;
@@ -1054,7 +1054,7 @@
               2) Preventing implicit conversion of function arguments:  
 
               <CODE_SNIPPET>
-                Class MyClass
+                class MyClass
                 {
                     void f(double i);
                     void f(int) = delete;
@@ -1064,7 +1064,7 @@
               The specifier <code>= default</code> can be used to state the programmers wish for defaults to be created.
 
               <CODE_SNIPPET>
-                Class MyClass 
+                class MyClass
                 {
                     MyClass() = default; // default constructor is explicitly requested.
                     MyClass(...);
@@ -1435,7 +1435,7 @@
                       (e.g. typo in the method name, mismatching method signature, virtual keyword forgotten in the base class).
                       For example:
                       <CODE_SNIPPET>
-                      Class Base
+                      class Base
                       {
                           virtual void a(int);
                           virtual void f();
@@ -1444,7 +1444,7 @@
                           virtual void h(char);
                       };
                       
-                      Class Derived : public Base
+                      class Derived : public Base
                       {
                           void a(float) override; // doesn't override Base::a(int) (wrong signature)
                           void f() override; // overrides Base::f()
@@ -1465,12 +1465,12 @@
                       The <code>final</code> keyword tells the compiler that derived classes may not override the virtual methods anymore.
                       This is useful to limit abuse of your classes by users, but it closes the possibility of better implementation of methods in derived classes. 
                       <CODE_SNIPPET>
-                        Class Base 
+                        class Base
                         {
                           virtual void f() final;
                         };
 
-                        Class Derived : Base 
+                        class Derived : Base
                         {
                           void f(); // ill-formed because the virtual method Base::f has been marked final
                         };
@@ -1479,9 +1479,9 @@
                         It can also be useful to prevent inheritance from classes (if a programmer tries to inherit from a class that is declared final by the 
                         author it is an indication that composition is more appropriate than inheritance in that case).
                       <CODE_SNIPPET>
-                        Class Base final { };
+                        class Base final { };
  
-                        Class Derived : Base { }; // ill-formed because the class Base has been marked final
+                        class Derived : Base { }; // ill-formed because the class Base has been marked final
                       </CODE_SNIPPET>
                     </p>
                 </CPP11>
