@@ -540,6 +540,11 @@
                     std::string name{ "Some Name" };
                     std::string name = { "Some Name" };
                 </CODE_SNIPPET>
+
+                <p>
+                  Brace initialization can be in particular useful to initialize class members.
+                </p>
+
                 <p>User data types can also define constructors that take
                     <code>initializer_list</code>, which is automatically created from
                     <i>braced-init-list</i>:
@@ -582,8 +587,19 @@
                 </p>
                 
                 <p> For clarity of the examples above we use directly explicit values, however following
-                    the rule about <a href="#Magic_Numbers">magic numbers</a> requires to define all such
-                    numbers as named constants or <code>constexpr</code> first. </p>
+                  the rule about <a href="#Magic_Numbers">magic numbers</a> requires to define all such
+                  numbers as named constants or <code>constexpr</code> first. </p>
+                <p>
+                  One potential pitfall is the brace initialization of an array with a size-mismatched initializer list.
+                </p>
+                <p>
+                  Example:
+                </p>
+                <BAD_CODE_SNIPPET>
+                  double *pd= new double [3] {0.5, 1.2, 12.99, 4};
+                </BAD_CODE_SNIPPET>
+                This leads to a run-time error.
+
             </BODY>
         </STYLEPOINT>
         
@@ -1821,6 +1837,250 @@
                 </BODY>
             </STYLEPOINT>
                 
+
+ 
+        <STYLEPOINT title="Strong Enums" cpp11="yes">
+            <SUMMARY>
+                Use strong enums instead of weak enums.
+                
+            </SUMMARY>
+            
+            <BODY>
+                <p>
+                    C++11 introduces strongly typed enums. They are what the name suggests. Enums with a type:
+                    <CODE_SNIPPET>
+                        enum class strongEnum {
+                        one, two, three, four
+                        };
+                    </CODE_SNIPPET>
+                    So the syntax stays similar and the class keyword is added. Additional, the underlying type can be specified.
+                    If not defined it defaults to int or, if e.g. large values are defined, system default.
+                    Strong enums solve the long standing problem with enums and scope.
+                    The strong type is also an advantage. In addition strong enums allow forward declaration and a definite size.
+                    Example:
+                    <CODE_SNIPPET>
+                        enum class  strongEnum : int{first, second};
+                    </CODE_SNIPPET>
+                    The advantage of strong enums is that they are strongly typed and have a scope. With weak enums the problem was e.g.
+                    Example:
+                    <BAD_CODE_SNIPPET>
+                        enum weakEnum_color{red, green,blue};
+                        //error: redefinition of enumerator red and green
+                        enum weakEnum_trafficLight{red, green, yellow};
+                        
+                    </BAD_CODE_SNIPPET>
+                    But this works:
+                    
+                    <CODE_SNIPPET>
+                        enum class strongEnum_color{red, green,blue};
+                        enum class strong_trafficLight{red, green, yellow};
+                        strong_trafficLight trafficLight=strong_trafficLight::red;
+                    </CODE_SNIPPET>
+                    This does not work, wrong type
+                    <BAD_CODE_SNIPPET>
+                        strong_trafficLight trafficLight=strongEnum_color::red;
+                    </BAD_CODE_SNIPPET>
+                    Strong enums do not convert to int by default anymore (even if the underlying type is int), so you cannot write
+                    <BAD_CODE_SNIPPET>
+                        int c= strongEnum_color::red;
+                    </BAD_CODE_SNIPPET>
+                    But you can use casts e.g. if you want to use cout:
+                    <CODE_SNIPPET>
+                        int c= static_cast &lt; int &gt; (strongEnum_color::red);
+                    </CODE_SNIPPET>
+                </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        
+        
+        <STYLEPOINT title="Lambda Expressions" cpp11="yes">
+            <SUMMARY>
+                Lambda functions are a powerful addition. They can be very useful in particular when iterating over containers. They should not be used for regular functions as there might be a performance penalty when they are called often.
+                Capture by reference can lead to side-effects. Therefore capture by reference is discouraged.
+                
+            </SUMMARY>
+            <BODY>
+                <p>
+                    C++11 added Lambda functions (closures). This concept usually known from functional programming allows the creation of anonymous inline functions.
+                    Lambda functions can access variables of the enclosing functions (variable capture) either by value or by reference.
+                    Lambdas e.g. valuable with the std libraries iteration functions:
+                </p>
+                <p>
+                    Examples:
+                    <CODE_SNIPPET>
+                        std::vector&lt;int&gt; v;
+                        v.push_back(1);
+                        v.push_back(2);
+                        v.push_back(3);
+                        
+                        //iterate over vector and print out each element
+                        std::for_each(std::begin(v),std::end(v),[](int n)
+                        {std::cout&lt;&lt;n&lt;&lt;std::endl;});
+                        
+                        //declare is_odd to be lambda function that returns true if
+                        // the argument is odd. Note the return syntax
+                        // Note that the return type can be omitted. It is then
+                        //determined as if auto is applied to the statement after return;
+                        
+                        auto is_odd=[](int n)-&gt;bool{return n%2==true;};
+                        auto pos=std::find_if(std::begin(v),std::end(v),
+                        is_odd);
+                        //the below snipplet returns 1 (the first position with an odd number
+                        if(pos!=std::end(v))
+                        std::cout&lt;&lt;*pos&lt;&lt;std::endl;
+                    </CODE_SNIPPET>
+                </p>
+                A lambda function is of type <code>std::function</code>, therefore instead of <code>auto</code>, the above return type for <code>is_odd</code>_ could be written as <code>std::function&lt;bool(int)&gt; is_odd; </code>
+                
+                <p>
+                    
+                    A powerful feature of lambda functions is that variables of the surrounding function can be captured. This is what the [] part of the function is for.
+                    <ul>
+                        <li>	[] No capture </li>
+                        <li>	[=] capture by copy </li>
+                        <li>	[&amp;] capture by reference </li>
+                        <li>	[a,b] capture only <code>a,b </code>by copy </li>
+                        <li>	[&amp;a, b] capture <code>a</code> by reference, <code>b</code> by copy </li>
+                    </ul>
+                    
+                    If the function is also modifying the variables that are captured by copy or wants to access the non-const members of a captured object, the lambda function has to be declared as ‘mutable’. Note that this does not modify the captured variable in the surrounding function
+                </p>
+                <p>
+                    Example (Gives output <code>“a is now 5”</code>):
+                    <CODE_SNIPPET>
+                        int a=5;
+                        auto testCopy=[a]()mutable {a=7;};
+                        testCopy();
+                        cout &lt;&lt;"a is now " &lt;&lt; a &lt;&lt;endl;
+                    </CODE_SNIPPET>
+                </p>
+                <p>
+                    
+                    Example (Gives output <code>“a is now 7”</code>):
+                    <CODE_SNIPPET>
+                        int a=5;
+                        auto testCopy=[&amp;a](){a=7;};
+                        testCopy();
+                        cout &lt;&lt;"a is now " &lt;&lt; a &lt;&lt;endl;
+                    </CODE_SNIPPET>
+                </p>
+                <p>
+                    Example does not compile (mutable missing)
+                    <CODE_SNIPPET>
+                        int a=5;
+                        auto testCopy=[a](){a=7;};
+                        testCopy();
+                        cout "a is now " &lt;&lt; a &lt;&lt;endl;
+                        
+                        
+                        
+                    </CODE_SNIPPET>
+                    Obviously, capturing variables by reference can lead to side-effects.
+                    Another danger in capturing variables by reference is that the reference might not be valid anymore when the lambda function is called:
+                </p>
+                <p>
+                    Example:
+                    <CODE_SNIPPET>
+                        function&lt;int (float)&gt; retLambda(int a, int&amp; b)
+                        {
+                        int c=5;
+                        //if this is &amp; (i.e. pass by reference, it doesn't work... (a,b, are nonsense)
+                        return [&amp;] (float d) -&gt;int {cout &lt;&lt;"lambda param: "&lt;&lt; d &lt;&lt;", a: "&lt;&lt; a &lt;&lt;" b : " &lt;&lt; b &lt;&lt; " c: "&lt;&lt; c &lt;&lt;endl;
+                        b=7;
+                        cout &lt;&lt;" lambda b is now " &lt;&lt; b &lt;&lt;endl;
+                        return a+b+c;};
+                        
+                        }
+                        void testVarByReference()
+                        {
+                        int a=1;
+                        int b=2;
+                        int c=3.0;
+                        auto f=retLambda(a,b);
+                        cout &lt;&lt;" lambda returns " &lt;&lt;  f(c)&lt;&lt;endl;
+                        cout &lt;&lt;" b is now " &lt;&lt; b &lt;&lt;endl;
+                        }
+                    </CODE_SNIPPET>
+                </p>
+                <p>
+                    In the above example there are several things that are noteworthy:
+                    <ul>
+                        <li>	The function that returns a lambda function has the return type function <code>&lt;int (float)&gt; </code></li>
+                        <li>	All variables are captured by reference. However when the lambda function <code>f</code> is called in <code>testVarByReference</code>, all variables that where on the stack of the function that generated the lambda function (<code>retLambda</code>) are invalid. That means that <code>c</code> and <code>a</code> are invalid. </li>
+                        <li>	The variable that was given by reference, <code>b</code>, is still valid. In fact it is modified in the lambda function, so that it has the value <code>7</code> after the lambda function is called. </li>
+                    </ul>
+                                   </p>
+            </BODY>
+        </STYLEPOINT>
+        
+        
+        <STYLEPOINT title="decltype" cpp11="yes">
+            <SUMMARY>
+                Do not use <code>decltype</code> if you can use <code>auto</code>. <code>decltype</code> is useful for templates, since there is no other way to declare the return type of a function if the return type depends on the parameter.
+            </SUMMARY>
+            <BODY>
+                <p>
+                    <code>decltype</code> can be used to get the type of a variable. Its simple use is very similar to the <code>auto</code> statement
+                    
+                </p>
+                <p>
+                    Example:
+                </p>
+                <CODE_SNIPPET>
+                    
+                    int x=7;
+                    decltype(x) y=x;
+                    //same thing
+                    auto y2=x;
+                    
+                </CODE_SNIPPET>
+                <p>
+                    It can be used for lambda functions, but here <code>auto</code> works as well:
+                </p>
+                <p>
+                    Example:
+                </p>
+                
+                <CODE_SNIPPET>
+                    auto f = [] (int a, int b) -&gt; int { return a*b;};
+                    
+                    decltype(f) f2=f;
+                    //works as well, so use of decltype not necessary
+                    auto f3=f;
+                    
+                </CODE_SNIPPET>
+                <p>
+                    The most common use case for <code>decltype</code> is to declare a return type that is part of a template parameter.
+                </p>
+                <p>
+                    Example:
+                </p>
+                <CODE_SNIPPET>
+                    class A
+                    {
+                    public:
+                    int makeObject() const
+                    {return 8;};
+                    A(){};
+                    };
+                    
+                    
+                    template &lt;typename Builder&gt;
+                    auto
+                    makeAndProcessObject (const Builder&amp; builder) -&gt; decltype( builder.makeObject() )
+                    {
+                    auto val = builder.makeObject();
+                    // do stuff with val
+                    return val;
+                    }
+                    
+                    
+                </CODE_SNIPPET>
+                </BODY>
+            </STYLEPOINT>
+
+
             <STYLEPOINT title="Exceptions">
             <SUMMARY>
                 Use C++ exceptions instead of return codes for error handling. Do not use exceptions to return values.
@@ -2333,7 +2593,14 @@
                     In addition, it does not improve readability and ease of debug.
                 </p>
             </BODY>
-        </STYLEPOINT>
+          </STYLEPOINT>
+
+          <STYLEPOINT title="inline namespaces and align statements" cpp11="yes">
+            <SUMMARY>
+              Both, inline namespaces and align statements are new in C++11. Use cases are limited enough that no specific recommendations for their use are made.
+            </SUMMARY>
+          </STYLEPOINT>
+
         
         <!-- <STYLEPOINT title="Function Parameters (Matthias)">
          <SUMMARY>
@@ -2859,8 +3126,9 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="0 and nullptr">
+        <STYLEPOINT title="0 and nullptr" cpp11="yes">
           <SUMMARY>
+                C++ 11 introduces the literal nullptr. It is of type std::nullptr_t and it converts implicitly to all pointer types. nullptr is a prvalue (i.e. pure rvalue, you e.g. cannot take its address)
             Use <code>0</code> for integers, <code>nullptr</code> for pointers,
             and <code>'\0'</code> for chars.
           </SUMMARY>
