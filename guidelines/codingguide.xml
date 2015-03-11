@@ -9,7 +9,7 @@
         Anselm Vossen <br/>
     </address>
     
-    <address><p><em>Draft Version 1.0, February 23, 2015</em></p></address>
+    <address><p><em>Draft Version 2.0, March 11, 2015</em></p></address>
     
     <CATEGORY title="Introduction">
     <p>
@@ -954,10 +954,10 @@
                         Non explicit initialization:
                     </p>
                     <CODE_SNIPPET>
-                        struct MySturct
+                        struct MyStruct
                         {
                           int x;
-                          mySturct(): x(10) {}
+                          myStruct(): x(10) {}
                         };
                         
                         class MyClass
@@ -965,7 +965,7 @@
                           public:
                             int mX;
                             int mY;
-                            MySturct mS;
+                            MyStruct mS;
                         
                             // mS and mY are not explicitly initialized in the initializer list
                             // mS default constructor will always be called.
@@ -1789,7 +1789,7 @@
     
               </DEFINITION>
                <DECISION>
-                   The use of ROOT mathematical function already available in <code>&lt;cmath&lt;</code> is strongly discouraged.
+                   The use of ROOT mathematical function already available in <code>&lt;cmath&gt;</code> is strongly discouraged.
                     Use <code>sqrt()</code> instead of <code>TMath::Sqrt()</code>, use <code>log()</code> instead
                    of <code>TMath::Log()</code>, use <code>sin()</code> instead of <code>TMath::Sin()</code>, etc.
                </DECISION>
@@ -1914,19 +1914,19 @@
                         v.push_back(2);
                         v.push_back(3);
                         
-                        //iterate over vector and print out each element
+                        //  iterate over vector and print out each element
                         std::for_each(std::begin(v),std::end(v),[](int n)
                         {std::cout&lt;&lt;n&lt;&lt;std::endl;});
                         
-                        //declare is_odd to be lambda function that returns true if
-                        // the argument is odd. Note the return syntax
-                        // Note that the return type can be omitted. It is then
-                        //determined as if auto is applied to the statement after return;
+                        //  declare is_odd to be lambda function that returns true if
+                        //  the argument is odd. Note the return syntax
+                        //  Note that the return type can be omitted. It is then
+                        //  determined as if auto is applied to the statement after return;
                         
                         auto is_odd=[](int n)-&gt;bool{return n%2==true;};
                         auto pos=std::find_if(std::begin(v),std::end(v),
                         is_odd);
-                        //the below snipplet returns 1 (the first position with an odd number
+                        //  the below snippet returns 1 (the first position with an odd number
                         if(pos!=std::end(v))
                         std::cout&lt;&lt;*pos&lt;&lt;std::endl;
                     </CODE_SNIPPET>
@@ -1937,11 +1937,11 @@
                     
                     A powerful feature of lambda functions is that variables of the surrounding function can be captured. This is what the [] part of the function is for.
                     <ul>
-                        <li>	[] No capture </li>
-                        <li>	[=] capture by copy </li>
-                        <li>	[&amp;] capture by reference </li>
-                        <li>	[a,b] capture only <code>a,b </code>by copy </li>
-                        <li>	[&amp;a, b] capture <code>a</code> by reference, <code>b</code> by copy </li>
+                        <li>	<code>[]</code> No capture </li>
+                        <li>	<code>[=]</code> capture by copy </li>
+                        <li>	<code>[&amp;]</code> capture by reference </li>
+                        <li>	<code>[a,b]</code> capture only <code>a,b </code>by copy </li>
+                        <li>	<code>[&amp;a,b]</code> capture <code>a</code> by reference, <code>b</code> by copy </li>
                     </ul>
                     
                     If the function is also modifying the variables that are captured by copy or wants to access the non-const members of a captured object, the lambda function has to be declared as ‘mutable’. Note that this does not modify the captured variable in the surrounding function
@@ -1967,15 +1967,12 @@
                 </p>
                 <p>
                     Example does not compile (mutable missing)
-                    <CODE_SNIPPET>
+                    <BAD_CODE_SNIPPET>
                         int a=5;
                         auto testCopy=[a](){a=7;};
                         testCopy();
                         cout "a is now " &lt;&lt; a &lt;&lt;endl;
-                        
-                        
-                        
-                    </CODE_SNIPPET>
+                    </BAD_CODE_SNIPPET>
                     Obviously, capturing variables by reference can lead to side-effects.
                     Another danger in capturing variables by reference is that the reference might not be valid anymore when the lambda function is called:
                 </p>
@@ -2011,6 +2008,12 @@
                         <li>	The variable that was given by reference, <code>b</code>, is still valid. In fact it is modified in the lambda function, so that it has the value <code>7</code> after the lambda function is called. </li>
                     </ul>
                                    </p>
+                <DECISION>
+                    Lambda functions is a new C++ feature worth getting familiar with.
+                    They can be very useful in particular when iterating over containers.
+                    They should not be used for regular functions and capture by reference
+                    is discouraged.
+                </DECISION>
             </BODY>
         </STYLEPOINT>
         
@@ -2192,7 +2195,7 @@
                 </DECISION>
                 <EXTRA>
                     <p>
-                        <code>mutable</code> can be used to make objects that are already threadsafe (such as <code>std::mutex</code>) mutable in <code>const</code> methods.
+                        <code>mutable</code> can be used to make objects that are already thread-safe (such as <code>std::mutex</code>) mutable in <code>const</code> methods.
                         Thus, it is possible to make <code>const</code> methods thread-safe, through internal synchronization.
                     </p>
                 </EXTRA>
@@ -2595,7 +2598,7 @@
             </BODY>
           </STYLEPOINT>
 
-          <STYLEPOINT title="inline namespaces and align statements" cpp11="yes">
+          <STYLEPOINT title="Inline Namespaces and Align Statements" cpp11="yes">
             <SUMMARY>
               Both, inline namespaces and align statements are new in C++11. Use cases are limited enough that no specific recommendations for their use are made.
             </SUMMARY>
