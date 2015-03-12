@@ -9,7 +9,7 @@
         Anselm Vossen <br/>
     </address>
     
-    <address><p><em>Draft Version 2.0, March 11, 2015</em></p></address>
+    <address><p><em>Draft Version 3.0, March 12, 2015</em></p></address>
     
     <CATEGORY title="Introduction">
     <p>
@@ -1884,7 +1884,7 @@
                     <BAD_CODE_SNIPPET>
                         int c= strongEnum_color::red;
                     </BAD_CODE_SNIPPET>
-                    But you can use casts e.g. if you want to use cout:
+                    But you can use casts e.g. if you want to use <code>cout</code>:
                     <CODE_SNIPPET>
                         int c= static_cast &lt; int &gt; (strongEnum_color::red);
                     </CODE_SNIPPET>
@@ -2084,50 +2084,68 @@
             </STYLEPOINT>
 
 
-            <STYLEPOINT title="Exceptions">
+            <STYLEPOINT title="Exception Handling">
             <SUMMARY>
-                Use C++ exceptions instead of return codes for error handling. Do not use exceptions to return values.
+                Do not use C++ exception handling in STAR code unless absolutely necessary.
             </SUMMARY>
             <BODY>
                 <p>
-                    Exceptions should be used for error handling. <br />
-                    Exception classes typically derive from <code>std::exception</code> (or one of its subclasses like <code>std::runtime_error</code>).<br />
-                    Exceptions should be scoped inside the class that throws them.<br />
-                    By default, catch exceptions by reference.<br />
+                    Exception handling is a powerful tool when used <em>consistently</em>. The beginning of the STAR framework
+                    goes back to a time when exception handling was not well established and hence was not used. Instead STAR
+                    implemented an alternative described in the <a href="formatguide.xml">STAR C++ Naming &amp; Formatting Guidelines</a>
+                    under "Handling Error Conditions in STAR Framework". Due to legacy reasons it is not advisable to introduce
+                    C++ exceptions now. Attempts to introduce it in the past caused substantial problems.
+                    STAR code is/was in general not written with exception safety in mind.
+                </p>
+                <p>
+                It is of course OK to use it in your private code, as long as you make sure that you use it consistently.
+                Be aware of the pros and cons:
+                </p>
+                <PROS>
+                 <ul>
+                    <li>Exceptions separate error-handling code from the normal program flow and thus make the code more readable, robust, and extensible.</li>
+                    <li>Throwing an exception is the only clean way to report an error from a constructor.</li>
+                    <li>Exceptions are hard to ignore, unlike error codes.</li>
+                    <li>Exceptions are easily propagated from deeply nested functions.</li>
+                    <li>Exceptions can be, and often are, user defined types that carry much more information than an error code.</li>
+                    <li>Exception objects are matched to the handlers by using the type system.</li>
+                    </ul>
+                </PROS>
+               <CONS>
+                   <ul>
+                   <li>Exceptions break code structure by creating multiple invisible exit points that make code hard to read and inspect.</li>
+                   <li>Exceptions easily lead to resource leaks.</li>
+                   <li>Learning to write Exception safe code is hard.</li>
+                   <li>Exceptions are hard to introduce to legacy code.</li>
+                   <li>Exceptions are easily abused for performing tasks that belong to normal program flow.</li>
+                   </ul>
+                </CONS>
+               <SUBSECTION title="Should you chose to use them in your own code:">
+                <p>
+                    Note that exception classes typically derive from <code>std::exception</code> (or one of its subclasses like <code>std::runtime_error</code>).<br />
+                    Exceptions should be scoped inside the class that throws them. By default, catch exceptions by reference.<br />
+                    Example:<br />
                     <CODE_SNIPPET>
                         int computePedestals()
                         {
-                        ...
-                        if (somethingWrong) {
-                        throw BadComputation();
-                        }
-                        ...
+                            ...
+                            if (somethingWrong) {
+                                throw BadComputation();
+                            }
+                            ...
                         }
                         ...
                         try {
-                        computePedestals();
+                             computePedestals();
                         }
                         catch (BadComputation&amp; e) {  // catch exception by reference
-                        // code that handles error
-                        ...
+                            // code that handles error
+                            ...
                         }
                     </CODE_SNIPPET>
-                    <BAD_CODE_SNIPPET>
-                        int computePedestals()
-                        {
-                        ...
-                        if (somethingWrong) {
-                        return -1;
-                        }
-                        ...
-                        }
-                        ...
-                        if (computePedestals() == -1) {
-                        // code that handles error
-                        ...
-                        }
-                    </BAD_CODE_SNIPPET>
-                </p>
+               </p>
+                Use C++ exceptions instead of return codes for error handling. Do not use exceptions to return values.
+                </SUBSECTION>
             </BODY>
         </STYLEPOINT>
         
@@ -2795,24 +2813,25 @@
                     </p>
                     <BAD_CODE_SNIPPET>
                         void foo(Bar* bar) {
-                        // ... some code where x, y, z are defined ...
-                        // ...
-                        if (Data1 data1 = dynamic_cast&lt;Data1*&gt;(bar)) {
-                        doSomething(data1, x, y);
-                        }
-                        else if (Data2 data2 = dynamic_cast&lt;Data2*&gt;(bar)) {
-                        doSomething(data2, z)
-                        }
+                            // ... some code where x, y, z are defined ...
+                            // ...
+                            if (Data1 data1 = dynamic_cast&lt;Data1*&gt;(bar)) {
+                                doSomething(data1, x, y);
+                            }
+                            else if (Data2 data2 = dynamic_cast&lt;Data2*&gt;(bar)) {
+                                doSomething(data2, z)
+                            }
+                         }
                     </BAD_CODE_SNIPPET>
                     <p>
                         which can be defined using the Visitor pattern: 
                     </p>
                     <CODE_SNIPPET>
                         void foo(Bar* bar) {
-                        // ... some code where x, y, z are defined ...
-                        // ...
-                        DoSomethingVisitor visitor(x, y, z);
-                        bar.accept(visitor);
+                            // ... some code where x, y, z are defined ...
+                            // ...
+                            DoSomethingVisitor visitor(x, y, z);
+                            bar.accept(visitor);
                         }
                     </CODE_SNIPPET>
                 </EXTRA>
@@ -2826,6 +2845,73 @@
                 C-casts are forbidden.
             </SUMMARY>
             <BODY>
+                <SUBSECTION title="Why not C style casts?">
+                    <p>The main reason is that classic C casts make no distinction between what we call
+                        <code>static_cast&lt;&gt;()</code>, <code>reinterpret_cast&lt;&gt;()</code>, <code>const_cast&lt;&gt;()</code>,
+                            and <code>dynamic_cast&lt;&gt;()</code>.
+                                These four things are completely different.
+                    </p>
+                            
+                    <p>A <code>static_cast&lt;&gt;()</code> is usually safe. There is a valid conversion in the language,
+                       or an appropriate constructor that makes it possible. The only time it's a bit risky
+                       is when you cast down to an inherited class; you must make sure that the object is a
+                       actually the descendant that you claim it is, by means external to the language
+                       (like a flag in the object). A <code>dynamic_cast&lt;&gt;()</code> is safe as long as the result is
+                       checked (pointer) or a possible exception is taken into account (reference).
+                    </p>
+                    
+                    <p>A <code>reinterpret_cast&lt;&gt;()</code> (or a <code>const_cast&lt;&gt;()</code>) on the other hand is always dangerous. You tell the compiler: "trust me: I know this doesn't look like a foo (this looks as if it isn't mutable), but it is".</p>
+                                    
+                    <p>The first problem is that it's almost impossible to tell which one will occur in a C-style cast without looking at large and disperse pieces of code and knowing all the rules.</p>
+                    <p>
+                    For example, what does this mean?:
+                    <BAD_CODE_SNIPPET>
+                        x = (T)y;
+                    </BAD_CODE_SNIPPET>
+                    We don't know. It depends on the type <code>T</code> and the types of <code>x</code> and <code>y</code>.
+                        <code>T</code> could be the name of a class,
+                    a typedef, or maybe a template parameter. Maybe <code>x</code> and <code>y</code> are scalar variables and <code>(T)</code> represents a
+                    value conversion. Maybe <code>x</code> is of a class derived from <code>y</code>'s class and <code>(T)</code> is a downcast.
+                        Maybe <code>x</code> and
+                    <code>y</code> are unrelated pointer types. Because the C-style cast <code>(T)</code> can be used to express many logically
+                    different operations, the compiler has only the barest chance to catch misuses. For the same reason,
+                    a programmer may not know exactly what a cast does. This is sometimes considered an advantage by
+                    novice programmers and is a source of subtle errors when the novice guessed wrong.
+                   </p>
+ 
+                </SUBSECTION>
+                <SUBSECTION title="What good is static_cast?">
+                <p>
+                    The "new-style casts" were introduced to give programmers a chance to state their intentions
+                    more clearly and for the compiler to catch more errors. For example:
+                </p>
+                
+                <CODE_SNIPPET>
+int a = 7;
+double* p1 = (double*) &amp;a; // ok (but a is not a double)
+double* p2 = static_cast&lt;double*&gt;(&amp;a); // error
+double* p2 = reinterpret_cast&lt;double*&gt;(&amp;a) // ok: I really mean it
+    
+const int c = 7;
+int* q1 = &amp;c; // error
+int* q2 = (int*)&amp;c; // ok (but *q2=2; is still invalid code and may fail)
+int* q3 = static_cast&lt;int*&gt;(&amp;c); // error: static_cast doesn't cast away const
+int* q4 = const_cast&lt;int*&gt;(&amp;c); // I really mean it
+                 </CODE_SNIPPET>
+                 <p>
+                     A secondary reason for introducing the new-style cast was that C-style casts are very hard to spot
+                     in a program. For example, you can't conveniently search for casts using an ordinary editor or
+                     word processor. This near-invisibility of C-style casts is especially unfortunate because they
+                     are so potentially damaging. An ugly operation should have an ugly syntactic form. That observation
+                     was part of the reason for choosing the syntax for the new-style casts. A further reason was for
+                     the new-style casts to match the template notation, so that programmers can write their own casts,
+                     especially run-time checked casts.
+                </p>
+                <p>
+                    Maybe, because static_cast is so ugly and so relatively hard to type, you're more likely to think
+                     twice before using one? That would be good, because casts really are mostly avoidable in modern C++.
+                </p>
+                </SUBSECTION>
                 <DECISION>
                     <ul>
                         <li>
@@ -2848,10 +2934,7 @@
                             (<a href="http://en.cppreference.com/w/cpp/language/reinterpret_cast">reinterpret_cast on cppreference.com</a>)
                         </li>
                     </ul>
-                    <p> See the <a href="#Run-Time_Type_Information__RTTI_">RTTI section</a>
-                        for guidance on the use of <code>dynamic_cast</code>.
-                    </p>
-                </DECISION>
+               </DECISION>
                 <EXTRA>
                     For the dangers of <code>reinterpret_cast</code> consider:
                     <BAD_CODE_SNIPPET>
