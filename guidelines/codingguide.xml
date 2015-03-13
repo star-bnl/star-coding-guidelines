@@ -2898,7 +2898,7 @@ int a = 7;
 double* p1 = (double*) &amp;a; // ok (but a is not a double)
 double* p2 = static_cast&lt;double*&gt;(&amp;a); // error
 double* p2 = reinterpret_cast&lt;double*&gt;(&amp;a) // ok: I really mean it
-    
+
 const int c = 7;
 int* q1 = &amp;c; // error
 int* q2 = (int*)&amp;c; // ok (but *q2=2; is still invalid code and may fail)
@@ -2918,6 +2918,34 @@ int* q4 = const_cast&lt;int*&gt;(&amp;c); // I really mean it
                     Maybe, because static_cast is so ugly and so relatively hard to type, you're more likely to think
                      twice before using one? That would be good, because casts really are mostly avoidable in modern C++.
                 </p>
+                </SUBSECTION>
+
+                <SUBSECTION title="How to use dynamic_cast">
+                  <p>
+                    The beauty of <code>dynamic_cast</code> is that you can check the type of data at runtime (RTTI).
+                    So remember to check that your casting was done successfully. 
+                  </p>
+
+                  <p>Don't do this.</p>
+                  <BAD_CODE_SNIPPET>
+void foo(Base* b1)
+{
+    Derived* d = dynamic_cast&lt;Derived*&gt;(b1);
+    d->DoSomething();
+}
+                  </BAD_CODE_SNIPPET>
+
+                  <p>You should be checking the success of the casting like this</p>
+                  <CODE_SNIPPET>
+void foo(Base* b1)
+{
+    if(Derived* d = dynamic_cast&lt;Derived*&gt;(b1))
+    {
+        d->DoSomething();
+    }
+}
+                  </CODE_SNIPPET>
+
                 </SUBSECTION>
                 <DECISION>
                     <ul>
