@@ -750,115 +750,6 @@
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Static Variables in Functions">
-            <SUMMARY>
-                Static variables in functions (called "function-local static variables" in the C++ terminology)
-                are expensive and need care on destruction.
-                Prefer to use static class variables where possible.
-            </SUMMARY>
-            <BODY>
-                <DEFINITION>
-                    Function-local static variables are initialized on first use and destructed in the reverse order of construction.
-                    <CPP11>
-                        Since C++11, function-local static variables are guaranteed to be initialized exactly once, even in a multi-threaded environment.
-                    </CPP11>
-                </DEFINITION>
-                <PROS>
-                    The variable is lazily initialized.
-                    Therefore the order of construction is better under control.
-                    Also the cost of initialization is only incurred if it is really needed.
-                </PROS>
-                <CONS>
-                    Because of the thread-safe lazy initialization, function-local static variables have an extra cost compared to other function variables.
-                </CONS>
-                <DECISION>
-                    Use static class variables rather than function-local static variables.
-                    Therefore, do this :
-                    <CODE_SNIPPET>
-                        class Something
-                        {
-                        public:
-                            int generateId() {
-                            return Something::sId++;
-                            }
-                        
-                        private:
-                            static int sId; // initialized in .cxx
-                        };
-                    </CODE_SNIPPET>
-                    instead of :
-                    <BAD_CODE_SNIPPET>
-                        class Something
-                        {
-                        public:
-                            int generateId() {
-                                static int sId = 0;
-                                return sId++;
-                            }
-                        };
-                    </BAD_CODE_SNIPPET>
-                </DECISION>
-                
-                <EXTRA>
-                    <p>
-                        Function-local static variables can be used to build factory functions for lazily initialized global objects.
-                        This makes it possible to safely use dynamically initialized types in the global scope.
-                    </p>
-                    <p>
-                        In case function-local static variables are nevertheless used, it is best to avoid non-owning references
-                        because their destruction happens after return from <code>main()</code>, as shown on the following
-                        code snippets :
-                        <CODE_SNIPPET>
-                            std::string &amp;globalMessage()
-                            {
-                                static std::string message = "Hello world.";
-                                return message;
-                            }
-                            
-                            int main()
-                            {
-                                std::cout &lt;&lt; globalMessage() &lt;&lt; '\n';
-                                globalMessage() = "Goodbye cruel world.";
-                                std::cout &lt;&lt; globalMessage() &lt;&lt; '\n';
-                                return 0;
-                            }
-                            // prints:
-                            // Hello world.
-                            // Goodbye cruel world.
-                        </CODE_SNIPPET>
-                        <BAD_CODE_SNIPPET>
-                            class BreakTheCode
-                            {
-                            public:
-                                void setReference(int *value) { mValuePointer = value; }
-                                ~BreakTheCode() { *mValuePointer += 2; }
-                            
-                            private:
-                                int *mValuePointer = 0;
-                            };
-                            
-                            BreakTheCode &amp;globalBreaker()
-                            {
-                                static BreakTheCode breaker;
-                                return breaker;
-                            }
-                            
-                            int main()
-                            {
-                                int someValue = 1;
-                                globalBreaker().setReference(&amp;someValue);
-                                return 0;
-                            }
-                            // globalBreaker::breaker accesses main::someValue after it went out of scope.
-                            // This example should be harmless, but if a more complex type instead of int
-                            // is involved — and possibly the destructor of another function-local
-                            // static overwrites the stack data from main — this pattern can lead to a crash.
-                        </BAD_CODE_SNIPPET>
-                    </p>
-                </EXTRA>
-                
-            </BODY>
-        </STYLEPOINT>
     </CATEGORY>
     
     <CATEGORY title="Classes">
@@ -1363,16 +1254,16 @@
 
         <STYLEPOINT title="Destructors">
             <SUMMARY>
-                Every class must have a desturctor defined to free resources (objects, IO handlers, etc.) it allocated during its lifetime
+                Every class must have a destructor defined to free resources (objects, IO handlers, etc.) it allocated during its lifetime
                 or compiler defaults should be <em>explicitly</em> requested using the <code>default</code> specifier.
                 The base class destructors must be declared virtual if they are public. 
             </SUMMARY>
             
             <BODY>
                 <p>
-                    By the Rule-of-Five, having a destructor defined or the compiler default explicitely requested will guarantee 
+                    By the Rule-of-Five, having a destructor defined or the compiler default explicitly requested will guarantee
                     that the move constructor and assignment operator will not be generated by default (<a href="#Move_Constructor_and_Assignment_Operator">see Rule-of-Five</a>). 
-                    It is important for STAR not to have the move sematics generated by the compiler unless explicietly requested.
+                    It is important for STAR not to have the move semantics generated by the compiler unless explicitly requested.
                     Also to always have a destructor is good practice, it indicates to the reader that the coder thought 
                     about this and not plainly forgot about it.
                 </p>
@@ -1386,7 +1277,7 @@
 
                 <DECISION>
                   <p>
-                    Every class must have a desturctor defined to free resources (objects, IO handlers, etc.) it allocated during its lifetime
+                    Every class must have a destructor defined to free resources (objects, IO handlers, etc.) it allocated during its lifetime
                     or compiler defaults should be <em>explicitly</em> requested using the <code>default</code> specifier.
                     The base class destructors must be declared virtual if they are public. 
                   </p>
