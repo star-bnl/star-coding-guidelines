@@ -2403,9 +2403,10 @@
                     }
                   </CODE_SNIPPET>
 
-                  The histogram which is handled by a unique pointer was owned by the current gDirectory. Since I politely closed the file before I exit my program 
-                  the histogram was destroyed by ROOT memory management agent. Now at the end of main() the pointer to the histogram goes out of scope and its resource needs to be freed,
-                  but it has already been freed!
+                  The histogram which is handled by a unique pointer is owned by the current <code>gDirectory</code>
+                  pointing to the opened ROOT file. When the file is closed with <code>f.Close()</code> the histogram
+                  object is destroyed by the internal ROOT memory management. This will prevent the unique pointer to
+                  properly clean up its resources when it goes out of scope at the end of <code>main()</code>.
                 </CONS>
 
                 <DECISION>
