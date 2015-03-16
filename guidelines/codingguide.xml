@@ -2781,8 +2781,8 @@
                 </SUBSECTION>
                 <SUBSECTION title="What good is static_cast?">
                 <p>
-                    The "new-style casts" were introduced to give programmers a chance to state their intentions
-                    more clearly and for the compiler to catch more errors. For example:
+                    The C++ casts give programmers a chance to state their intentions
+                    more clearly and allow compilers to catch errors early. For example:
                 </p>
                 
                 <CODE_SNIPPET>
@@ -2797,6 +2797,7 @@ int* q2 = (int*)&amp;c; // ok (but *q2=2; is still invalid code and may fail)
 int* q3 = static_cast&lt;int*&gt;(&amp;c); // error: static_cast doesn't cast away const
 int* q4 = const_cast&lt;int*&gt;(&amp;c); // I really mean it
                  </CODE_SNIPPET>
+                <BLOCKQUOTE>
                  <p>
                      A secondary reason for introducing the new-style cast was that C-style casts are very hard to spot
                      in a program. For example, you can't conveniently search for casts using an ordinary editor or
@@ -2807,9 +2808,11 @@ int* q4 = const_cast&lt;int*&gt;(&amp;c); // I really mean it
                      especially run-time checked casts.
                 </p>
                 <p>
-                    Maybe, because static_cast is so ugly and so relatively hard to type, you're more likely to think
+                    Maybe, because <code>static_cast</code> is so ugly and so relatively hard to type, you're more likely to think
                      twice before using one? That would be good, because casts really are mostly avoidable in modern C++.
                 </p>
+                <CITE>[Source: <a href="http://www.stroustrup.com/bs_faq2.html">Bjarne Stroustrup</a>]</CITE>
+                </BLOCKQUOTE>
                 </SUBSECTION>
 
                 <SUBSECTION title="How to use dynamic_cast">
