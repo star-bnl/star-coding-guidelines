@@ -251,15 +251,15 @@
                 </p>
                 <CODE_SNIPPET>
                     // classes and structs
-                    class UrlTable { ...
-                    class UrlTableTester { ...
-                    struct UrlTableProperties { ...
+                    class UrlTable { ... }
+                    class UrlTableTester { ... }
+                    struct UrlTableProperties { ... }
                     
                     // typedefs
                     typedef HashMap&lt;UrlTableProperties *, string&gt; PropertiesMap;
                     
                     // enums
-                    enum UrlTableErrors { ...
+                    enum UrlTableErrors { ... }
                 </CODE_SNIPPET>
             </BODY>
         </STYLEPOINT>
@@ -1327,7 +1327,7 @@
                     namespace {
                     
                     void doSomething() { // Bad.  Indented when it should not be
-                    ...
+                        ...
                     }
                     
                     }
@@ -1338,7 +1338,7 @@
                 <CODE_SNIPPET>
                     namespace Foo {
                     namespace Bar {
-                    ...
+                        ...
                     }
                     }
                 </CODE_SNIPPET>
