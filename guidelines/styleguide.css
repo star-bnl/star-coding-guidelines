@@ -200,6 +200,20 @@ hr {
     color: #fff;
 }
 
+blockquote {
+    background-color: #f8f8ff;
+    border-color: #ddddff;
+    border-style: solid;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-right-width: 1px;
+    border-left-width: 5px;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
 .stylepoint_section {
     display: block;
     margin-bottom: 1em;

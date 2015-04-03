@@ -509,8 +509,8 @@
                 The names <code>Ok</code> and <code>OutOfMemory</code> are too generic to be added to the global namespace.
                 <BAD_CODE_SNIPPET>
                     enum UrlTableErrors {
-                    Ok,                 // Bad.
-                    OutOfMemory         // Bad.
+                        Ok,                 // Bad.
+                        OutOfMemory         // Bad.
                     };
                 </BAD_CODE_SNIPPET>
             </BODY>
@@ -971,10 +971,10 @@
                 <CODE_SNIPPET>
                     // Good. One statement per line.
                     if (condition) {
-                         doSomething();
+                        doSomething();
                     }
                     else {
-                         doAnotherThing;
+                        doAnotherThing;
                     }
                 </CODE_SNIPPET>
                 <BAD_CODE_SNIPPET>
@@ -1043,8 +1043,8 @@
                 <CODE_SNIPPET>
                     class MyClass {
                     public:
-                         double energy() const;
-                         double momentum() const;
+                        double energy() const;
+                        double momentum() const;
                     };
                     
                     inline double MyClass::energy() const {return mEnergy;}
@@ -1111,7 +1111,7 @@
                     if (thisOneThing &gt; thisOtherThing &amp;&amp;
                         aThirdThing == aFourthThing &amp;&amp;
                         yetAnother &amp;&amp; lastOne) {
-                    ...
+                        ...
                     }
                 </CODE_SNIPPET>
             </BODY>
@@ -1187,9 +1187,9 @@
                     // Bad - indented directives
                     if (lopsidedScore) {
                     #if DISASTER_PENDING  // The "#if" should be at beginning of line
-                    dropEverything();
+                        dropEverything();
                     #endif                // Do not indent "#endif"
-                    goBackToNormal();
+                        goBackToNormal();
                     }
                 </BAD_CODE_SNIPPET>
                 <p>
@@ -1660,9 +1660,9 @@
      DoSomething();                  // Comment here so the comments line up.
      DoSomethingElseThatIsLonger();  // Comment here so there are two spaces between
                                      // the code and the comment.
-     { // One space before comment when opening a new scope is allowed,
-     // thus the comment lines up with the following comments and code.
-     DoSomethingElse();  // Two spaces before line comments normally.
+     {   // At least one space before comment when opening a new scope is allowed,
+         // thus the comment lines up with the following comments and code.
+         DoSomethingElse();  // Two spaces before line comments normally.
      }
      </CODE_SNIPPET>
      </SUBSECTION>

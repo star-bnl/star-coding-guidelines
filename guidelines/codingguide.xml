@@ -258,7 +258,7 @@
                         class Foo
                         &#123;
                         public:
-                            Bar getBar&#40;&#41;;
+                           Bar getBar&#40;&#41;;
                         &#125;;
                     </BAD_CODE_SNIPPET>
                 </p>
@@ -278,13 +278,13 @@
                         class Foo
                         &#123;
                         public:
-                            Bar getBar&#40;&#41;;
+                           Bar getBar&#40;&#41;;
                         &#125;;
                     </CODE_SNIPPET>
                     
                     <CODE_SNIPPET>
                        // Foo.cxx
-                        #include &quot;Foo.h&quot;
+                       #include &quot;Foo.h&quot;
                     </CODE_SNIPPET>
                 </p>
                 <p>
@@ -404,10 +404,10 @@
                     
                     class MyClass {
                     public:
-                    ...
-                    // Good -- doGlobalBar is a static member of class MyClass and
-                    // has a reason to be part of this class (not shown here).
-                    static Bar* doGlobalBar();
+                       ...
+                       // Good -- doGlobalBar is a static member of class MyClass and
+                       // has a reason to be part of this class (not shown here).
+                       static Bar* doGlobalBar();
                     }
                 </CODE_SNIPPET>
             </BODY>
@@ -439,8 +439,8 @@
                             <BAD_CODE_SNIPPET>
                                 // Inefficient implementation:
                                 for (int i = 0; i &lt; bigNumber; ++i) {
-                                Foo foo;  // My ctor and dtor get called bigNumber times each.
-                                foo.doSomething(i);
+                                   Foo foo;  // My ctor and dtor get called bigNumber times each.
+                                   foo.doSomething(i);
                                 }
                             </BAD_CODE_SNIPPET>
                             <p>
@@ -450,7 +450,7 @@
                             <CODE_SNIPPET>
                                 Foo foo;  // My ctor and dtor get called once each.
                                 for (int i = 0; i &lt; bigNumber; ++i) {
-                                foo.doSomething(i);
+                                   foo.doSomething(i);
                                 }
                             </CODE_SNIPPET>
                         </li>
@@ -484,16 +484,16 @@
                 <BAD_CODE_SNIPPET>
                     int speedupFactor;       // Bad: does not initialize variable
                     if (condition) {
-                    speedupFactor = NoFactor;
+                       speedupFactor = NoFactor;
                     }
                     else {
-                    speedupFactor = DoubleFactor;
+                       speedupFactor = DoubleFactor;
                     }
                 </BAD_CODE_SNIPPET>
                 <CODE_SNIPPET>
                     int speedupFactor = DoubleFactor; // Good: initializes variable
                     if (condition) {
-                    speedupFactor = NoFactor;
+                       speedupFactor = NoFactor;
                     }
                 </CODE_SNIPPET>
                 <CODE_SNIPPET>
@@ -506,12 +506,12 @@
                 <BAD_CODE_SNIPPET>
                     int i;                   // Bad: does not initialize variable
                     for (i = 0; i &lt; number; ++i) {
-                    doSomething(i);
+                       doSomething(i);
                     }
                 </BAD_CODE_SNIPPET>
                 <CODE_SNIPPET>
                     for (int i = 0; i &lt; number; ++i) {
-                    doSomething(i); // Good
+                       doSomething(i); // Good
                     }
                 </CODE_SNIPPET>
             </BODY>
@@ -552,11 +552,11 @@
                         #include &lt;initializer_list&gt;
                         class MyType {
                         public:
-                        // initializer_list is a reference to the underlying init list,
-                        // so it can be passed by value.
-                        MyType(std::initializer_list&lt;int&gt; initList) {
-                        for (int element : initList) { .. }
-                        }
+                           // initializer_list is a reference to the underlying init list,
+                           // so it can be passed by value.
+                           MyType(std::initializer_list&lt;int&gt; initList) {
+                              for (int element : initList) { .. }
+                           }
                         };
                         MyType myObject{2, 3, 5, 7};
                     </CODE_SNIPPET></p>
@@ -568,8 +568,8 @@
                         // initializer_list constructor.
                         class MyOtherType {
                         public:
-                        explicit MyOtherType(std::string name);
-                        MyOtherType(int value, std::string name);
+                           explicit MyOtherType(std::string name);
+                           MyOtherType(int value, std::string name);
                         };
                         MyOtherType object1 = {1, "b"};
                         // If the constructor is explicit, you can't use the "= {}" form.
@@ -618,7 +618,7 @@
                         class Something
                         {
                         private:
-                            static int sId; // but this one too (details at the end of the rule)
+                           static int sId; // but this one too (details at the end of the rule)
                         };
                         namespace NotGlobalScope {
                         Foo fooObject;    // and finally this one as well
@@ -673,12 +673,12 @@
                 </p>
                 <CODE_SNIPPET>
                     struct Pod {
-                        int indexes[5];
-                        float width;
+                       int indexes[5];
+                       float width;
                     };
                     struct LiteralType {
-                        int value;
-                        constexpr LiteralType() : value(1) {}
+                       int value;
+                       constexpr LiteralType() : value(1) {}
                     };
                     
                     Pod gData;
@@ -689,7 +689,7 @@
                 </p>
                 <BAD_CODE_SNIPPET>
                     class NotPod {
-                        NotPod();
+                       NotPod();
                     };
                     NotPod gBadData;  // dynamic constructor
                 </BAD_CODE_SNIPPET>
@@ -725,7 +725,7 @@
                         // Struct.h:
                         #include &lt;string&gt;
                         struct Struct {
-                            static std::string sString;
+                           static std::string sString;
                         };
                         
                         // Struct.cxx:
@@ -738,8 +738,8 @@
                         std::string gAnotherString = Struct::sString;
                         
                         int main() {
-                            std::cout &lt;&lt; gAnotherString &lt;&lt; std::endl;
-                            return 0;
+                           std::cout &lt;&lt; gAnotherString &lt;&lt; std::endl;
+                           return 0;
                         }
                     </BAD_CODE_SNIPPET>
                     <p>
@@ -788,8 +788,8 @@
                     <CODE_SNIPPET>
                     class MyClass
                     {
-                      public:
-                        int x = 1;
+                    public:
+                       int x = 1;
                     };
                     </CODE_SNIPPET>
                     This is basically equivalent to using initialization lists in constructors. The advantage of in-class initialization is that it allows
@@ -827,14 +827,14 @@
                         class MyClass : public MyBase  {
                         // ...
                         private:
-                            int mValue;
-                            std::vector mVector;
+                           int mValue;
+                           std::vector mVector;
                         };
                         // MyClass.cxx
                         MyClass::MyClass()
                         : MyBase(),
-                        mValue(0),
-                        mVector()
+                           mValue(0),
+                           mVector()
                         {}
                     </CODE_SNIPPET>
                     <p>
@@ -847,31 +847,31 @@
                     <CODE_SNIPPET>
                         struct MyStruct
                         {
-                          int x;
-                          myStruct(): x(10) {}
+                           int x;
+                           myStruct(): x(10) {}
                         };
                         
                         class MyClass
                         {
-                          public:
-                            int mX;
-                            int mY;
-                            MyStruct mS;
+                        public:
+                           int mX;
+                           int mY;
+                           MyStruct mS;
                         
-                            // mS and mY are not explicitly initialized in the initializer list
-                            // mS default constructor will always be called.
-                            // mY is a POD therefore it will be:
-                            //    Zero-initialized if instance of MyClass is created with new operator.
-                            //    Otherwise, left un-initialized.
-                            MyClass(): mX(5) { cout&lt;&lt;mX&lt;&lt;" "&lt;&lt;mS.x&lt;&lt;" "&lt;&lt;mY&lt;&lt;endl; }
-                        
+                           // mS and mY are not explicitly initialized in the initializer list
+                           // mS default constructor will always be called.
+                           // mY is a POD therefore it will be:
+                           //    Zero-initialized if instance of MyClass is created with new operator.
+                           //    Otherwise, left un-initialized.
+                           MyClass(): mX(5) { cout&lt;&lt;mX&lt;&lt;" "&lt;&lt;mS.x&lt;&lt;" "&lt;&lt;mY&lt;&lt;endl; }
+
                         };
                         
                         int main()
                         {
-                          MyClass c0; // MyClass::mY will not be initialized.
-                          MyClass* c1 = new MyClass(); // MyClass::mY will be zero-initialized. 
-                          MyClass* c2 = new MyClass;   // MyClass::mY will be zero-initialized.
+                           MyClass c0; // MyClass::mY will not be initialized.
+                           MyClass* c1 = new MyClass(); // MyClass::mY will be zero-initialized.
+                           MyClass* c2 = new MyClass;   // MyClass::mY will be zero-initialized.
                         }
                     </CODE_SNIPPET>
                 </DEFINITION>
@@ -919,15 +919,15 @@
                     <BAD_CODE_SNIPPET>
                         class MyClass {
                         public:
-                        MyClass() { doSomething(); }    // Bad
-                        virtual void doSomething();
+                           MyClass() { doSomething(); }    // Bad
+                           virtual void doSomething();
                         };
                     </BAD_CODE_SNIPPET>
                     <CODE_SNIPPET>
                         class MyClass {
                         public:
-                             MyClass() { MyClass::doSomething(); }    // Good
-                             virtual void doSomething();
+                           MyClass() { MyClass::doSomething(); }    // Good
+                           virtual void doSomething();
                         };
                     </CODE_SNIPPET>
                 </p>
@@ -953,8 +953,8 @@
               <CODE_SNIPPET>
                 class NonCopyable 
                 {
-                    NonCopyable(const NonCopyable&amp;) = delete;
-                    NonCopyable&amp; operator=(const NonCopyable&amp;) = delete;
+                   NonCopyable(const NonCopyable&amp;) = delete;
+                   NonCopyable&amp; operator=(const NonCopyable&amp;) = delete;
                 };
               </CODE_SNIPPET>
 
@@ -963,8 +963,8 @@
               <CODE_SNIPPET>
                 class MyClass
                 {
-                    void f(double i);
-                    void f(int) = delete;
+                   void f(double i);
+                   void f(int) = delete;
                 };
               </CODE_SNIPPET>
 
@@ -973,8 +973,8 @@
               <CODE_SNIPPET>
                 class MyClass
                 {
-                    MyClass() = default; // default constructor is explicitly requested.
-                    MyClass(...);
+                   MyClass() = default; // default constructor is explicitly requested.
+                   MyClass(...);
                 };
               </CODE_SNIPPET>
 
@@ -1051,8 +1051,8 @@
                         <CODE_SNIPPET>
                         void someFunction(SomeInterface *object)
                         {
-                            SomeInterface *objectCopy = object->clone();
-                            ...
+                           SomeInterface *objectCopy = object->clone();
+                           ...
                         }
                         </CODE_SNIPPET>
                     </p>
@@ -1129,13 +1129,13 @@
                         <CODE_SNIPPET>
                         class A {
                         public:
-                            A(): num1(0), num2(0) {average=(num1+num2)/2.;}
-                            A(int i): num1(i), num2(0) {average=(num1+num2)/2.;}
-                            A(int i, int j): num1(i), num2(j) {average=(num1+num2)/2.;}
+                           A(): num1(0), num2(0) {average=(num1+num2)/2.;}
+                           A(int i): num1(i), num2(0) {average=(num1+num2)/2.;}
+                           A(int i, int j): num1(i), num2(j) {average=(num1+num2)/2.;}
                         private:
-                            int num1;
-                            int num2;
-                            double average;
+                           int num1;
+                           int num2;
+                           double average;
                         };
                         </CODE_SNIPPET>
                        
@@ -1144,14 +1144,14 @@
                         <CODE_SNIPPET>
                         class A {
                         public:
-                            A(): num1(0), num2(0) {init();}
-                            A(int i): num1(i), num2(0) {init();}
-                            A(int i, int j): num1(i), num2(j) {init();}
+                           A(): num1(0), num2(0) {init();}
+                           A(int i): num1(i), num2(0) {init();}
+                           A(int i, int j): num1(i), num2(j) {init();}
                         private:
-                            int num1;
-                            int num2;
-                            double average;
-                            void init(){ average=(num1+num2)/2.;};
+                           int num1;
+                           int num2;
+                           double average;
+                           void init(){ average=(num1+num2)/2.;};
                         };
                         </CODE_SNIPPET>
                         
@@ -1168,17 +1168,17 @@
                         <CODE_SNIPPET>
                         class A {
                         public:
-                            A(): A(0){}
-                            A(int i): A(i, 0){}
-                            A(int i, int j) {
-                                 num1=i;
-                                 num2=j;
-                                 average=(num1+num2)/2.;
-                            }
+                           A(): A(0){}
+                           A(int i): A(i, 0){}
+                           A(int i, int j) {
+                              num1=i;
+                              num2=j;
+                              average=(num1+num2)/2.;
+                           }
                         private:
-                            int num1;
-                            int num2;
-                            double average;
+                           int num1;
+                           int num2;
+                           double average;
                         };
                         </CODE_SNIPPET>
                         
@@ -1195,15 +1195,15 @@
                         class C
                         {
                         public:
-                            C(int) { }
-                            C() : C(42) { }
-                            C(char) : C(42.0) { }
-                            C(double) : C('a') { }
+                           C(int) { }
+                           C() : C(42) { }
+                           C(char) : C(42.0) { }
+                           C(double) : C('a') { }
                         };
                         
                         int main()
                         {
-                            C c('b');
+                           C c('b');
                            return 0;
                         }
                         </BAD_CODE_SNIPPET>
@@ -1223,15 +1223,15 @@
                     <CODE_SNIPPET>
                         class Base {
                         public:
-                        Base();
-                        Base(int number);
-                        Base(const string&amp; name);
-                        ...
+                           Base();
+                           Base(int number);
+                           Base(const string&amp; name);
+                           ...
                         };
                         
                         class Derived : public Base {
                         public:
-                        using Base::Base;  // Base's constructors are redeclared here.
+                           using Base::Base;  // Base's constructors are redeclared here.
                         };
                     </CODE_SNIPPET>
                     <p>
@@ -1352,20 +1352,20 @@
                       <CODE_SNIPPET>
                       class Base
                       {
-                          virtual void a(int);
-                          virtual void f();
-                          virtual void g() const;
-                          void k(); // not virtual
-                          virtual void h(char);
+                         virtual void a(int);
+                         virtual void f();
+                         virtual void g() const;
+                         void k(); // not virtual
+                         virtual void h(char);
                       };
                       
                       class Derived : public Base
                       {
-                          void a(float) override; // doesn't override Base::a(int) (wrong signature)
-                          void f() override; // overrides Base::f()
-                          void g() override; // doesn't override Base::g() (wrong type)
-                          void k() override; // doesn't override Base::k() (Base::k() is not virtual)
-                          void h(char); // overrides Base::h()
+                         void a(float) override; // doesn't override Base::a(int) (wrong signature)
+                         void f() override; // overrides Base::f()
+                         void g() override; // doesn't override Base::g() (wrong type)
+                         void k() override; // doesn't override Base::k() (Base::k() is not virtual)
+                         void h(char); // overrides Base::h()
                       };
                       </CODE_SNIPPET>
                       
@@ -1382,12 +1382,12 @@
                       <CODE_SNIPPET>
                         class Base
                         {
-                          virtual void f() final;
+                           virtual void f() final;
                         };
 
                         class Derived : Base
                         {
-                          void f(); // ill-formed because the virtual method Base::f has been marked final
+                           void f(); // ill-formed because the virtual method Base::f has been marked final
                         };
                       </CODE_SNIPPET>
                         
@@ -1541,36 +1541,36 @@
             <p>Don't do this:</p>
             <BAD_CODE_SNIPPET>
                 class Momentum {
-                    double mX;  // w/o access control keyword implicitly private
-                    double mY;
-                    double mZ;
+                   double mX;  // w/o access control keyword implicitly private
+                   double mY;
+                   double mZ;
 
                 protected:
-                    bool containsInvalidNumbers() const;
+                   bool containsInvalidNumbers() const;
 
                 public:             // should be listed first
-                    double px() const;
-                    double py() const;
-                    double pz() const;
-                    double pT() const;
+                   double px() const;
+                   double py() const;
+                   double pz() const;
+                   double pT() const;
                 };
            </BAD_CODE_SNIPPET>
             <p>Do this:</p>
             <CODE_SNIPPET>
                 class Momentum {
                 public:
-                    double px() const;
-                    double py() const;
-                    double pz() const;
-                    double pT() const;
+                   double px() const;
+                   double py() const;
+                   double pz() const;
+                   double pT() const;
                     
                 protected:
-                     bool containsInvalidNumbers() const;
+                    bool containsInvalidNumbers() const;
                      
                 private:
-                    double mX;
-                    double mY;
-                    double mZ;
+                   double mX;
+                   double mY;
+                   double mZ;
                 };
             </CODE_SNIPPET>
             </BODY>
@@ -1723,7 +1723,7 @@
                     <CODE_SNIPPET>
                         void boom [[ noreturn ]] ()	// boom() will never return
                         {
-                                throw "error";
+                           throw "error";
                         }
                     </CODE_SNIPPET>
 
@@ -1749,7 +1749,7 @@
                     C++11 introduces strongly typed enums. They are what the name suggests. Enums with a type:
                     <CODE_SNIPPET>
                         enum class strongEnum {
-                        one, two, three, four
+                           one, two, three, four
                         };
                     </CODE_SNIPPET>
                     So the syntax stays similar and the class keyword is added. Additional, the underlying type can be specified.
@@ -1827,7 +1827,7 @@
                         is_odd);
                         //  the below snippet returns 1 (the first position with an odd number
                         if(pos!=std::end(v))
-                        std::cout&lt;&lt;*pos&lt;&lt;std::endl;
+                           std::cout&lt;&lt;*pos&lt;&lt;std::endl;
                     </CODE_SNIPPET>
                 </p>
                 A lambda function is of type <code>std::function</code>, therefore instead of <code>auto</code>, the above return type for <code>is_odd</code>_ could be written as <code>std::function&lt;bool(int)&gt; is_odd; </code>
@@ -1880,22 +1880,22 @@
                     <CODE_SNIPPET>
                         function&lt;int (float)&gt; retLambda(int a, int&amp; b)
                         {
-                        int c=5;
-                        //if this is &amp; (i.e. pass by reference, it doesn't work... (a,b, are nonsense)
-                        return [&amp;] (float d) -&gt;int {cout &lt;&lt;"lambda param: "&lt;&lt; d &lt;&lt;", a: "&lt;&lt; a &lt;&lt;" b : " &lt;&lt; b &lt;&lt; " c: "&lt;&lt; c &lt;&lt;endl;
-                        b=7;
-                        cout &lt;&lt;" lambda b is now " &lt;&lt; b &lt;&lt;endl;
-                        return a+b+c;};
+                           int c=5;
+                           // if this is &amp; (i.e. pass by reference, it doesn't work... (a,b, are nonsense)
+                           return [&amp;] (float d) -&gt;int {cout &lt;&lt;"lambda param: "&lt;&lt; d &lt;&lt;", a: "&lt;&lt; a &lt;&lt;" b : " &lt;&lt; b &lt;&lt; " c: "&lt;&lt; c &lt;&lt;endl;
+                           b=7;
+                           cout &lt;&lt;" lambda b is now " &lt;&lt; b &lt;&lt;endl;
+                           return a+b+c;};
                         
                         }
                         void testVarByReference()
                         {
-                        int a=1;
-                        int b=2;
-                        int c=3.0;
-                        auto f=retLambda(a,b);
-                        cout &lt;&lt;" lambda returns " &lt;&lt;  f(c)&lt;&lt;endl;
-                        cout &lt;&lt;" b is now " &lt;&lt; b &lt;&lt;endl;
+                           int a=1;
+                           int b=2;
+                           int c=3.0;
+                           auto f=retLambda(a,b);
+                           cout &lt;&lt;" lambda returns " &lt;&lt;  f(c)&lt;&lt;endl;
+                           cout &lt;&lt;" b is now " &lt;&lt; b &lt;&lt;endl;
                         }
                     </CODE_SNIPPET>
                 </p>
@@ -1962,9 +1962,8 @@
                     class A
                     {
                     public:
-                    int makeObject() const
-                    {return 8;};
-                    A(){};
+                       int makeObject() const {return 8;};
+                       A() {};
                     };
                     
                     
@@ -1972,9 +1971,9 @@
                     auto
                     makeAndProcessObject (const Builder&amp; builder) -&gt; decltype( builder.makeObject() )
                     {
-                    auto val = builder.makeObject();
-                    // do stuff with val
-                    return val;
+                       auto val = builder.makeObject();
+                       // do stuff with val
+                       return val;
                     }
                     
                     
@@ -2027,19 +2026,19 @@
                     <CODE_SNIPPET>
                         int computePedestals()
                         {
-                            ...
-                            if (somethingWrong) {
-                                throw BadComputation();
-                            }
-                            ...
+                           ...
+                           if (somethingWrong) {
+                               throw BadComputation();
+                           }
+                           ...
                         }
                         ...
                         try {
-                             computePedestals();
+                           computePedestals();
                         }
                         catch (BadComputation&amp; e) {  // catch exception by reference
-                            // code that handles error
-                            ...
+                           // code that handles error
+                           ...
                         }
                     </CODE_SNIPPET>
                </p>
@@ -2133,12 +2132,12 @@
                     <CODE_SNIPPET>
                         constexpr int multiply(int x, int y)
                         {
-                             return x*y;
+                           return x*y;
                         }
                         
                         constexpr int factorial(int n)
                         {
-                             return n &lt;= 1 ? 1 : (n * factorial(n-1));
+                           return n &lt;= 1 ? 1 : (n * factorial(n-1));
                         }
                     </CODE_SNIPPET>
                     Then the compiler will evaluate the following statements at compile time instead at run time:
@@ -2158,7 +2157,7 @@
                     <CODE_SNIPPET>
                         constexpr int defaultArraySize(int multiplier)
                         {
-                              return 10*multiplier;
+                           return 10*multiplier;
                         }
                     </CODE_SNIPPET>
                     and in the program it is now possible to use:
@@ -2236,11 +2235,11 @@
                         }
                         
                         struct Struct {
-                        static constexpr int ScopeValue = 1;
+                           static constexpr int ScopeValue = 1;
                         };
                         
                         template&lt;typename T&gt; struct TemplateStruct {
-                        static constexpr int ScopeValue = 1;
+                           static constexpr int ScopeValue = 1;
                         };
                         
                         void function(const int &amp;value);
@@ -2295,7 +2294,7 @@
                     template&lt;class T, class U&gt;
                     ??? add(T x, U y)
                     {
-                        return x+y;
+                       return x+y;
                     }
                     </CODE_SNIPPET>
                         
@@ -2306,7 +2305,7 @@
                     template&lt;class T, class U&gt;
                     decltype(x+y) add(T x, U y) // scope problem!
                     {
-                         return x+y;
+                       return x+y;
                     }
                     </BAD_CODE_SNIPPET>
                             
@@ -2318,7 +2317,7 @@
                     template&lt;class T, class U&gt;
                     auto add(T x, U y) -&gt; decltype(x+y)
                     {
-                        return x+y;
+                       return x+y;
                     }
                     </CODE_SNIPPET>
                                 
@@ -2403,9 +2402,10 @@
                     }
                   </CODE_SNIPPET>
 
-                  The histogram which is handled by a unique pointer was owned by the current gDirectory. Since I politely closed the file before I exit my program 
-                  the histogram was destroyed by ROOT memory management agent. Now at the end of main() the pointer to the histogram goes out of scope and its resource needs to be freed,
-                  but it has already been freed!
+                  The histogram which is handled by a unique pointer is owned by the current <code>gDirectory</code>
+                  pointing to the opened ROOT file. When the file is closed with <code>f.Close()</code> the histogram
+                  object is destroyed by the internal ROOT memory management. This will prevent the unique pointer to
+                  properly clean up its resources when it goes out of scope at the end of <code>main()</code>.
                 </CONS>
 
                 <DECISION>
@@ -2670,7 +2670,7 @@
                         Geo::Factory geoFactory;
                         Geo::Object* circle = geoFactory.CreateCircle();
                         if ( ! dynamic_cast&lt;Geo::Circle&gt;(circle) ) {
-                        std::cerr &lt;&lt; "Unit test failed."  &lt;&lt; std::endl;
+                           std::cerr &lt;&lt; "Unit test failed."  &lt;&lt; std::endl;
                         }  
                     </CODE_SNIPPET>
                 </PROS>
@@ -2711,25 +2711,25 @@
                     </p>
                     <BAD_CODE_SNIPPET>
                         void foo(Bar* bar) {
-                            // ... some code where x, y, z are defined ...
-                            // ...
-                            if (Data1 data1 = dynamic_cast&lt;Data1*&gt;(bar)) {
-                                doSomething(data1, x, y);
-                            }
-                            else if (Data2 data2 = dynamic_cast&lt;Data2*&gt;(bar)) {
-                                doSomething(data2, z)
-                            }
-                         }
+                           // ... some code where x, y, z are defined ...
+                           // ...
+                           if (Data1 data1 = dynamic_cast&lt;Data1*&gt;(bar)) {
+                              doSomething(data1, x, y);
+                           }
+                           else if (Data2 data2 = dynamic_cast&lt;Data2*&gt;(bar)) {
+                              doSomething(data2, z)
+                           }
+                        }
                     </BAD_CODE_SNIPPET>
                     <p>
                         which can be defined using the Visitor pattern: 
                     </p>
                     <CODE_SNIPPET>
                         void foo(Bar* bar) {
-                            // ... some code where x, y, z are defined ...
-                            // ...
-                            DoSomethingVisitor visitor(x, y, z);
-                            bar.accept(visitor);
+                           // ... some code where x, y, z are defined ...
+                           // ...
+                           DoSomethingVisitor visitor(x, y, z);
+                           bar.accept(visitor);
                         }
                     </CODE_SNIPPET>
                 </EXTRA>
@@ -2780,8 +2780,8 @@
                 </SUBSECTION>
                 <SUBSECTION title="What good is static_cast?">
                 <p>
-                    The "new-style casts" were introduced to give programmers a chance to state their intentions
-                    more clearly and for the compiler to catch more errors. For example:
+                    The C++ casts give programmers a chance to state their intentions
+                    more clearly and allow compilers to catch errors early. For example:
                 </p>
                 
                 <CODE_SNIPPET>
@@ -2796,6 +2796,7 @@ int* q2 = (int*)&amp;c; // ok (but *q2=2; is still invalid code and may fail)
 int* q3 = static_cast&lt;int*&gt;(&amp;c); // error: static_cast doesn't cast away const
 int* q4 = const_cast&lt;int*&gt;(&amp;c); // I really mean it
                  </CODE_SNIPPET>
+                <BLOCKQUOTE>
                  <p>
                      A secondary reason for introducing the new-style cast was that C-style casts are very hard to spot
                      in a program. For example, you can't conveniently search for casts using an ordinary editor or
@@ -2806,9 +2807,11 @@ int* q4 = const_cast&lt;int*&gt;(&amp;c); // I really mean it
                      especially run-time checked casts.
                 </p>
                 <p>
-                    Maybe, because static_cast is so ugly and so relatively hard to type, you're more likely to think
+                    Maybe, because <code>static_cast</code> is so ugly and so relatively hard to type, you're more likely to think
                      twice before using one? That would be good, because casts really are mostly avoidable in modern C++.
                 </p>
+                <CITE>[Source: <a href="http://www.stroustrup.com/bs_faq2.html">Bjarne Stroustrup</a>]</CITE>
+                </BLOCKQUOTE>
                 </SUBSECTION>
 
                 <SUBSECTION title="How to use dynamic_cast">
@@ -2821,8 +2824,8 @@ int* q4 = const_cast&lt;int*&gt;(&amp;c); // I really mean it
                   <BAD_CODE_SNIPPET>
 void foo(Base* b1)
 {
-    Derived* d = dynamic_cast&lt;Derived*&gt;(b1);
-    d->DoSomething();
+   Derived* d = dynamic_cast&lt;Derived*&gt;(b1);
+   d->DoSomething();
 }
                   </BAD_CODE_SNIPPET>
 
@@ -2830,10 +2833,10 @@ void foo(Base* b1)
                   <CODE_SNIPPET>
 void foo(Base* b1)
 {
-    if(Derived* d = dynamic_cast&lt;Derived*&gt;(b1))
-    {
-        d->DoSomething();
-    }
+   if(Derived* d = dynamic_cast&lt;Derived*&gt;(b1))
+   {
+      d->DoSomething();
+   }
 }
                   </CODE_SNIPPET>
 
@@ -2866,17 +2869,17 @@ void foo(Base* b1)
                     <BAD_CODE_SNIPPET>
                         std::uint32_t fun()
                         {
-                        std::uint32_t binary = 0;
-                        reinterpret_cast&lt;float &amp;&gt;(binary) = 1.f;
-                        return binary; // the return value is undefined, according to the C++ standard
+                           std::uint32_t binary = 0;
+                           reinterpret_cast&lt;float &amp;&gt;(binary) = 1.f;
+                           return binary; // the return value is undefined, according to the C++ standard
                         }
                     </BAD_CODE_SNIPPET>
                     The following is better, but still undefined behavior according to the type aliasing rules:
                     <CODE_SNIPPET>
                         std::uint32_t fun()
                         {
-                        float value = 1.f;
-                        return reinterpret_cast&lt;std::uint32_t &amp;&gt;(value); // this returns 0x3f800000 on x86
+                           float value = 1.f;
+                           return reinterpret_cast&lt;std::uint32_t &amp;&gt;(value); // this returns 0x3f800000 on x86
                         }
                     </CODE_SNIPPET>
                     In case of doubt, prefer not to use <code>reinterpret_cast</code> in order to avoid mistakes.
@@ -2950,7 +2953,7 @@ void foo(Base* b1)
                 </p>
                 <CODE_SNIPPET>
                     while (condition) {
-                    // Repeat test until it returns false.
+                       // Repeat test until it returns false.
                     }
                     for (int i = 0; i &lt; someNumber; ++i) {}  // Good — empty body.
                     while (condition) continue;  // Good — continue indicates no logic.
@@ -3189,7 +3192,7 @@ void foo(Base* b1)
                     </BAD_CODE_SNIPPET>
                     <CODE_SNIPPET>
                         if (rawSize &lt; sizeof(int)) {
-                        logMessage &lt;&lt; "compressed record not big enough for count: " &lt;&lt; rawSize; 
+                           logMessage &lt;&lt; "compressed record not big enough for count: " &lt;&lt; rawSize;
                         }
                     </CODE_SNIPPET>
                 </p>
@@ -3338,7 +3341,7 @@ void foo(Base* b1)
                     <CODE_SNIPPET>
                         std::vector&lt;int&gt; v;
                         for(auto it = v.begin(); it != v.end(); ++it)
-                        std::cout &lt;&lt; *it &lt;&lt; std::endl;
+                           std::cout &lt;&lt; *it &lt;&lt; std::endl;
                     </CODE_SNIPPET>
                     The problem here is that not all user-defined containers have <code>begin()</code> and <code>end()</code>, which makes them
                     impossible to use with the STL algorithms or any other user-defined template function that requires
@@ -3348,7 +3351,7 @@ void foo(Base* b1)
                     <CODE_SNIPPET>
                         std::vector&lt;int&gt; v;
                         for(auto it = begin(v); it != end(v); ++it)
-                        std::cout &lt;&lt; *it &lt;&lt; std::endl;
+                           std::cout &lt;&lt; *it &lt;&lt; std::endl;
                     </CODE_SNIPPET>
                     To adopt any custom container all one must do is create your own iterator that supports <code>*</code>,
                     prefix increment (<code>++itr</code>) and <code>!=</code> .
@@ -3376,15 +3379,15 @@ void foo(Base* b1)
                     template &lt;typename T, size_t Size&gt;
                     class MyVector
                     {
-                        static_assert(Size &gt; 3, "Size is too small");
-                        T points[Size];
+                       static_assert(Size &gt; 3, "Size is too small");
+                       T points[Size];
                     };
                     
                     int main()
                     {
-                        MyVector &lt;int, 16&gt; a1;
-                        MyVector &lt;double, 2&gt; a2;  // will produce compile error
-                        return 0;
+                       MyVector &lt;int, 16&gt; a1;
+                       MyVector &lt;double, 2&gt; a2;  // will produce compile error
+                       return 0;
                     }
             </CODE_SNIPPET>
             The form of the output depends on the platform. One the Mac using LLVM it prints:
@@ -3405,14 +3408,12 @@ void foo(Base* b1)
             </p>
             <CODE_SNIPPET>
                 template &lt;typename T1, typename T2&gt;
-                    auto add(T1 t1, T2 t2) -&gt; decltype(t1 + t2)
-                    {
-                        static_assert(std::is_integral&lt;T1&gt;::value,
-                                      "Type T1 must be integral");
-                        static_assert(std::is_integral&lt;T2&gt;::value,
-                                      "Type T2 must be integral");
-                        return t1 + t2;
-                    }
+                auto add(T1 t1, T2 t2) -&gt; decltype(t1 + t2)
+                {
+                   static_assert(std::is_integral&lt;T1&gt;::value, "Type T1 must be integral");
+                   static_assert(std::is_integral&lt;T2&gt;::value, "Type T2 must be integral");
+                   return t1 + t2;
+                }
             </CODE_SNIPPET>
 
         </DEFINITION>
@@ -3487,49 +3488,49 @@ void foo(Base* b1)
                   
                   class dataHandler
                   {
-                    private:
-                      int  mNumberOfElements;
-                      int* mData;
+                  private:
+                     int  mNumberOfElements;
+                     int* mData;
                   
-                    public:
-                      dataHandler(int n=10): mNumberOfElements(n), mData(new int[mNumberOfElements]) {cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;}
+                  public:
+                     dataHandler(int n=10): mNumberOfElements(n), mData(new int[mNumberOfElements]) {cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;}
                   
-                      // copy constructor
-                      dataHandler(const dataHandler&amp; x): mNumberOfElements(x.mNumberOfElements), mData(new int[x.mNumberOfElements]) 
-                      {
+                     // copy constructor
+                     dataHandler(const dataHandler&amp; x): mNumberOfElements(x.mNumberOfElements), mData(new int[x.mNumberOfElements])
+                     {
                         cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
                         for(int i=0;i&lt;this->mNumberOfElements;i++){ this->mData[i] = x.mData[i]; }
-                      }
+                     }
                   
-                      // copy assignment operator
-                      dataHandler&amp; operator=(const dataHandler&amp; rhs)
-                      {
+                     // copy assignment operator
+                     dataHandler&amp; operator=(const dataHandler&amp; rhs)
+                     {
                         cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
                   
                         if(this == &amp;rhs) return *this;
                         if(this.mNumberOfElements != rhs.mNumberOfElements) 
                         {
-                          // this should never happen and should throw an exception. 
-                          // we will just terminate the program instead of throwing an exception in this demo example.
-                          exit(1);
+                           // this should never happen and should throw an exception.
+                           // we will just terminate the program instead of throwing an exception in this demo example.
+                           exit(1);
                         }
 
                         for(int i=0;i&lt;this->mNumberOfElements;i++){ this->mData[i] = x.mData[i]; }
                         return *this;
-                      }
+                     }
                   
-                      // move constructor
-                      dataHandler(dataHandler&amp;&amp; x)
-                      {
+                     // move constructor
+                     dataHandler(dataHandler&amp;&amp; x)
+                     {
                         cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
                         this->mData = x.mData;
                         this->mNumberOfElements  = x.mNumberOfElements;
                         x.mData = nullptr;
-                      }
+                     }
                   
-                      // move assignment operator
-                      dataHandler&amp; operator=(dataHandler&amp;&amp; rhs)
-                      {
+                     // move assignment operator
+                     dataHandler&amp; operator=(dataHandler&amp;&amp; rhs)
+                     {
                         cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
                   
                         if(this == &amp;rhs) return *this;
@@ -3539,28 +3540,28 @@ void foo(Base* b1)
                         rhs.mData = nullptr;
                   
                         return *this;
-                      }
+                     }
                   
-                      ~dataHandler(){ cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl; if(mData) delete mData;}
+                     ~dataHandler(){ cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl; if(mData) delete mData;}
                   
-                      inline int data() const { return *mData;}
+                     inline int data() const { return *mData;}
                   };
                   
                   dataHandler get_a_dataHandler()
                   {
-                    dataHandler t(6);
-                    return t;
+                     dataHandler t(6);
+                     return t;
                   }
                   
                   int main()
                   {
-                    cout&lt;&lt;"Testing move semantics..."&lt;&lt;endl;
-                    dataHandler t0;
-                    t0 = get_a_dataHandler(); // should call move assignment operator.
-                  
-                    dataHandler t1(get_a_dataHandler()); // should call move constructor (unless optimized away by the compiler (lookup RVO and copy elision)). 
+                     cout&lt;&lt;"Testing move semantics..."&lt;&lt;endl;
+                     dataHandler t0;
+                     t0 = get_a_dataHandler(); // should call move assignment operator.
                    
-                    return 0;
+                     dataHandler t1(get_a_dataHandler()); // should call move constructor (unless optimized away by the compiler (lookup RVO and copy elision)).
+
+                     return 0;
                   }
                   </CODE_SNIPPET>
                   
