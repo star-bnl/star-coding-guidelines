@@ -317,7 +317,7 @@ Toggle all extra details
 <SPAN class="link_button" id="link-{$buttonName}" name="link-{$buttonName}">
 <A>
 <xsl:attribute name="href">?showone=<xsl:value-of select="$stylepoint_name"/>#<xsl:value-of select="$stylepoint_name"/></xsl:attribute>
-link
+
 </A>
 </SPAN>
 <SPAN class="showhide_button">
