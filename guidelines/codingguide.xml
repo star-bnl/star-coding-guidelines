@@ -1038,8 +1038,8 @@
                       The former can be optimized much better by the compiler.
                     </p>
 
-                    <p>Exception 2: if the design of the class asks specifically demands that no copy is created (e.g. for singletons) the copy constructor and assignment 
-                      operators should be be disabled by using the <code>delete</code> keyword (C++11) or by making them private (C++98 or older). </p>
+                    <p>Exception 2: if the design of the class specifically demands that no copy is created (e.g. for singletons) the copy constructor and assignment 
+                      operators should be disabled by using the <code>delete</code> keyword (C++11) or by making them private (C++98 or older). </p>
 
                     <p>
                       Polymorphic class design implies pointer semantics. Since copy constructors/assignment operators, etc. cannot be made virtual, making a base class copyable
