@@ -3655,12 +3655,6 @@ void foo(Base* b1)
         </p>
     </PARTING_WORDS>
     
-    <REFERENCES>
-        <p>
-            [1] Herb Sutter on software, hardware, and concurrency blog [<a href="http://herbsutter.com/2013/05/09/gotw-1-solution">http://herbsutter.com/2013/05/09/gotw-1-solution</a>]
-        </p>
-    </REFERENCES>
-    
 </GUIDE>
 <!-- vim: sw=2 et sts=2
  -->
