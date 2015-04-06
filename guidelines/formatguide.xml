@@ -810,7 +810,7 @@
                                     of default path in a compiler option or if you want a default
                                     include/ directory <a id="footnote_b">(b)</a> to be always added in a
                                     default include path compiler option statement, you may request this
-                                    feature to be enabled. To do that, send an Email to STARSOFI.</p>
+                                    feature to be enabled. To do that, send an email to the <code>starsoft-hn</code> mailing list.</p>
                                 
                                 <p>Include statement can ALWAYS refer to
                                     the relative path after the
