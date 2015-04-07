@@ -320,12 +320,15 @@ Toggle all extra details
 
 </A>
 </SPAN>
+<!-- Hack to get rid of the expand button when there's nothing to expand, tu 4/7/2015 -->
+<xsl:if test="not(@nobutton)">
 <SPAN class="showhide_button">
 <xsl:attribute name="onclick"><xsl:value-of select="$onclick_definition"/></xsl:attribute>
 <xsl:attribute name="name"><xsl:value-of select="$buttonName"/></xsl:attribute>
 <xsl:attribute name="id"><xsl:value-of select="$buttonName"/></xsl:attribute>
 <xsl:value-of select="$button_text"/>
 </SPAN>
+</xsl:if>
 <xsl:apply-templates>
 <xsl:with-param name="anchor_prefix" select="$stylepoint_name" />
 </xsl:apply-templates>
