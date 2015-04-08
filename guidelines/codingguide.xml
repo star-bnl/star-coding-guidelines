@@ -171,15 +171,19 @@
         
         <STYLEPOINT title="Inline Functions">
             <SUMMARY>
-                As a general rule, put function definitions into the <code>.cxx</code> file and let the compiler decide what gets inlined (it can decide anyway, regardless of the inline keyword).
-                Use inline when you require the implementation of a function in multiple translation units (e.g. template classes/functions).
+                As a general rule, put function definitions into the <code>.cxx</code> file.
+                Short, compact member functions can be put in the header file <em>after</em> the class declaration
+                preceded by the <code>inline</code> keyword. Inlining virtual function is discouraged.
             </SUMMARY>
             <BODY>
                 <DEFINITION>
                     <p>
-                        The inline keyword indicates that inline substitution of the function body at the point of call is to be preferred to the usual function call mechanism.
+                        The inline keyword indicates that inline substitution of the function body at the point
+                        of call is to be preferred to the usual function call mechanism.
                         But a compiler is not required to perform this inline substitution at the point of call.
                     </p>
+                </DEFINITION>
+                <SUBSECTION title="Discussion:">
                     <p>
                         Functions that are defined within a class definition are implicitly inline. Note, however, that the definition of functions in the class definition is strongly discouraged in STAR.
                     </p>
@@ -193,7 +197,14 @@
                         Note that the inline keyword has no effect on the linkage of a function.
                         Linkage can be changed via unnamed namespaces or the static keyword.
                     </p>
-                </DEFINITION>
+                    <p>
+                        In general, virtual functions can only be inlined when the compiler can either prove that the static
+                        type matches the dynamic type or when the compiler can safely determine the dynamic type. For example,
+                        when you use a value of type A the compiler knows that the dynamic type cannot be different and it can
+                        inline the function. When using a pointer or a reference the compiler generally cannot prove that the
+                        static type is the same and virtual functions generally need to follow the usual virtual dispatch.
+                    </p>
+                    </SUBSECTION>
                 <DECISION>
                     <p>
                         If you add a new function, put it into the <code>.cxx</code> file per default.
@@ -201,6 +212,11 @@
                         Also, most template function implementations need to go into the <code>.h</code> file.
                         If you later determine that a function should be moved from the <code>.cxx</code> file into the <code>.h</code> file, please make sure that it helps the compiler in optimizing the code.
                         Otherwise you're just increasing compile time.
+                    </p>
+                    <p>
+                       The inlining of virtual functions is problematic. At least one virtual function must be outlined but we
+                       advise to not inline virtual functions as a general rule.
+                       This pins the vtable, which will otherwise cause a pile of unnecessary symbols.
                     </p>
                 </DECISION>
             </BODY>
@@ -1604,30 +1620,60 @@
         
         <STYLEPOINT title="ROOT Types">
             <SUMMARY>
-            Prefer the use of fundamental types built-in C++ over ROOT types, except where absolutely required.
+            Use fundamental types provided by the C++ language over ROOT types, except in persistent
+            classes that are subject to schema evolution.
             </SUMMARY>
             
             <BODY>
               <DEFINITION>
-                <p>ROOT defines a large set of portable and unportable types such as <CODE>Int_t</CODE>,
-                <CODE>Float_t</CODE>, <CODE>Double_t</CODE>, and many more.
-                There is a priori no reason to use any of those when not needed. Use of builtin C++
-                types makes the code in fact more portable, readable, and often faster (see discussion under
-                <a href="#Integer_Types">"Extended integer types"</a>).
-                If fixed size is absolutely required the introduction of extended integer types of
-                fixed size and guaranteed size types in C++11 makes ROOT types redundant.</p>
-               
+                <p>C++ provides a large set of fundamental types. Among them are <em>integral types</em> such as
+                    Boolean, character, and integer types. Integral and floating-point types are collectively called
+                    <em>arithmetic types</em>. Integral and floating point types are available in a variety of sizes.
+                    These C++ fundamental types together with pointers and arrays present the machine-level notion
+                    to the programmer in a reasonable implementation-independent manner.
+                </p>
                 <p>
-                The only exceptions are
-                data member in “persistent” classes (e.g. <code>StEvent</code>) under schema evolution. Here ROOT types
-                need to be used to define the data members.</p>
-            </DEFINITION>
+                    ROOT defines a large set of portable and unportable types such as <CODE>Int_t</CODE>,
+                <CODE>Float_t</CODE>, <CODE>Double_t</CODE>, and many more. Some, such as <code>Double32_t</code>
+                and <code>Float16_t</code> have even different size in memory and when written.</p>
+               </DEFINITION>
+              
+              <SUBSECTION title="Discussion:">
+                <p>
+                 There is a priori no reason to use ROOT types unless where absolutely needed (see below). Use of builtin C++
+                 data types makes the code in fact more portable, readable, and often faster (see discussion under
+                 <a href="#Integer_Types">"Extended integer types"</a>).
+                 If fixed size is absolutely required the introduction of extended integer types of
+                 fixed size and guaranteed size types in C++11 makes ROOT types redundant.
+                </p>
                 
+                <p>
+                    The use of ROOT types that have a different storage size in memory and when stored are inherently dangerous. Code
+                    that uses for example <code>Double32_t</code>, will give different results dependent on if the variable was earlier
+                    written to and from storage or if its value was assigned previously in memory.
+                </p>
+
+              </SUBSECTION>
+ 
+              <SUBSECTION title="Exception:">
+                <p>
+                The only exceptions are data member in “persistent” classes in STAR that are under schema evolution.
+                Here ROOT types need to be used to define the data members.
+                The only persistent classes are those in StEvent and StMicroDst. Any other class (e.g. makers, analysis code)
+                should not use ROOT types.
+                </p>
+              </SUBSECTION>
+ 
               <DECISION>
-                  Avoid the use ROOT definitions of built-in data types and use the built-in C++ types.
+                <p>
+                  Do not use ROOT definitions of fundamental data types but use the available C++ data types.
                   Use <code>int</code> instead <code>Int_t</code>, <code>float</code> instead of <code>Float_t</code>,
                   <code>double</code> instead of <code>Double_t</code>, etc.
-              </DECISION>
+                </p>
+                <p>
+                   ROOT types of mixed memory and storage representation such as  <code>Double32_t</code> and <code>Float16_t</code> shall not be used in STAR without any exceptions.
+                </p>
+                </DECISION>
             </BODY>
         </STYLEPOINT>
       
