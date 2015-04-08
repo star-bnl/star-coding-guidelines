@@ -371,14 +371,15 @@
         <STYLEPOINT title="std Namespace">
             <SUMMARY>
                 Do not declare anything in namespace <code>std</code>, not even forward
-                declarations of standard library classes.
+                declarations of standard library classes. The only exception to this rule is template specialization (see below).  
             </SUMMARY>
             <BODY>
                 <MOTIVATION>
                     <p>
                         Declaring entities in namespace <code>std</code> represents undefined behavior,
                         i.e., not portable.  To declare entities from the standard library, include
-                        the appropriate header file.
+                        the appropriate header file. One exception to this is template specialization, e.g. <code>std::hash&lt;MyType&gt;</code>
+                        needs to be in namespace <code>std</code>.
                     </p>
                 </MOTIVATION>
             </BODY>
@@ -388,30 +389,11 @@
     
     <CATEGORY title="Scoping">
         
-        <STYLEPOINT title="Nonmember and Global Functions">
+        <STYLEPOINT title="Nonmember and Global Functions" nobutton="yes">
             <SUMMARY>
-                Nonmember functions (also known as global functions) should be
-                within a namespace.
+                Avoid non-member function if possible. If it is a function that applies to several classes of similar type consider 
+                making it a member of a base class.
             </SUMMARY>
-            <BODY>
-                <p>Putting nonmember functions in a namespace avoids polluting
-                    the global namespace. Static member functions are an alternative
-                    as long as it makes sense to include the function within the
-                    class.</p>
-                <CODE_SNIPPET>
-                    namespace MyNamespace {
-                    void doGlobalFoo(); // Good -- doGlobalFoo is within a namespace.
-                    }
-                    
-                    class MyClass {
-                    public:
-                       ...
-                       // Good -- doGlobalBar is a static member of class MyClass and
-                       // has a reason to be part of this class (not shown here).
-                       static Bar* doGlobalBar();
-                    }
-                </CODE_SNIPPET>
-            </BODY>
         </STYLEPOINT>
         
         <STYLEPOINT title="Local Variables">
@@ -520,7 +502,7 @@
         
         <STYLEPOINT title="Brace Initialization" cpp11="yes">
             <SUMMARY>
-                Prefer initialization with braces except for single-argument assignment.
+              Prefer initialization with braces except for single-argument assignment. However, never use brace initialization with <code>auto</code>.
             </SUMMARY>
             <BODY>
                 <p>In C++11, the brace initialization syntax for builtin arrays and POD structures has been extended for use with all other datatypes.
@@ -582,30 +564,7 @@
                         MyOtherType object2{"b"};
                     </CODE_SNIPPET></p>
                 
-                <p>Never assign a <i>braced-init-list</i> to an auto local variable. In the
-                    single element case, what this means can be confusing.
-                    <BAD_CODE_SNIPPET>
-                        auto value = {1.23};        // value is an initializer_list&lt;double&gt;
-                    </BAD_CODE_SNIPPET>
-                    <CODE_SNIPPET>
-                        auto value = double{1.23};  // Good -- value is a double, not an initializer_list.
-                    </CODE_SNIPPET>
-                </p>
-                
-                <p> For clarity of the examples above we use directly explicit values, however following
-                  the rule about <a href="#Magic_Numbers">magic numbers</a> requires to define all such
-                  numbers as named constants or <code>constexpr</code> first. </p>
-                <p>
-                  One potential pitfall is the brace initialization of an array with a size-mismatched initializer list.
-                </p>
-                <p>
-                  Example:
-                </p>
-                <BAD_CODE_SNIPPET>
-                  double *pd= new double [3] {0.5, 1.2, 12.99, 4};
-                </BAD_CODE_SNIPPET>
-                This leads to a run-time error.
-
+                    <p>Never assign a <i>braced-init-list</i> to an <code>auto</code> local variable.</p>
             </BODY>
         </STYLEPOINT>
         
@@ -1746,7 +1705,6 @@
         <STYLEPOINT title="Strong Enums" cpp11="yes">
             <SUMMARY>
                 Use strong enums instead of weak enums.
-                
             </SUMMARY>
             
             <BODY>
@@ -1792,6 +1750,10 @@
                     <CODE_SNIPPET>
                         int c= static_cast &lt; int &gt; (strongEnum_color::red);
                     </CODE_SNIPPET>
+                </p>
+                <p>
+                  Note that while we encourage the use of strong enums be aware that currently ROOT I/O us not supporting to store these values. 
+                  However, there’s no case we are aware of where enums are stored in the first place.
                 </p>
             </BODY>
         </STYLEPOINT>
@@ -2043,7 +2005,33 @@
                            ...
                         }
                     </CODE_SNIPPET>
-               </p>
+                  </p>
+                </SUBSECTION>
+                <SUBSECTION title="If you chose to use exceptions:">
+                  <ul>
+                    <li>Don not hide exception by using a catch followed by an empty code block.</li>
+                    <li>Don not EVER use exception to indicate the absence of a resource.</li>
+                    <li>Similarly, don't use exception as a mean to return special information from a method.</li>
+                    <li>Use exception ONLY for errors that should not be ignored.</li>
+                    <li>Do not clear the stack trace by re-throwing an exception i.e.:
+                        <BAD_CODE_SNIPPET>
+                        catch (Exception ex)
+                        {
+                           // some code here
+                           throw ex;
+                        }
+                        </BAD_CODE_SNIPPET>
+                       should not be used as "throw ex" will throw a new exception and clear the stack trace (bad for code developers). Instead, use:
+                       <CODE_SNIPPET>
+                        catch (Exception ex)
+                        {
+                           // some code here
+                           throw;
+                        }
+                       </CODE_SNIPPET>
+                       which will not clear the stack.
+                    </li>
+                  </ul>
                 </SUBSECTION>
             </BODY>
         </STYLEPOINT>
@@ -2121,8 +2109,8 @@
         
         <STYLEPOINT title="Use of constexpr" cpp11="yes">
             <SUMMARY>
-                In C++11, use <code>constexpr</code>
-                to define true constants or to ensure constant initialization.
+                In C++11, use <code>constexpr</code> to define true constants or to ensure constant initialization. When used with functions you should also declare 
+                them <code>const</code> for forward consistency reasons (see notes below).
             </SUMMARY>
             <BODY>
                 <DEFINITION>
@@ -2132,12 +2120,12 @@
                     time—literally while your code compiles—rather than when the program itself is run.
 
                     <CODE_SNIPPET>
-                        constexpr int multiply(int x, int y)
+                        constexpr int multiply(int x, int y) const
                         {
                            return x*y;
                         }
                         
-                        constexpr int factorial(int n)
+                        constexpr int factorial(int n) const
                         {
                            return n &lt;= 1 ? 1 : (n * factorial(n-1));
                         }
@@ -2167,25 +2155,28 @@
                         int array[defaultArraySize(3)];
                     </CODE_SNIPPET>
                     
-                    <p>Note that a <code>constexpr</code> specifier used in an object declaration implies
-                        <code>const</code>. A <code>constexpr</code> specifier used in a function
-                    declaration implies inline. If you declare a class member function to be <code>constexpr</code>,
-                    that marks the function as <code>const</code> as well. If you
-                    declare a variable as <code>constexpr</code>, that in turn marks the variable as
-                    <code>const</code>. However, it doesn't work the other way--a
-                    <code>const</code> function is not a <code>constexpr</code>,
-                        nor is a <code>const</code> variable a <code>constexpr</code>.</p>
-                    
-                    <p>
-                    You can make any object a <code>constexpr</code>. In this case the constructor must be
-                    declared a <code>constexpr</code> as well as the method to be used.
+                    <p>Note that:
+                       <ul>
+                         <li>A <code>constexpr</code> specifier used in a function declaration implies inline.</li>
+                         <li>If you declare a class member function to be <code>constexpr</code> you should declare it <code>const</code> as well.
+                             In C++11, constexpr functions are const. C++14 had to change that. Thus <em>always</em> specify <code>constexpr f() const</code>. 
+                             This will guarantee our code remains unchanged both in spelling and meaning if we move to C++14 in the future.
+                             It will also gets rid of the warning "the meaning of this changes in C++14!"`
+                         </li>
+                         <li>If you declare a variable as <code>constexpr</code>, that in turn marks the variable as <code>const</code>. However, it doesn't work the 
+                             other way, a <code>const</code> variable is not a <code>constexpr</code>.</li>
+                       </ul>
+                     </p>
+                     <p>
+                       You can make any object a <code>constexpr</code>. In this case the constructor must be
+                       declared a <code>constexpr</code> as well as the method to be used.
+                       There are also some limitations:
+                       <ul>
+                         <li>It must consist of single return statement (with a few exceptions)</li>
+                         <li>It can call only other <code>constexpr</code> functions</li>
+                         <li>It can reference only <code>constexpr</code> global variables</li>
+                       </ul>
                     </p>
-                   There are also some limitations:
-                    <ul>
-                    <li>It must consist of single return statement (with a few exceptions)</li>
-                    <li>It can call only other <code>constexpr</code> functions</li>
-                    <li>It can reference only <code>constexpr</code> global variables</li>
-                    </ul>
                     <p>
                         Some variables can be declared <code>constexpr</code>
                         to indicate the variables are true constants,
@@ -2339,8 +2330,7 @@
             
             <SUMMARY>
               It is a modern C++ idiom to get rid of naked pointers whenever possible. However, it is currently difficult to devise an error free scheme where smart pointers
-              can live in harmony with ROOT object ownership and management rules. Avoid using smart pointers in STAR code. This decision could be revisited in the future if conflict 
-              with ROOT is resolved.
+              can live in harmony with ROOT object ownership and management rules. Avoid using smart pointers in STAR code.
             </SUMMARY>
             <BODY>
                 <DEFINITION>
@@ -2411,7 +2401,8 @@
                 </CONS>
 
                 <DECISION>
-                  Avoid using smart pointers in STAR code.
+                  For the cons mentioned above using smart pointers in STAR code is discouraged. If you decide to use them you should pay special attention 
+                  to possible conflicts with ROOT object ownership scheme.
                 </DECISION>
             </BODY>
         </STYLEPOINT>
@@ -2516,7 +2507,7 @@
             </BODY>
           </STYLEPOINT>
 
-          <STYLEPOINT title="Inline Namespaces and Align Statements" cpp11="yes">
+          <STYLEPOINT title="Inline Namespaces and Align Statements" cpp11="yes" nobutton="yes">
             <SUMMARY>
               Both, inline namespaces and align statements are new in C++11. Use cases are limited enough that no specific recommendations for their use are made.
             </SUMMARY>
@@ -2744,14 +2735,13 @@
             <SUMMARY>
                 In general, avoid designs that require casting.
                 You may use <code>static_cast</code> when necessary, but avoid <code>const_cast</code> and <code>reinterpret_cast</code>.
-                C-casts are forbidden.
+                C-casts should be avoided and are highly discouraged.
             </SUMMARY>
             <BODY>
                 <SUBSECTION title="Why not C style casts?">
                     <p>The main reason is that classic C casts make no distinction between what we call
-                        <code>static_cast&lt;&gt;()</code>, <code>reinterpret_cast&lt;&gt;()</code>, <code>const_cast&lt;&gt;()</code>,
-                            and <code>dynamic_cast&lt;&gt;()</code>.
-                                These four things are completely different.
+                       <code>static_cast&lt;&gt;()</code>, <code>reinterpret_cast&lt;&gt;()</code>, <code>const_cast&lt;&gt;()</code>,
+                       and <code>dynamic_cast&lt;&gt;()</code>. These four things are completely different.
                     </p>
                             
                     <p>A <code>static_cast&lt;&gt;()</code> is usually safe. There is a valid conversion in the language,
@@ -2762,23 +2752,24 @@
                        checked (pointer) or a possible exception is taken into account (reference).
                     </p>
                     
-                    <p>A <code>reinterpret_cast&lt;&gt;()</code> (or a <code>const_cast&lt;&gt;()</code>) on the other hand is always dangerous. You tell the compiler: "trust me: I know this doesn't look like a foo (this looks as if it isn't mutable), but it is".</p>
+                    <p>A <code>reinterpret_cast&lt;&gt;()</code> (or a <code>const_cast&lt;&gt;()</code>) on the other hand is always dangerous. 
+                       You tell the compiler: "trust me: I know this doesn't look like a foo (this looks as if it isn't mutable), but it is".</p>
                                     
-                    <p>The first problem is that it's almost impossible to tell which one will occur in a C-style cast without looking at large and disperse pieces of code and knowing all the rules.</p>
-                    <p>
-                    For example, what does this mean?:
-                    <BAD_CODE_SNIPPET>
-                        x = (T)y;
-                    </BAD_CODE_SNIPPET>
-                    We don't know. It depends on the type <code>T</code> and the types of <code>x</code> and <code>y</code>.
-                        <code>T</code> could be the name of a class,
-                    a typedef, or maybe a template parameter. Maybe <code>x</code> and <code>y</code> are scalar variables and <code>(T)</code> represents a
-                    value conversion. Maybe <code>x</code> is of a class derived from <code>y</code>'s class and <code>(T)</code> is a downcast.
-                        Maybe <code>x</code> and
-                    <code>y</code> are unrelated pointer types. Because the C-style cast <code>(T)</code> can be used to express many logically
-                    different operations, the compiler has only the barest chance to catch misuses. For the same reason,
-                    a programmer may not know exactly what a cast does. This is sometimes considered an advantage by
-                    novice programmers and is a source of subtle errors when the novice guessed wrong.
+                    <p>The first problem is that it's almost impossible to tell which one will occur in a C-style cast without looking at large and 
+                       disperse pieces of code and knowing all the rules.</p>
+                    <p>For example, what does this mean?:
+                       <BAD_CODE_SNIPPET>
+                           x = (T)y;
+                       </BAD_CODE_SNIPPET>
+                       We don't know. It depends on the type <code>T</code> and the types of <code>x</code> and <code>y</code>.
+                           <code>T</code> could be the name of a class,
+                       a typedef, or maybe a template parameter. Maybe <code>x</code> and <code>y</code> are scalar variables and <code>(T)</code> represents a
+                       value conversion. Maybe <code>x</code> is of a class derived from <code>y</code>'s class and <code>(T)</code> is a downcast.
+                           Maybe <code>x</code> and
+                       <code>y</code> are unrelated pointer types. Because the C-style cast <code>(T)</code> can be used to express many logically
+                       different operations, the compiler has only the barest chance to catch misuses. For the same reason,
+                       a programmer may not know exactly what a cast does. This is sometimes considered an advantage by
+                       novice programmers and is a source of subtle errors when the novice guessed wrong.
                    </p>
  
                 </SUBSECTION>
@@ -2912,20 +2903,26 @@ void foo(Base* b1)
             </BODY>
         </STYLEPOINT>
         
-        <STYLEPOINT title="Increment and Decrement Operators">
+        <STYLEPOINT title="Increment and Decrement Operators" nobutton="yes">
             <SUMMARY>
-                Prefer the prefix form of the increment (<code>++i</code>) and decrement 
+                Wherever applicable, prefer the prefix form of the increment (<code>++i</code>) and decrement 
                 (<code>--i</code>) operators because it has simpler semantics.
             </SUMMARY>
+        </STYLEPOINT>
+
+        <STYLEPOINT title="assert">
+          <SUMMARY>
+          </SUMMARY>
+          <BODY>
+          </BODY>
         </STYLEPOINT>
         
         <STYLEPOINT title="Loops and Switch Statements">
             <SUMMARY>
                 <p>
-                    If not conditional on an enumerated value, switch statements
-                    should always have a <code>default</code> case.
-                    Empty loop bodies should use <code>{}</code>
-                    or <code>continue</code>. 
+                    If not conditional on an enumerated value, switch statements should always have a <code>default</code> case.
+                    Empty loop bodies should use <code>{}</code> or <code>continue</code>. Declare variable in <code>if</code> and <code>while</code> statement conditions to pin
+                    the lifetime of the variable to the intended scope (see below). 
                 </p>
             </SUMMARY>
             <BODY>
@@ -2933,8 +2930,7 @@ void foo(Base* b1)
                     should always have a <code>default</code> case (in the case of
                     an enumerated value, the compiler will warn you if any values
                     are not handled).  If the default case should never execute,
-                    simply
-                    <code>assert</code>:
+                    simply <code>assert</code>:
                 </p>
                 <CODE_SNIPPET>
                     switch (value) {
@@ -2965,6 +2961,33 @@ void foo(Base* b1)
                 <BAD_CODE_SNIPPET>
                     while (condition);  // Bad — looks like part of do/while loop.
                 </BAD_CODE_SNIPPET>
+
+                <p>
+                   Declare variable in <code>if</code> and <code>while</code> statement conditions to pin the lifetime of the variable to the intended scope.
+                   For example:
+                   <CODE_SNIPPET>
+                       if (MyType* var = something->getMore())
+                       {
+                         if (MyNext* next = var->getNext())
+                         {
+                           ...
+                         }
+                       }
+                   </CODE_SNIPPET>
+                   instead of 
+                   <BAD_CODE_SNIPPET>
+                       MyType* var = nullptr;
+                       MyType* next = nullptr;
+                       if (var = something->getMore())
+                       {
+                         if (next = var->getNext())
+                         {
+                           ...
+                         }
+                       }
+                   </BAD_CODE_SNIPPET>
+                   similarly for <code>while</code> conditional statements.
+                </p>
             </BODY>
         </STYLEPOINT>
 
@@ -3010,7 +3033,9 @@ void foo(Base* b1)
               <p>Range-for loops are useful and should be used.</p>
               <p>Ordinary loops should be preferred when programmer needs the element index. Avoid having your own counter.</p>
               <p>Using reference to elements is encouraged when dealing with large objects. Use <code>const</code> reference when you don't need to modify the object state.</p>
-          </DECISION>
+              <p>Note that when dealing with proxy references <code>auto&amp;</code> does not work, <code>auto&amp;&amp;</code> should be used instead.</p>
+            </DECISION>
+
           </BODY>
         </STYLEPOINT>
         
