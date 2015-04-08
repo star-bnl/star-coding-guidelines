@@ -251,15 +251,15 @@
                 </p>
                 <CODE_SNIPPET>
                     // classes and structs
-                    class UrlTable { ...
-                    class UrlTableTester { ...
-                    struct UrlTableProperties { ...
+                    class UrlTable { ... }
+                    class UrlTableTester { ... }
+                    struct UrlTableProperties { ... }
                     
                     // typedefs
                     typedef HashMap&lt;UrlTableProperties *, string&gt; PropertiesMap;
                     
                     // enums
-                    enum UrlTableErrors { ...
+                    enum UrlTableErrors { ... }
                 </CODE_SNIPPET>
             </BODY>
         </STYLEPOINT>
@@ -810,7 +810,7 @@
                                     of default path in a compiler option or if you want a default
                                     include/ directory <a id="footnote_b">(b)</a> to be always added in a
                                     default include path compiler option statement, you may request this
-                                    feature to be enabled. To do that, send an Email to STARSOFI.</p>
+                                    feature to be enabled. To do that, send an email to the <code>starsoft-hn</code> mailing list.</p>
                                 
                                 <p>Include statement can ALWAYS refer to
                                     the relative path after the
@@ -1327,7 +1327,7 @@
                     namespace {
                     
                     void doSomething() { // Bad.  Indented when it should not be
-                    ...
+                        ...
                     }
                     
                     }
@@ -1338,7 +1338,7 @@
                 <CODE_SNIPPET>
                     namespace Foo {
                     namespace Bar {
-                    ...
+                        ...
                     }
                     }
                 </CODE_SNIPPET>
@@ -1873,11 +1873,5 @@
         </p>
         
      </PARTING_WORDS>
-    
-    <REFERENCES>
-        <p>
-            [1] Herb Sutter on software, hardware, and concurrency blog [<a href="http://herbsutter.com/2013/05/09/gotw-1-solution">http://herbsutter.com/2013/05/09/gotw-1-solution</a>]
-        </p>
-    </REFERENCES>
     
 </GUIDE>

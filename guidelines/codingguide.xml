@@ -323,9 +323,9 @@
                     namespace StMyStuff //$NMSPC
                     {
                     
-                    class AClass : public TNamed {....};
+                    class AClass : public TNamed {...};
             
-                    class BClass : public TNamed {....};
+                    class BClass : public TNamed {...};
                     
                     } // namespace StMyStuff
                     </CODE_SNIPPET>
@@ -401,6 +401,7 @@
                 <CODE_SNIPPET>
                     namespace MyNamespace {
                     void doGlobalFoo(); // Good -- doGlobalFoo is within a namespace.
+                    }
                     
                     class MyClass {
                     public:
@@ -550,14 +551,17 @@
                     <i>braced-init-list</i>:
                     <CODE_SNIPPET>
                         #include &lt;initializer_list&gt;
-                        class MyType {
+
+                        class MyType
+                        {
                         public:
                            // initializer_list is a reference to the underlying init list,
                            // so it can be passed by value.
                            MyType(std::initializer_list&lt;int&gt; initList) {
-                              for (int element : initList) { .. }
+                              for (int element : initList) {...}
                            }
                         };
+
                         MyType myObject{2, 3, 5, 7};
                     </CODE_SNIPPET></p>
                 
@@ -571,7 +575,9 @@
                            explicit MyOtherType(std::string name);
                            MyOtherType(int value, std::string name);
                         };
+
                         MyOtherType object1 = {1, "b"};
+
                         // If the constructor is explicit, you can't use the "= {}" form.
                         MyOtherType object2{"b"};
                     </CODE_SNIPPET></p>
@@ -830,9 +836,9 @@
                            int mValue;
                            std::vector mVector;
                         };
+
                         // MyClass.cxx
-                        MyClass::MyClass()
-                        : MyBase(),
+                        MyClass::MyClass() : MyBase(),
                            mValue(0),
                            mVector()
                         {}
@@ -863,8 +869,7 @@
                            // mY is a POD therefore it will be:
                            //    Zero-initialized if instance of MyClass is created with new operator.
                            //    Otherwise, left un-initialized.
-                           MyClass(): mX(5) { cout&lt;&lt;mX&lt;&lt;" "&lt;&lt;mS.x&lt;&lt;" "&lt;&lt;mY&lt;&lt;endl; }
-
+                           MyClass(): mX(5) { cout &lt;&lt; mX &lt;&lt; " " &lt;&lt; mS.x &lt;&lt; " " &lt;&lt; mY &lt;&lt; endl; }
                         };
                         
                         int main()
@@ -1814,8 +1819,7 @@
                         v.push_back(3);
                         
                         //  iterate over vector and print out each element
-                        std::for_each(std::begin(v),std::end(v),[](int n)
-                        {std::cout&lt;&lt;n&lt;&lt;std::endl;});
+                        std::for_each(std::begin(v),std::end(v),[](int n) { std::cout &lt;&lt; n &lt;&lt; std::endl; } );
                         
                         //  declare is_odd to be lambda function that returns true if
                         //  the argument is odd. Note the return syntax
@@ -1823,11 +1827,11 @@
                         //  determined as if auto is applied to the statement after return;
                         
                         auto is_odd=[](int n)-&gt;bool{return n%2==true;};
-                        auto pos=std::find_if(std::begin(v),std::end(v),
-                        is_odd);
+                        auto pos=std::find_if(std::begin(v),std::end(v), is_odd);
+
                         //  the below snippet returns 1 (the first position with an odd number
                         if(pos!=std::end(v))
-                           std::cout&lt;&lt;*pos&lt;&lt;std::endl;
+                           std::cout &lt;&lt; *pos &lt;&lt; std::endl;
                     </CODE_SNIPPET>
                 </p>
                 A lambda function is of type <code>std::function</code>, therefore instead of <code>auto</code>, the above return type for <code>is_odd</code>_ could be written as <code>std::function&lt;bool(int)&gt; is_odd; </code>
@@ -1851,7 +1855,7 @@
                         int a=5;
                         auto testCopy=[a]()mutable {a=7;};
                         testCopy();
-                        cout &lt;&lt;"a is now " &lt;&lt; a &lt;&lt;endl;
+                        cout &lt;&lt; "a is now " &lt;&lt; a &lt;&lt; endl;
                     </CODE_SNIPPET>
                 </p>
                 <p>
@@ -1861,7 +1865,7 @@
                         int a=5;
                         auto testCopy=[&amp;a](){a=7;};
                         testCopy();
-                        cout &lt;&lt;"a is now " &lt;&lt; a &lt;&lt;endl;
+                        cout &lt;&lt; "a is now " &lt;&lt; a &lt;&lt; endl;
                     </CODE_SNIPPET>
                 </p>
                 <p>
@@ -1870,7 +1874,7 @@
                         int a=5;
                         auto testCopy=[a](){a=7;};
                         testCopy();
-                        cout "a is now " &lt;&lt; a &lt;&lt;endl;
+                        cout "a is now " &lt;&lt; a &lt;&lt; endl;
                     </BAD_CODE_SNIPPET>
                     Obviously, capturing variables by reference can lead to side-effects.
                     Another danger in capturing variables by reference is that the reference might not be valid anymore when the lambda function is called:
@@ -1882,20 +1886,20 @@
                         {
                            int c=5;
                            // if this is &amp; (i.e. pass by reference, it doesn't work... (a,b, are nonsense)
-                           return [&amp;] (float d) -&gt;int {cout &lt;&lt;"lambda param: "&lt;&lt; d &lt;&lt;", a: "&lt;&lt; a &lt;&lt;" b : " &lt;&lt; b &lt;&lt; " c: "&lt;&lt; c &lt;&lt;endl;
+                           return [&amp;] (float d) -&gt;int {cout &lt;&lt; "lambda param: " &lt;&lt; d &lt;&lt; ", a: " &lt;&lt; a &lt;&lt; " b : " &lt;&lt; b &lt;&lt; " c: " &lt;&lt; c &lt;&lt; endl;
                            b=7;
-                           cout &lt;&lt;" lambda b is now " &lt;&lt; b &lt;&lt;endl;
+                           cout &lt;&lt; " lambda b is now " &lt;&lt; b &lt;&lt; endl;
                            return a+b+c;};
-                        
                         }
+
                         void testVarByReference()
                         {
                            int a=1;
                            int b=2;
                            int c=3.0;
                            auto f=retLambda(a,b);
-                           cout &lt;&lt;" lambda returns " &lt;&lt;  f(c)&lt;&lt;endl;
-                           cout &lt;&lt;" b is now " &lt;&lt; b &lt;&lt;endl;
+                           cout &lt;&lt; " lambda returns " &lt;&lt;  f(c) &lt;&lt; endl;
+                           cout &lt;&lt; " b is now " &lt;&lt; b &lt;&lt; endl;
                         }
                     </CODE_SNIPPET>
                 </p>
@@ -1965,11 +1969,9 @@
                        int makeObject() const {return 8;};
                        A() {};
                     };
-                    
-                    
+
                     template &lt;typename Builder&gt;
-                    auto
-                    makeAndProcessObject (const Builder&amp; builder) -&gt; decltype( builder.makeObject() )
+                    auto makeAndProcessObject(const Builder&amp; builder) -&gt; decltype( builder.makeObject() )
                     {
                        auto val = builder.makeObject();
                        // do stuff with val
@@ -2032,7 +2034,7 @@
                            }
                            ...
                         }
-                        ...
+
                         try {
                            computePedestals();
                         }
@@ -2641,11 +2643,12 @@
                         code is on the wrong track.
                         <BAD_CODE_SNIPPET>
                             if (typeid(*data) == typeid(Data1)) {
-                            ...
+                               ...
                             } else if (typeid(*data) == typeid(Data2)) {
-                            ...
+                               ...
                             } else if (typeid(*data) == typeid(Data3)) {
-                            ...
+                               ...
+                            }
                         </BAD_CODE_SNIPPET>
                         Code such as this usually breaks when additional subclasses are
                         added to the class hierarchy.  Moreover, when properties of a subclass
@@ -2669,7 +2672,8 @@
                         // Example of a unit test
                         Geo::Factory geoFactory;
                         Geo::Object* circle = geoFactory.CreateCircle();
-                        if ( ! dynamic_cast&lt;Geo::Circle&gt;(circle) ) {
+
+                        if ( !dynamic_cast&lt;Geo::Circle&gt;(circle) ) {
                            std::cerr &lt;&lt; "Unit test failed."  &lt;&lt; std::endl;
                         }  
                     </CODE_SNIPPET>
@@ -2711,7 +2715,7 @@
                     </p>
                     <BAD_CODE_SNIPPET>
                         void foo(Bar* bar) {
-                           // ... some code where x, y, z are defined ...
+                           // Some code where x, y, z are defined
                            // ...
                            if (Data1 data1 = dynamic_cast&lt;Data1*&gt;(bar)) {
                               doSomething(data1, x, y);
@@ -2726,7 +2730,7 @@
                     </p>
                     <CODE_SNIPPET>
                         void foo(Bar* bar) {
-                           // ... some code where x, y, z are defined ...
+                           // Some code where x, y, z are defined
                            // ...
                            DoSomethingVisitor visitor(x, y, z);
                            bar.accept(visitor);
@@ -2934,16 +2938,16 @@ void foo(Base* b1)
                 </p>
                 <CODE_SNIPPET>
                     switch (value) {
-                    case 0: {  // 2 space indent
-                    ...      // 4 space indent
+                    case 0: {
+                       ...      // Minimum 2 space indent
                     break;
                     }
                     case 1: {
-                    ...
+                       ...
                     break;
                     }
                     default: {
-                    assert(false);
+                       assert(false);
                     }
                     }
                 </CODE_SNIPPET>
@@ -2975,18 +2979,17 @@ void foo(Base* b1)
               <CODE_SNIPPET>
                 int main()
                 {
-
                    vector&lt;int&gt; v {1,2,3,4,5};
 
                    for(auto&amp; i:v)  // reference to element
                    {
-                      cout&lt;&lt;i&lt;&lt;endl;
+                      cout &lt;&lt; i &lt;&lt; endl;
                       i +=1;        // modifies element value
                    }
 
                    for(auto i:v)   // copy of element
                    {
-                      cout&lt;&lt;i&lt;&lt;endl;
+                      cout &lt;&lt; i &lt;&lt; endl;
                    }
                    return 0;
                 }
@@ -3452,14 +3455,14 @@ void foo(Base* b1)
 
                       void print(int const&amp; x)
                       {
-                         cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
-                         cout&lt;&lt;x&lt;&lt;endl;
+                         cout &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;
+                         cout &lt;&lt; x &lt;&lt; endl;
                       }
 
                       void print(int&amp;&amp; x)
                       {
-                         cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
-                         cout&lt;&lt;x&lt;&lt;endl;
+                         cout &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;
+                         cout &lt;&lt; x &lt;&lt; endl;
                       }
 
                       int main()
@@ -3493,19 +3496,19 @@ void foo(Base* b1)
                      int* mData;
                   
                   public:
-                     dataHandler(int n=10): mNumberOfElements(n), mData(new int[mNumberOfElements]) {cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;}
+                     dataHandler(int n=10): mNumberOfElements(n), mData(new int[mNumberOfElements]) {cout &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;}
                   
                      // copy constructor
                      dataHandler(const dataHandler&amp; x): mNumberOfElements(x.mNumberOfElements), mData(new int[x.mNumberOfElements])
                      {
-                        cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                        cout &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;
                         for(int i=0;i&lt;this->mNumberOfElements;i++){ this->mData[i] = x.mData[i]; }
                      }
                   
                      // copy assignment operator
                      dataHandler&amp; operator=(const dataHandler&amp; rhs)
                      {
-                        cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                        cout &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;
                   
                         if(this == &amp;rhs) return *this;
                         if(this.mNumberOfElements != rhs.mNumberOfElements) 
@@ -3522,7 +3525,7 @@ void foo(Base* b1)
                      // move constructor
                      dataHandler(dataHandler&amp;&amp; x)
                      {
-                        cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                        cout &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;
                         this->mData = x.mData;
                         this->mNumberOfElements  = x.mNumberOfElements;
                         x.mData = nullptr;
@@ -3531,7 +3534,7 @@ void foo(Base* b1)
                      // move assignment operator
                      dataHandler&amp; operator=(dataHandler&amp;&amp; rhs)
                      {
-                        cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl;
+                        cout &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;
                   
                         if(this == &amp;rhs) return *this;
                   
@@ -3542,7 +3545,7 @@ void foo(Base* b1)
                         return *this;
                      }
                   
-                     ~dataHandler(){ cout&lt;&lt;__PRETTY_FUNCTION__&lt;&lt;endl; if(mData) delete mData;}
+                     ~dataHandler(){ cout &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl; if(mData) delete mData;}
                   
                      inline int data() const { return *mData;}
                   };
@@ -3555,7 +3558,7 @@ void foo(Base* b1)
                   
                   int main()
                   {
-                     cout&lt;&lt;"Testing move semantics..."&lt;&lt;endl;
+                     cout &lt;&lt; "Testing move semantics..." &lt;&lt; endl;
                      dataHandler t0;
                      t0 = get_a_dataHandler(); // should call move assignment operator.
                    
@@ -3595,7 +3598,7 @@ void foo(Base* b1)
 
                     <CODE_SNIPPET>
                     template&lt;typename T&gt;
-                    void print(T&amp;&amp; x) { cout&lt;&lt;x&lt;&lt;endl;}
+                    void print(T&amp;&amp; x) { cout &lt;&lt; x &lt;&lt; endl;}
                     </CODE_SNIPPET>
 
                     So calling print on a lvalue makes <code>x</code> an lvalue reference, same if <code>x</code> is an rvalue. Now when does this matter? It doesn't matter inside <code>print</code> itself 
@@ -3655,12 +3658,4 @@ void foo(Base* b1)
         </p>
     </PARTING_WORDS>
     
-    <REFERENCES>
-        <p>
-            [1] Herb Sutter on software, hardware, and concurrency blog [<a href="http://herbsutter.com/2013/05/09/gotw-1-solution">http://herbsutter.com/2013/05/09/gotw-1-solution</a>]
-        </p>
-    </REFERENCES>
-    
 </GUIDE>
-<!-- vim: sw=2 et sts=2
- -->
