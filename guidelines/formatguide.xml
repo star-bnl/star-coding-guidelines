@@ -1740,7 +1740,21 @@
      </p>
      </BODY>
      </STYLEPOINT>
-     
+
+     <STYLEPOINT title="Commenting Out Code">
+          <SUMMARY>
+            Do not leave commented out code in the source file after testing. Proper utilization of revision control system can be relied on to retrieve any version of the code.
+          </SUMMARY>
+          <BODY>
+            <p>
+            A commented code is a rudiment from the times when there were no sophisticated revision control systems which we have now. 
+            The developer would sometime stash a feature for later consideration right there in the code but often would forget about it. 
+            The other developers do not care about such unfinished or under-implemented feature which just draws their attention from the real code. 
+            Proper utilization of revision control systems allow us to save and test new features on branches without polluting the main trunk with commented code.
+            This rule also extends to the notorious use of <a href="#Preprocessor_Directives">preprocessor directives</a> to comment out code.
+          </p>
+          </BODY>
+        </STYLEPOINT>
      </CATEGORY>
     
     <CATEGORY title="Other">
