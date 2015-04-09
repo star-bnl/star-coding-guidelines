@@ -1807,22 +1807,6 @@
                     kStFatal      // Fatal error, processing impossible
                 };
                 </CODE_SNIPPET>
-                
-                <p>
-                    Outside Makers in your application code AND for testing conditions that should
-                    never happen and indicate disaster if they do, we recommend the use of
-                    <code>assert()</code> (it aborts the program if the assertion is false).
-                    Don't use <code>exit()</code>.
-                </p>
-                <p>
-                Generally speaking though, it is BAD to just abort the program and should be avoided.
-                Better to message an error and propagate up a fatal error flag.
-                Unless your Maker is a fundamental and base maker (DAQ detecting a corruption,
-                db finding an unlikely condition which should really never happen, IO maker not able to stream, ...)
-                the use of <code>assert()</code> is prohibited as a single detector sub-system error shall
-                not lead to an entire
-                chain abort. The use of clear messages with level <code>FATAL</code> is emphasized.
-                </p>
            </BODY>
         </STYLEPOINT>
  

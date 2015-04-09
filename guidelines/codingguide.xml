@@ -2958,8 +2958,19 @@ void foo(Base* b1)
 
         <STYLEPOINT title="assert">
           <SUMMARY>
+            Use of <code>assert</code> for aborting the program execution if some test condition is true is strongly discoureged in STAR code.
           </SUMMARY>
           <BODY>
+               <DEFINITION>
+                 <a href="http://en.cppreference.com/w/cpp/error/assert"><code>assert</code></a> checks if its argument compares equal to zero. It calls <code>std::abort</code> 
+                 if it does, and prints out standard diganostic information on the standard error output. 
+               </DEFINITION>
+               <p>
+                Generally speaking, it is BAD to just abort the program and should be avoided. Better to message an error and propagate up a <code>kStFatal</code> error flag.
+                Unless your Maker is a fundamental and base maker (DAQ detecting a corruption, DB finding an unlikely condition which should really never happen, IO maker not able to stream, ...)
+                the use of <code>assert</code> is prohibited as a single detector sub-system error shall never lead to an entire
+                chain abort. The use of clear messages with level <code>FATAL</code> is emphasized.
+               </p>
           </BODY>
         </STYLEPOINT>
         
@@ -2975,22 +2986,23 @@ void foo(Base* b1)
                 <p>If not conditional on an enumerated value, switch statements
                     should always have a <code>default</code> case (in the case of
                     an enumerated value, the compiler will warn you if any values
-                    are not handled).  If the default case should never execute,
-                    simply <code>assert</code>:
+                    are not handled).  If the default case should never execute, you should print a clear log message with level 
+                    <code>FATAL</code> and propagate up a <code>kStFatal</code> error flag.
                 </p>
                 <CODE_SNIPPET>
                     switch (value) {
                     case 0: {
                        ...      // Minimum 2 space indent
-                    break;
-                    }
+                       break;
+                     }
                     case 1: {
-                       ...
-                    break;
-                    }
+                          ...
+                       break;
+                     }
                     default: {
-                       assert(false);
-                    }
+                       LOG_FATAL&lt;&lt;"StMyMaker - a switch case reached a default case that should never have been reached"&lt;&lt;enmd;
+                       return kStFatal;
+                     }
                     }
                 </CODE_SNIPPET>
                 <p>
