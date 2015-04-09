@@ -10,7 +10,7 @@
         Anselm Vossen <br/>
     </address>
     
-    <address><p><em>Draft Version 1.0, February 23, 2015</em></p></address>
+    <address><p><em>Draft Version 2.0, April 9, 2015</em></p></address>
    
     <CATEGORY title="Introduction">
         <p>
@@ -922,7 +922,7 @@
                             <td> This form will include in the <code>CPPPATH</code> every sub-directories
                                 found one level below.
                                 Only <code>macros/</code>, <code>examples/</code>, and <code>doc/</code>
-                                are excluded withing
+                                are excluded within
                                 this form noted in (a) [<a href="#footnote_a">see above</a>]. For the
                                 Pool directory, the extraneous rule
                                 mentioned here is additive to the one of Pool directories.</td>
@@ -1747,9 +1747,9 @@
           </SUMMARY>
           <BODY>
             <p>
-            A commented code is a rudiment from the times when there were no sophisticated revision control systems which we have now. 
-            The developer would sometime stash a feature for later consideration right there in the code but often would forget about it. 
-            The other developers do not care about such unfinished or under-implemented feature which just draws their attention from the real code. 
+            A commented code is a rudiment from the times when there were no sophisticated revision control systems available.
+            The developer would sometime stash a feature for later consideration right there in the code -- but often would forget about it.
+            The other developers do not care about such unfinished or under-implemented features, which just draws their attention from the real code.
             Proper utilization of revision control systems allow us to save and test new features on branches without polluting the main trunk with commented code.
             This rule also extends to the notorious use of <a href="#Preprocessor_Directives">preprocessor directives</a> to comment out code.
           </p>

@@ -9,7 +9,7 @@
         Anselm Vossen <br/>
     </address>
     
-    <address><p><em>Draft Version 4.0, March 14, 2015</em></p></address>
+    <address><p><em>Draft Version 5.0, April 9, 2015</em></p></address>
     
     <CATEGORY title="Introduction">
     <p>
@@ -1659,7 +1659,7 @@
                 <p>
                 The only exceptions are data member in “persistent” classes in STAR that are under schema evolution.
                 Here ROOT types need to be used to define the data members.
-                The only persistent classes are those in StEvent and StMicroDst. Any other class (e.g. makers, analysis code)
+                The only persistent classes are those in StEvent and StMuDst. Any other class (e.g. makers, analysis code)
                 should not use ROOT types.
                 </p>
               </SUBSECTION>
@@ -2958,20 +2958,23 @@ void foo(Base* b1)
 
         <STYLEPOINT title="assert">
           <SUMMARY>
-            Use of <code>assert</code> for aborting the program execution if some test condition is true is strongly discoureged in STAR code.
+            Use of the <code>assert()</code> macro for aborting the program execution if a test condition is met is strongly discouraged in STAR code.
           </SUMMARY>
           <BODY>
                <DEFINITION>
-                 <a href="http://en.cppreference.com/w/cpp/error/assert"><code>assert</code></a> checks if its argument compares equal to zero. It calls <code>std::abort</code> 
-                 if it does, and prints out standard diganostic information on the standard error output. 
+                 <a href="http://en.cppreference.com/w/cpp/error/assert"><code>assert</code></a> checks if its argument compares equal to zero.
+                 If so, it calls <code>std::abort</code> and prints out standard diagnostic information on the standard error output.
                </DEFINITION>
-               <p>
-                Generally speaking, it is BAD to just abort the program and should be avoided. Better to message an error and propagate up a <code>kStFatal</code> error flag.
-                Unless your Maker is a fundamental and base maker (DAQ detecting a corruption, DB finding an unlikely condition which should really never happen, IO maker not able to stream, ...)
-                the use of <code>assert</code> is prohibited as a single detector sub-system error shall never lead to an entire
-                chain abort. The use of clear messages with level <code>FATAL</code> is emphasized.
+               <DECISION>
+                   <p>
+                  In STAR software, plainly aborting a program should be avoided.
+                  Given the size and complexity of our software, it is mandatory to signal an error and propagate the <code>kStFatal</code> error flag.
+                  Unless your Maker is a fundamental and/or base maker (DAQ detecting a corruption, DB finding an unlikely condition which should really never happen, IO maker not able to stream, ...),
+                  the use of <code>assert()</code> is prohibited as a single detector sub-system error shall never lead to an entire
+                  chain abort. The use of clear messages with level <code>FATAL</code> is emphasized.
                </p>
-          </BODY>
+               </DECISION>
+         </BODY>
         </STYLEPOINT>
         
         <STYLEPOINT title="Loops and Switch Statements">
