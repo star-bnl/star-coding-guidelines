@@ -13,7 +13,7 @@
     
     <CATEGORY title="Introduction">
     <p>
-        This document is a draft of new C++ coding guidelines compiled for the STAR
+        This is a document of the C++ coding guidelines compiled for the STAR
         collaboration by the above mentioned authors. This effort was initiated by the STAR
         computing coordinator Jerome Lauret on October 31, 2014. The charge can be
         viewed <a href="charge.txt">here</a>. The committee produced two documents, one for the
