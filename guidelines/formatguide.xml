@@ -1186,9 +1186,9 @@
                 <BAD_CODE_SNIPPET>
                     // Bad - indented directives
                     if (lopsidedScore) {
-                    #if DISASTER_PENDING  // The "#if" should be at beginning of line
+                        #if DISASTER_PENDING  // The "#if" should be at beginning of line
                         dropEverything();
-                    #endif                // Do not indent "#endif"
+                        #endif                // Do not indent "#endif"
                         goBackToNormal();
                     }
                 </BAD_CODE_SNIPPET>
